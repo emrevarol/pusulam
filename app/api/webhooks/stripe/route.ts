@@ -21,6 +21,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
+  // 1. Checkout completed — deliver credits
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     const userId = session.metadata?.userId;
@@ -42,6 +43,69 @@ export async function POST(request: Request) {
           data: { credits: { increment: credits } },
         }),
       ]);
+    }
+  }
+
+  // 2. Checkout expired — mark purchase as failed
+  if (event.type === "checkout.session.expired") {
+    const session = event.data.object;
+    const purchaseId = session.metadata?.purchaseId;
+
+    if (purchaseId) {
+      await prisma.creditPurchase.update({
+        where: { id: purchaseId },
+        data: { status: "EXPIRED" },
+      });
+    }
+  }
+
+  // 3. Refund — revoke credits
+  if (event.type === "charge.refunded") {
+    const charge = event.data.object;
+    const paymentIntentId = charge.payment_intent as string;
+
+    if (paymentIntentId) {
+      const purchase = await prisma.creditPurchase.findFirst({
+        where: { stripePaymentId: paymentIntentId, status: "COMPLETED" },
+      });
+
+      if (purchase) {
+        await prisma.$transaction([
+          prisma.creditPurchase.update({
+            where: { id: purchase.id },
+            data: { status: "REFUNDED" },
+          }),
+          prisma.user.update({
+            where: { id: purchase.userId },
+            data: { credits: { decrement: purchase.amount } },
+          }),
+        ]);
+      }
+    }
+  }
+
+  // 4. Dispute/chargeback — revoke credits
+  if (event.type === "charge.dispute.created") {
+    const dispute = event.data.object;
+    const paymentIntentId = dispute.payment_intent as string;
+
+    if (paymentIntentId) {
+      const purchase = await prisma.creditPurchase.findFirst({
+        where: { stripePaymentId: paymentIntentId, status: "COMPLETED" },
+      });
+
+      if (purchase) {
+        await prisma.$transaction([
+          prisma.creditPurchase.update({
+            where: { id: purchase.id },
+            data: { status: "DISPUTED" },
+          }),
+          prisma.user.update({
+            where: { id: purchase.userId },
+            data: { credits: { decrement: purchase.amount } },
+          }),
+        ]);
+      }
     }
   }
 
