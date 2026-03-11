@@ -44,7 +44,7 @@ export default function AssistantPage() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage, history: messages }),
+        body: JSON.stringify({ message: userMessage, history: messages, locale }),
       });
 
       const data = await res.json();
