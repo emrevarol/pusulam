@@ -1,0 +1,164 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  username     String   @unique
+  displayName  String
+  passwordHash String
+  avatar       String?
+  bio          String?
+  balance      Float    @default(1000) // Kurus - sanal para
+  reputation   Float    @default(0)    // Kalibrasyon skoru
+  streak       Int      @default(0)    // Gunluk tahmin serisi
+  lastActiveAt DateTime @default(now())
+  role         String   @default("USER") // USER, PRO, ADMIN
+  createdAt    DateTime @default(now())
+
+  markets      Market[]
+  trades       Trade[]
+  positions    Position[]
+  comments     Comment[]
+  commentVotes CommentVote[]
+  badges       UserBadge[]
+  predictions  Prediction[]
+
+  @@index([reputation])
+  @@index([balance])
+}
+
+model Market {
+  id              String    @id @default(cuid())
+  title           String
+  description     String
+  category        String
+  slug            String    @unique
+  status          String    @default("OPEN") // OPEN, CLOSED, RESOLVED
+  resolutionDate  DateTime
+  resolvedAt      DateTime?
+  resolvedOutcome String?   // YES, NO
+  yesPool         Float     @default(100)
+  noPool          Float     @default(100)
+  volume          Float     @default(0)
+  traderCount     Int       @default(0)
+  featured        Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  trades      Trade[]
+  positions   Position[]
+  comments    Comment[]
+  predictions Prediction[]
+
+  @@index([status, category])
+  @@index([status, volume])
+  @@index([slug])
+}
+
+model Trade {
+  id        String   @id @default(cuid())
+  direction String   // BUY, SELL
+  side      String   // YES, NO
+  shares    Float
+  price     Float
+  cost      Float
+  createdAt DateTime @default(now())
+
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
+  marketId String
+  market   Market @relation(fields: [marketId], references: [id])
+
+  @@index([userId])
+  @@index([marketId])
+  @@index([createdAt])
+}
+
+model Position {
+  id       String @id @default(cuid())
+  side     String // YES, NO
+  shares   Float  @default(0)
+  avgPrice Float  @default(0)
+
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
+  marketId String
+  market   Market @relation(fields: [marketId], references: [id])
+
+  @@unique([userId, marketId, side])
+}
+
+model Prediction {
+  id          String   @id @default(cuid())
+  probability Float    // 0.0 - 1.0 kullanicinin tahmini
+  reasoning   String?  // Neden boyle dusunuyorsun?
+  score       Float?   // Brier/log skoru (cozuldukten sonra)
+  createdAt   DateTime @default(now())
+
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
+  marketId String
+  market   Market @relation(fields: [marketId], references: [id])
+
+  @@unique([userId, marketId])
+  @@index([score])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
+  marketId String
+  market   Market @relation(fields: [marketId], references: [id])
+  votes    CommentVote[]
+
+  @@index([marketId])
+}
+
+model CommentVote {
+  id    String @id @default(cuid())
+  value Int    // +1 or -1
+
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  commentId String
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])
+}
+
+model Badge {
+  id          String @id @default(cuid())
+  name        String @unique
+  description String
+  icon        String
+  tier        String // BRONZE, SILVER, GOLD, PLATINUM
+  requirement String // JSON: kosul aciklamasi
+
+  users UserBadge[]
+}
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  earnedAt DateTime @default(now())
+
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+  badgeId String
+  badge   Badge  @relation(fields: [badgeId], references: [id])
+
+  @@unique([userId, badgeId])
+}
