@@ -15,6 +15,8 @@ async function getMarkets(category?: string) {
 
   return markets.map((m) => ({
     ...m,
+    titleTranslations: m.titleTranslations as Record<string, string> | null,
+    descriptionTranslations: m.descriptionTranslations as Record<string, string> | null,
     resolutionDate: m.resolutionDate.toISOString(),
     resolvedAt: m.resolvedAt?.toISOString() ?? null,
     createdAt: m.createdAt.toISOString(),

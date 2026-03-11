@@ -8,7 +8,7 @@ import { TradePanel } from "@/components/trade-panel";
 import { CommentSection } from "@/components/comment-section";
 import { Countdown } from "@/components/countdown";
 import { ShareButtons } from "@/components/share-buttons";
-import { CATEGORIES } from "@/lib/helpers";
+import { CATEGORIES, getLocalizedField } from "@/lib/helpers";
 
 async function getMarket(slug: string) {
   const market = await prisma.market.findUnique({
@@ -60,9 +60,11 @@ export default async function MarketDetailPage({
                 {cat.emoji} {cat.label}
               </span>
             )}
-            <h1 className="mb-3 text-2xl font-bold">{market.title}</h1>
+            <h1 className="mb-3 text-2xl font-bold">
+              {getLocalizedField(market.title, market.titleTranslations as Record<string, string> | null, locale)}
+            </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              {market.description}
+              {getLocalizedField(market.description, market.descriptionTranslations as Record<string, string> | null, locale)}
             </p>
           </div>
 

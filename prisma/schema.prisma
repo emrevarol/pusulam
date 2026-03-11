@@ -38,6 +38,8 @@ model Market {
   id              String    @id @default(cuid())
   title           String
   description     String
+  titleTranslations       Json?  // { en: "...", es: "...", fr: "...", ... }
+  descriptionTranslations Json?  // { en: "...", es: "...", fr: "...", ... }
   category        String
   slug            String    @unique
   status          String    @default("OPEN") // OPEN, CLOSED, RESOLVED

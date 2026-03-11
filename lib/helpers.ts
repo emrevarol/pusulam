@@ -39,6 +39,17 @@ export function timeAgo(date: Date | string): string {
   return formatDate(date);
 }
 
+// Get localized market title/description
+// Falls back to Turkish (default) if translation not available
+export function getLocalizedField(
+  field: string,
+  translations: Record<string, string> | null | undefined,
+  locale: string
+): string {
+  if (locale === "tr" || !translations) return field;
+  return translations[locale] || translations["en"] || field;
+}
+
 export const CATEGORIES: Record<string, { label: string; color: string; emoji: string }> = {
   EKONOMI: { label: "Ekonomi", color: "emerald", emoji: "📊" },
   SIYASET: { label: "Siyaset", color: "blue", emoji: "🏛️" },

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import { CATEGORIES } from "@/lib/helpers";
+import { CATEGORIES, getLocalizedField } from "@/lib/helpers";
 import { Countdown } from "./countdown";
 
 interface MarketCardProps {
@@ -18,6 +18,7 @@ interface MarketCardProps {
     volume: number;
     resolutionDate: string;
     traderCount?: number;
+    titleTranslations?: Record<string, string> | null;
   };
 }
 
@@ -55,7 +56,7 @@ export function MarketCard({ market }: MarketCardProps) {
       </div>
 
       <h3 className="mb-4 text-sm font-semibold leading-snug text-gray-900 group-hover:text-teal-600 dark:text-gray-100 dark:group-hover:text-teal-400">
-        {market.title}
+        {getLocalizedField(market.title, market.titleTranslations, locale)}
       </h3>
 
       <div className="mb-3">
