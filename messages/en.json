@@ -16,7 +16,8 @@
     "confirm": "Confirm",
     "back": "Back",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "askAi": "Ask AI"
   },
   "home": {
     "hero": "Predict the future, set your course.",

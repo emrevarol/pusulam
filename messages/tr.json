@@ -16,7 +16,8 @@
     "confirm": "Onayla",
     "back": "Geri",
     "yes": "Evet",
-    "no": "Hayir"
+    "no": "Hayir",
+    "askAi": "AI'a Sor"
   },
   "home": {
     "hero": "Gelecegi tahmin et, yonunu belirle.",

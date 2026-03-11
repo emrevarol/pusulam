@@ -81,7 +81,7 @@ export default function CreateMarketPage() {
                 ? "Orn: 2026 sonunda dolar 40 TL'yi gecer mi?"
                 : "e.g. Will USD/TRY exceed 40 by end of 2026?"
             }
-            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800"
+            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
           />
         </div>
 
@@ -99,7 +99,7 @@ export default function CreateMarketPage() {
                 ? "Piyasanin nasil cozulecegini aciklayin..."
                 : "Explain how this market will be resolved..."
             }
-            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800"
+            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
           />
         </div>
 
@@ -135,7 +135,7 @@ export default function CreateMarketPage() {
             onChange={(e) => updateField("resolutionDate", e.target.value)}
             required
             min={new Date().toISOString().split("T")[0]}
-            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800"
+            className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
           />
         </div>
 

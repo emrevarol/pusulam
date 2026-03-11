@@ -179,7 +179,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
 
         {/* Shares input */}
         <div className="mb-4">
-          <label className="mb-1.5 block text-xs font-medium text-gray-500">
+          <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
             {t("shares")}
             {direction === "SELL" && currentPosition && (
               <span className="ml-1 text-gray-400">
@@ -199,7 +199,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
                 ? currentPosition.shares
                 : undefined
             }
-            className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800"
+            className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
           />
         </div>
 

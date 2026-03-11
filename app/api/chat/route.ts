@@ -12,11 +12,36 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { message, history, locale } = await request.json();
+  const { message, history, locale, conversationId, marketId } =
+    await request.json();
   const isTr = locale !== "en";
 
   if (!message?.trim()) {
     return NextResponse.json({ error: "Empty message" }, { status: 400 });
+  }
+
+  // Resolve or create conversation
+  let conversation;
+  if (conversationId) {
+    conversation = await prisma.conversation.findFirst({
+      where: { id: conversationId, userId: session.user.id },
+      include: { messages: { orderBy: { createdAt: "asc" } } },
+    });
+    if (!conversation) {
+      return NextResponse.json(
+        { error: "Conversation not found" },
+        { status: 404 }
+      );
+    }
+  } else {
+    conversation = await prisma.conversation.create({
+      data: {
+        userId: session.user.id,
+        marketId: marketId || null,
+        title: message.slice(0, 50),
+      },
+      include: { messages: true },
+    });
   }
 
   // Get active markets for context
@@ -25,6 +50,7 @@ export async function POST(request: Request) {
     orderBy: { volume: "desc" },
     take: 20,
     select: {
+      id: true,
       title: true,
       slug: true,
       category: true,
@@ -33,8 +59,21 @@ export async function POST(request: Request) {
       volume: true,
       traderCount: true,
       resolutionDate: true,
+      description: true,
     },
   });
+
+  // If marketId provided, get specific market details for richer context
+  let specificMarketContext = "";
+  const targetMarketId = marketId || conversation.marketId;
+  if (targetMarketId) {
+    const specificMarket = markets.find((m) => m.id === targetMarketId);
+    if (specificMarket) {
+      specificMarketContext = isTr
+        ? `\n\nKULLANICI BU PIYASA HAKKINDA KONUSUYOR:\nBaslik: ${specificMarket.title}\nAciklama: ${specificMarket.description}\nKategori: ${specificMarket.category}\nEvet Olasiligi: %${((specificMarket.noPool / (specificMarket.yesPool + specificMarket.noPool)) * 100).toFixed(0)}\nHacim: ${specificMarket.volume} K\nTahminci: ${specificMarket.traderCount}\nBitis: ${specificMarket.resolutionDate.toISOString().split("T")[0]}`
+        : `\n\nUSER IS DISCUSSING THIS MARKET:\nTitle: ${specificMarket.title}\nDescription: ${specificMarket.description}\nCategory: ${specificMarket.category}\nYes Probability: ${((specificMarket.noPool / (specificMarket.yesPool + specificMarket.noPool)) * 100).toFixed(0)}%\nVolume: ${specificMarket.volume} K\nForecasters: ${specificMarket.traderCount}\nEnds: ${specificMarket.resolutionDate.toISOString().split("T")[0]}`;
+    }
+  }
 
   const marketContext = markets
     .map((m) => {
@@ -58,7 +97,7 @@ ONEMLI KURALLAR:
 - Kaynak goster: TCMB, TUIK, Reuters, Bloomberg, Polymarket gibi
 
 AKTIF PIYASALAR:
-${marketContext}
+${marketContext}${specificMarketContext}
 
 Kullanicinin sorusuna bu piyasalar baglaminda cevap ver. Eger spesifik bir piyasa hakkinda soruyorsa, o piyasanin detaylarini kullan.`
     : `You are the Pusulam AI Assistant. Pusulam is Turkey's collective intelligence platform. Users make predictions on real-world events.
@@ -73,17 +112,26 @@ IMPORTANT RULES:
 - Cite sources: TCMB, TUIK, Reuters, Bloomberg, Polymarket, etc.
 
 ACTIVE MARKETS:
-${marketContext}
+${marketContext}${specificMarketContext}
 
 Answer the user's question in the context of these markets. If they ask about a specific market, use that market's details.`;
 
-  const messages: { role: "user" | "assistant"; content: string }[] = [
-    ...(history || []).map((h: { role: string; content: string }) => ({
-      role: h.role as "user" | "assistant",
-      content: h.content,
-    })),
-    { role: "user", content: message },
-  ];
+  // Build messages from DB history (if conversation has prior messages) or from passed history
+  const dbMessages = conversation.messages.map((m) => ({
+    role: m.role as "user" | "assistant",
+    content: m.content,
+  }));
+
+  const messages: { role: "user" | "assistant"; content: string }[] =
+    dbMessages.length > 0
+      ? [...dbMessages, { role: "user", content: message }]
+      : [
+          ...(history || []).map((h: { role: string; content: string }) => ({
+            role: h.role as "user" | "assistant",
+            content: h.content,
+          })),
+          { role: "user", content: message },
+        ];
 
   const response = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
@@ -95,5 +143,39 @@ Answer the user's question in the context of these markets. If they ask about a 
   const text =
     response.content[0].type === "text" ? response.content[0].text : "";
 
-  return NextResponse.json({ response: text });
+  // Save both messages to conversation
+  await prisma.chatMessage.createMany({
+    data: [
+      {
+        conversationId: conversation.id,
+        role: "user",
+        content: message,
+      },
+      {
+        conversationId: conversation.id,
+        role: "assistant",
+        content: text,
+      },
+    ],
+  });
+
+  // Update conversation timestamp (and title if first message)
+  const updateData: { updatedAt: Date; title?: string; marketId?: string } = {
+    updatedAt: new Date(),
+  };
+  if (!conversation.title && message) {
+    updateData.title = message.slice(0, 50);
+  }
+  if (marketId && !conversation.marketId) {
+    updateData.marketId = marketId;
+  }
+  await prisma.conversation.update({
+    where: { id: conversation.id },
+    data: updateData,
+  });
+
+  return NextResponse.json({
+    response: text,
+    conversationId: conversation.id,
+  });
 }

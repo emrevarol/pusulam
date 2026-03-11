@@ -16,7 +16,8 @@
     "confirm": "Confirmer",
     "back": "Retour",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "askAi": "Demander a l'IA"
   },
   "home": {
     "hero": "Prédisez l'avenir, tracez votre cap.",

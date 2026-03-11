@@ -56,7 +56,7 @@ function HomeContent({
           <div className="flex justify-center gap-4">
             <Link
               href={`/${locale}/piyasalar`}
-              className="rounded-xl bg-white px-6 py-3 text-sm font-semibold text-teal-700 shadow-lg transition hover:bg-teal-50"
+              className="rounded-xl bg-white px-6 py-3 text-sm font-semibold text-teal-700 shadow-lg transition hover:bg-teal-50 dark:bg-gray-800 dark:text-teal-400"
             >
               {t("startTrading")}
             </Link>
@@ -122,7 +122,7 @@ function HomeContent({
                   {item.icon}
                 </div>
                 <h3 className="mb-2 text-sm font-bold">{item.title}</h3>
-                <p className="text-sm text-gray-500">{item.desc}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{item.desc}</p>
               </div>
             ))}
           </div>

@@ -16,7 +16,8 @@
     "confirm": "Confirmar",
     "back": "Volver",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "askAi": "Preguntar a IA"
   },
   "home": {
     "hero": "Predice el futuro, marca tu rumbo.",

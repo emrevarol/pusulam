@@ -8,6 +8,7 @@ import { TradePanel } from "@/components/trade-panel";
 import { CommentSection } from "@/components/comment-section";
 import { Countdown } from "@/components/countdown";
 import { ShareButtons } from "@/components/share-buttons";
+import { AskAiButton } from "@/components/ask-ai-button";
 import { CATEGORIES, getLocalizedField } from "@/lib/helpers";
 
 async function getMarket(slug: string) {
@@ -164,7 +165,7 @@ export default async function MarketDetailPage({
         </div>
 
         {/* Trade sidebar */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-4">
           {isOpen ? (
             <TradePanel
               marketId={market.id}
@@ -180,6 +181,13 @@ export default async function MarketDetailPage({
               </p>
             </div>
           )}
+
+          {/* Ask AI button */}
+          <AskAiButton
+            marketId={market.id}
+            marketTitle={market.title}
+            locale={locale}
+          />
         </div>
       </div>
     </div>
