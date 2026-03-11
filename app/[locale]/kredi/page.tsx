@@ -49,8 +49,11 @@ export default function CreditsPage() {
     }
   }, [status, session, locale, router]);
 
+  const [error, setError] = useState("");
+
   async function buyPackage(packageId: string) {
     setLoading(packageId);
+    setError("");
     try {
       const res = await fetch("/api/credits/checkout", {
         method: "POST",
@@ -58,10 +61,19 @@ export default function CreditsPage() {
         body: JSON.stringify({ packageId }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Checkout failed");
+        setLoading(null);
+        return;
+      }
       if (data.url) {
         window.location.href = data.url;
+      } else {
+        setError(isTr ? "Odeme baglantisi alinamadi." : "Could not get checkout link.");
+        setLoading(null);
       }
     } catch {
+      setError(isTr ? "Baglanti hatasi." : "Connection error.");
       setLoading(null);
     }
   }
@@ -103,6 +115,12 @@ export default function CreditsPage() {
           </div>
         </div>
       </div>
+
+      {error && (
+        <div className="mb-6 rounded-xl border border-rose-200 bg-rose-50 p-4 text-center text-sm text-rose-700 dark:border-rose-800 dark:bg-rose-900/20 dark:text-rose-400">
+          {error}
+        </div>
+      )}
 
       {/* Credit Packages */}
       <h2 className="mb-4 text-lg font-bold">
