@@ -4,7 +4,9 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 import { getYesPrice, getNoPrice, calculateBuyCost, calculateSellReturn } from "@/lib/amm";
+import { VALID_WEIGHTS, DAILY_FREE_PREDICTIONS, getCreditsRequired } from "@/lib/credits";
 
 interface Position {
   id: string;
@@ -25,14 +27,18 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
   const pathname = usePathname();
   const router = useRouter();
   const locale = pathname.split("/")[1] || "tr";
+  const isTr = locale === "tr";
 
   const [direction, setDirection] = useState<"BUY" | "SELL">("BUY");
   const [side, setSide] = useState<"YES" | "NO">("YES");
   const [shares, setShares] = useState("");
+  const [weight, setWeight] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [positions, setPositions] = useState<Position[]>([]);
+  const [credits, setCredits] = useState(0);
+  const [dailyRemaining, setDailyRemaining] = useState(DAILY_FREE_PREDICTIONS);
 
   const sharesNum = parseFloat(shares) || 0;
 
@@ -50,6 +56,12 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
             );
             setPositions(marketPositions);
           }
+        });
+      fetch("/api/user/balance")
+        .then((r) => r.json())
+        .then((d) => {
+          setCredits(d.credits ?? 0);
+          setDailyRemaining(d.dailyPredictionsRemaining ?? DAILY_FREE_PREDICTIONS);
         });
     }
   }, [session, pathname]);
@@ -76,8 +88,10 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
 
   const yesPrice = getYesPrice(yesPool, noPool);
   const noPrice = getNoPrice(yesPool, noPool);
-
   const currentPosition = positions.find((p) => p.side === side);
+
+  const isFree = dailyRemaining > 0 && weight === 1;
+  const creditsNeeded = direction === "BUY" ? getCreditsRequired(weight, isFree) : 0;
 
   async function handleTrade() {
     if (!session) {
@@ -93,21 +107,25 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
       const res = await fetch("/api/trade", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ marketId, side, shares: sharesNum, direction }),
+        body: JSON.stringify({ marketId, side, shares: sharesNum, direction, weight }),
       });
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || t("insufficientBalance"));
+        if (data.error === "Yetersiz kredi") {
+          setError(isTr ? "Yetersiz kredi. Kredi satin alin." : "Insufficient credits. Buy credits.");
+        } else {
+          setError(data.error || t("insufficientBalance"));
+        }
         return;
       }
 
       setShares("");
+      setWeight(1);
       setSuccess(t("tradeSuccess"));
       setTimeout(() => setSuccess(""), 2000);
-      // Notify navbar to refresh balance
       window.dispatchEvent(new Event("trade-complete"));
-      // Refresh positions
+      // Refresh positions + credits
       fetch("/api/user/positions")
         .then((r) => r.json())
         .then((data) => {
@@ -116,9 +134,15 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
             setPositions(data.filter((p: { market: { slug: string } }) => p.market.slug === slug));
           }
         });
+      fetch("/api/user/balance")
+        .then((r) => r.json())
+        .then((d) => {
+          setCredits(d.credits ?? 0);
+          setDailyRemaining(d.dailyPredictionsRemaining ?? DAILY_FREE_PREDICTIONS);
+        });
       router.refresh();
     } catch {
-      setError(locale === "tr" ? "Bir hata olustu." : "An error occurred.");
+      setError(isTr ? "Bir hata olustu." : "An error occurred.");
     } finally {
       setLoading(false);
     }
@@ -132,7 +156,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
         {/* Buy/Sell toggle */}
         <div className="mb-4 flex gap-2">
           <button
-            onClick={() => setDirection("BUY")}
+            onClick={() => { setDirection("BUY"); setWeight(1); }}
             className={`flex-1 rounded-lg py-2 text-sm font-semibold transition ${
               direction === "BUY"
                 ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900"
@@ -142,7 +166,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
             {t("buy")}
           </button>
           <button
-            onClick={() => setDirection("SELL")}
+            onClick={() => { setDirection("SELL"); setWeight(1); }}
             className={`flex-1 rounded-lg py-2 text-sm font-semibold transition ${
               direction === "SELL"
                 ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900"
@@ -203,6 +227,52 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
           />
         </div>
 
+        {/* Weight selector (only for BUY) */}
+        {direction === "BUY" && (
+          <div className="mb-4">
+            <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
+              {isTr ? "Agirlik" : "Weight"}
+            </label>
+            <div className="flex gap-1.5">
+              {VALID_WEIGHTS.map((w) => {
+                const wIsFree = dailyRemaining > 0 && w === 1;
+                const wCredits = getCreditsRequired(w, wIsFree);
+                const canAfford = wCredits === 0 || credits >= wCredits;
+                return (
+                  <button
+                    key={w}
+                    onClick={() => setWeight(w)}
+                    disabled={!canAfford}
+                    className={`flex-1 rounded-lg py-2 text-xs font-semibold transition ${
+                      weight === w
+                        ? "bg-teal-600 text-white"
+                        : canAfford
+                          ? "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
+                          : "bg-gray-50 text-gray-300 dark:bg-gray-800/50 dark:text-gray-600"
+                    }`}
+                  >
+                    <span className="block">{w}x</span>
+                    <span className="block text-[10px] font-normal opacity-75">
+                      {wCredits === 0
+                        ? isTr ? "Ucretsiz" : "Free"
+                        : `${wCredits} Kr`}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {/* Daily free remaining */}
+            {session && (
+              <p className="mt-1.5 text-[10px] text-gray-400 dark:text-gray-500">
+                {isTr
+                  ? `Gunluk ucretsiz: ${dailyRemaining}/${DAILY_FREE_PREDICTIONS}`
+                  : `Daily free: ${dailyRemaining}/${DAILY_FREE_PREDICTIONS}`}
+                {credits > 0 && ` · ${credits} ${isTr ? "kredi" : "credits"}`}
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Cost/Return breakdown */}
         {sharesNum > 0 && (
           <div className="mb-4 space-y-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
@@ -218,11 +288,29 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
                     %{(avgPrice * 100).toFixed(1)}
                   </span>
                 </div>
+                {creditsNeeded > 0 && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-500">
+                      {isTr ? "Kredi" : "Credits"}
+                    </span>
+                    <span className="font-semibold text-teal-600">
+                      -{creditsNeeded} Kr
+                    </span>
+                  </div>
+                )}
+                {weight > 1 && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-500">
+                      {isTr ? "Kazanc carpani" : "Reward multiplier"}
+                    </span>
+                    <span className="font-semibold text-emerald-600">{weight}x</span>
+                  </div>
+                )}
               </>
             ) : (
               <div className="flex justify-between text-xs">
                 <span className="text-gray-500">
-                  {locale === "tr" ? "Kazanc" : "Return"}
+                  {isTr ? "Kazanc" : "Return"}
                 </span>
                 <span className="font-semibold text-emerald-600">
                   +{returnAmount.toFixed(2)} K
@@ -232,7 +320,19 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
           </div>
         )}
 
-        {error && <p className="mb-3 text-xs text-rose-500">{error}</p>}
+        {error && (
+          <div className="mb-3">
+            <p className="text-xs text-rose-500">{error}</p>
+            {error.includes("kredi") && (
+              <Link
+                href={`/${locale}/kredi`}
+                className="mt-1 inline-block text-xs font-medium text-teal-600 hover:text-teal-700"
+              >
+                {isTr ? "Kredi Satin Al →" : "Buy Credits →"}
+              </Link>
+            )}
+          </div>
+        )}
         {success && (
           <p className="mb-3 text-xs text-emerald-500">{success}</p>
         )}
@@ -252,9 +352,9 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
             ? "..."
             : session
               ? direction === "BUY"
-                ? `${t("buy")} ${sharesNum || 0} ${side === "YES" ? t("yesShares") : t("noShares")}`
+                ? `${t("buy")} ${sharesNum || 0} ${side === "YES" ? t("yesShares") : t("noShares")}${weight > 1 ? ` (${weight}x)` : ""}`
                 : `${t("sell")} ${sharesNum || 0} ${side === "YES" ? t("yesShares") : t("noShares")}`
-              : locale === "tr"
+              : isTr
                 ? "Giris yap"
                 : "Log in"}
         </button>

@@ -16,6 +16,7 @@ model User {
   avatar       String?
   bio          String?
   balance      Float    @default(1000) // Kurus - sanal para
+  credits      Int      @default(0)    // Satin alinan kredi
   reputation   Float    @default(0)    // Kalibrasyon skoru
   streak       Int      @default(0)    // Gunluk tahmin serisi
   lastActiveAt DateTime @default(now())
@@ -27,9 +28,11 @@ model User {
   positions    Position[]
   comments     Comment[]
   commentVotes CommentVote[]
-  badges       UserBadge[]
-  predictions  Prediction[]
-  conversations Conversation[]
+  badges           UserBadge[]
+  predictions      Prediction[]
+  conversations    Conversation[]
+  dailyPredictions DailyPrediction[]
+  creditPurchases  CreditPurchase[]
 
   @@index([reputation])
   @@index([balance])
@@ -76,6 +79,7 @@ model Trade {
   shares    Float
   price     Float
   cost      Float
+  weight    Int      @default(1) // 1, 2, 5, 10
   createdAt DateTime @default(now())
 
   userId   String
@@ -192,4 +196,30 @@ model ChatMessage {
   createdAt      DateTime @default(now())
 
   @@index([conversationId])
+}
+
+model DailyPrediction {
+  id     String   @id @default(cuid())
+  date   DateTime @db.Date
+  count  Int      @default(0)
+  userId String
+  user   User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+}
+
+model CreditPurchase {
+  id              String    @id @default(cuid())
+  amount          Int       // credits purchased
+  priceUsd        Float     // amount paid in USD
+  stripeSessionId String    @unique
+  stripePaymentId String?
+  status          String    @default("PENDING") // PENDING, COMPLETED, FAILED
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  createdAt       DateTime  @default(now())
+  completedAt     DateTime?
+
+  @@index([userId])
+  @@index([stripeSessionId])
 }

@@ -3,6 +3,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { calculateBuyCost, calculateSellReturn } from "@/lib/amm";
+import {
+  VALID_WEIGHTS,
+  DAILY_FREE_PREDICTIONS,
+  getCreditsRequired,
+  getTodayIstanbul,
+} from "@/lib/credits";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -10,24 +16,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
   }
 
-  const { marketId, side, shares, direction } = await request.json();
+  const { marketId, side, shares, direction, weight = 1 } = await request.json();
 
   if (!marketId || !side || !shares || !direction) {
     return NextResponse.json({ error: "Eksik alan" }, { status: 400 });
   }
 
   if (shares <= 0) {
-    return NextResponse.json({ error: "Geçersiz miktar" }, { status: 400 });
+    return NextResponse.json({ error: "Gecersiz miktar" }, { status: 400 });
+  }
+
+  if (!VALID_WEIGHTS.includes(weight)) {
+    return NextResponse.json({ error: "Gecersiz agirlik" }, { status: 400 });
   }
 
   const market = await prisma.market.findUnique({ where: { id: marketId } });
   if (!market || market.status !== "OPEN") {
-    return NextResponse.json({ error: "Piyasa bulunamadı veya kapalı" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Piyasa bulunamadi veya kapali" },
+      { status: 404 }
+    );
   }
 
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
   if (!user) {
-    return NextResponse.json({ error: "Kullanıcı bulunamadı" }, { status: 404 });
+    return NextResponse.json({ error: "Kullanici bulunamadi" }, { status: 404 });
   }
 
   if (direction === "BUY") {
@@ -42,10 +55,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Yetersiz bakiye" }, { status: 400 });
     }
 
-    await prisma.$transaction([
+    // Check daily prediction limit and credits
+    const today = getTodayIstanbul();
+    const daily = await prisma.dailyPrediction.findUnique({
+      where: { userId_date: { userId: user.id, date: today } },
+    });
+    const usedToday = daily?.count ?? 0;
+    const isFree = usedToday < DAILY_FREE_PREDICTIONS && weight === 1;
+    const creditsNeeded = getCreditsRequired(weight, isFree);
+
+    if (creditsNeeded > 0 && user.credits < creditsNeeded) {
+      return NextResponse.json(
+        { error: "Yetersiz kredi", creditsNeeded },
+        { status: 400 }
+      );
+    }
+
+    const operations = [
       prisma.user.update({
         where: { id: user.id },
-        data: { balance: user.balance - cost },
+        data: {
+          balance: user.balance - cost,
+          ...(creditsNeeded > 0 ? { credits: { decrement: creditsNeeded } } : {}),
+        },
       }),
       prisma.market.update({
         where: { id: market.id },
@@ -63,6 +95,7 @@ export async function POST(request: Request) {
           shares,
           price: avgPrice,
           cost,
+          weight,
           userId: user.id,
           marketId: market.id,
         },
@@ -86,9 +119,16 @@ export async function POST(request: Request) {
           shares: { increment: shares },
         },
       }),
-    ]);
+      prisma.dailyPrediction.upsert({
+        where: { userId_date: { userId: user.id, date: today } },
+        create: { userId: user.id, date: today, count: 1 },
+        update: { count: { increment: 1 } },
+      }),
+    ];
 
-    return NextResponse.json({ success: true, cost, avgPrice });
+    await prisma.$transaction(operations);
+
+    return NextResponse.json({ success: true, cost, avgPrice, creditsUsed: creditsNeeded });
   }
 
   if (direction === "SELL") {
@@ -133,6 +173,7 @@ export async function POST(request: Request) {
           shares,
           price: returnAmount / shares,
           cost: returnAmount,
+          weight: 1,
           userId: user.id,
           marketId: market.id,
         },
@@ -152,5 +193,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, returnAmount });
   }
 
-  return NextResponse.json({ error: "Geçersiz işlem yönü" }, { status: 400 });
+  return NextResponse.json({ error: "Gecersiz islem yonu" }, { status: 400 });
 }

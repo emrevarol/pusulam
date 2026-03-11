@@ -21,7 +21,8 @@
     "prisma": "^7.4.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "recharts": "^3.7.0"
+    "recharts": "^3.7.0",
+    "stripe": "^20.4.1"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"

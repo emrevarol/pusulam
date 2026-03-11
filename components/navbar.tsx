@@ -13,6 +13,7 @@ export function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const [balance, setBalance] = useState<number | null>(null);
+  const [credits, setCredits] = useState<number | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const locale = pathname.split("/")[1] || "tr";
@@ -22,7 +23,7 @@ export function Navbar() {
     if (session?.user) {
       fetch("/api/user/balance")
         .then((r) => r.json())
-        .then((d) => setBalance(d.balance));
+        .then((d) => { setBalance(d.balance); setCredits(d.credits ?? 0); });
     }
   }, [session, pathname]);
 
@@ -32,7 +33,7 @@ export function Navbar() {
       if (session?.user) {
         fetch("/api/user/balance")
           .then((r) => r.json())
-          .then((d) => setBalance(d.balance));
+          .then((d) => { setBalance(d.balance); setCredits(d.credits ?? 0); });
       }
     }
     window.addEventListener("trade-complete", onTradeComplete);
@@ -88,6 +89,13 @@ export function Navbar() {
                   ? `${balance.toLocaleString("tr-TR", { maximumFractionDigits: 0 })} K`
                   : "..."}
               </span>
+              <Link
+                href={`/${locale}/kredi`}
+                className="flex items-center gap-1 rounded-lg bg-teal-50 px-2 py-1 text-xs font-medium text-teal-600 hover:bg-teal-100 dark:bg-teal-900/20 dark:text-teal-400 dark:hover:bg-teal-900/40"
+              >
+                {credits !== null ? credits : "0"} Kr
+                <span className="text-teal-400">+</span>
+              </Link>
 
               {/* Profile dropdown */}
               <div className="relative">
@@ -118,6 +126,13 @@ export function Navbar() {
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
                       >
                         {t("profile")}
+                      </Link>
+                      <Link
+                        href={`/${locale}/kredi`}
+                        onClick={() => setMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+                      >
+                        {isTr ? "Kredi Satin Al" : "Buy Credits"}
                       </Link>
                       <button
                         onClick={() => {
