@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { getTranslations } from "next-intl/server";
 import { MarketCard } from "@/components/market-card";
 import { CategoryFilter } from "@/components/category-filter";
 
@@ -22,12 +23,16 @@ async function getMarkets(category?: string) {
 }
 
 export default async function MarketsPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ kategori?: string }>;
 }) {
+  const { locale } = await params;
   const { kategori } = await searchParams;
   const markets = await getMarkets(kategori);
+  const t = await getTranslations({ locale, namespace: "market" });
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -41,7 +46,7 @@ export default async function MarketsPage({
         </div>
       ) : (
         <div className="rounded-xl border-2 border-dashed border-gray-200 p-16 text-center dark:border-gray-800">
-          <p className="text-gray-400">Henüz bu kategoride piyasa yok.</p>
+          <p className="text-gray-400">{t("noMarkets")}</p>
         </div>
       )}
     </div>

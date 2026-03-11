@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getYesPrice, getNoPrice } from "@/lib/amm";
+import { getTranslations } from "next-intl/server";
 import { TradePanel } from "@/components/trade-panel";
 import { CommentSection } from "@/components/comment-section";
 import { Countdown } from "@/components/countdown";
@@ -35,6 +36,7 @@ export default async function MarketDetailPage({
   const { locale, slug } = await params;
   const market = await getMarket(slug);
   const session = await getServerSession(authOptions);
+  const t = await getTranslations({ locale, namespace: "market" });
 
   if (!market) notFound();
 
@@ -69,13 +71,13 @@ export default async function MarketDetailPage({
             <div className="mb-4 flex items-end justify-between">
               <div>
                 <p className="text-sm text-gray-500">
-                  {locale === "tr" ? "Evet Olasiligi" : "Yes Probability"}
+                  {t("yesProbability")}
                 </p>
                 <p className="text-4xl font-bold text-emerald-600">%{yesPct}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm text-gray-500">
-                  {locale === "tr" ? "Hayir Olasiligi" : "No Probability"}
+                  {t("noProbability")}
                 </p>
                 <p className="text-4xl font-bold text-rose-500">%{noPct}</p>
               </div>
@@ -92,7 +94,7 @@ export default async function MarketDetailPage({
           <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div className="rounded-lg border border-gray-200 bg-white p-4 text-center dark:border-gray-800 dark:bg-gray-900">
               <p className="text-xs text-gray-500">
-                {locale === "tr" ? "Hacim" : "Volume"}
+                {t("volume")}
               </p>
               <p className="text-lg font-bold">
                 {market.volume.toLocaleString("tr-TR")} K
@@ -100,19 +102,19 @@ export default async function MarketDetailPage({
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-4 text-center dark:border-gray-800 dark:bg-gray-900">
               <p className="text-xs text-gray-500">
-                {locale === "tr" ? "Islem" : "Trades"}
+                {t("trades")}
               </p>
               <p className="text-lg font-bold">{market._count.trades}</p>
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-4 text-center dark:border-gray-800 dark:bg-gray-900">
               <p className="text-xs text-gray-500">
-                {locale === "tr" ? "Tahminci" : "Forecasters"}
+                {t("forecasters")}
               </p>
               <p className="text-lg font-bold">{market.traderCount}</p>
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-4 text-center dark:border-gray-800 dark:bg-gray-900">
               <p className="mb-1 text-xs text-gray-500">
-                {locale === "tr" ? "Bitis" : "Ends"}
+                {t("ends")}
               </p>
               <Countdown
                 targetDate={market.resolutionDate.toISOString()}
@@ -126,7 +128,7 @@ export default async function MarketDetailPage({
           {isOpen && (
             <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
               <p className="mb-3 text-center text-xs font-medium uppercase tracking-wider text-gray-400">
-                {locale === "tr" ? "Cozulmeye Kalan Sure" : "Time Until Resolution"}
+                {t("timeUntilResolution")}
               </p>
               <Countdown
                 targetDate={market.resolutionDate.toISOString()}
@@ -171,10 +173,8 @@ export default async function MarketDetailPage({
             <div className="rounded-xl border border-gray-200 bg-white p-6 text-center dark:border-gray-800 dark:bg-gray-900">
               <p className="font-medium text-gray-500">
                 {market.status === "RESOLVED"
-                  ? `${locale === "tr" ? "Sonuc" : "Result"}: ${market.resolvedOutcome}`
-                  : locale === "tr"
-                    ? "Bu piyasa kapandi."
-                    : "This market is closed."}
+                  ? `${t("result")}: ${market.resolvedOutcome}`
+                  : t("marketClosed")}
               </p>
             </div>
           )}

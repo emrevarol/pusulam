@@ -61,7 +61,7 @@ export function MarketCard({ market }: MarketCardProps) {
       <div className="mb-3">
         <div className="flex justify-between text-xs text-gray-500 mb-1">
           <span>{t("probability")}</span>
-          <span className="font-semibold text-emerald-600">%{yesPct} Evet</span>
+          <span className="font-semibold text-emerald-600">%{yesPct} {t("yesShort")}</span>
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
           <div

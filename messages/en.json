@@ -64,7 +64,18 @@
     "traders": "Forecasters",
     "prediction": "Prediction",
     "reasoning": "Reasoning",
-    "yourPrediction": "Your Prediction"
+    "yourPrediction": "Your Prediction",
+    "yesShort": "Yes",
+    "noShort": "No",
+    "yesProbability": "Yes Probability",
+    "noProbability": "No Probability",
+    "trades": "Trades",
+    "forecasters": "Forecasters",
+    "ends": "Ends",
+    "timeUntilResolution": "Time Until Resolution",
+    "result": "Result",
+    "marketClosed": "This market is closed.",
+    "noMarkets": "No markets in this category yet."
   },
   "auth": {
     "loginTitle": "Log In",

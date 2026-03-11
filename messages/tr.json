@@ -64,7 +64,18 @@
     "traders": "Tahminci",
     "prediction": "Tahmin",
     "reasoning": "Gerekce",
-    "yourPrediction": "Senin Tahminin"
+    "yourPrediction": "Senin Tahminin",
+    "yesShort": "Evet",
+    "noShort": "Hayir",
+    "yesProbability": "Evet Olasiligi",
+    "noProbability": "Hayir Olasiligi",
+    "trades": "Islem",
+    "forecasters": "Tahminci",
+    "ends": "Bitis",
+    "timeUntilResolution": "Cozulmeye Kalan Sure",
+    "result": "Sonuc",
+    "marketClosed": "Bu piyasa kapandi.",
+    "noMarkets": "Henuz bu kategoride piyasa yok."
   },
   "auth": {
     "loginTitle": "Giris Yap",
