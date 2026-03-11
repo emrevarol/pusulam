@@ -13,11 +13,15 @@ export default function CreateMarketPage() {
   const router = useRouter();
   const locale = pathname.split("/")[1] || "tr";
 
+  // Default: tomorrow at current time
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const defaultDate = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}T${String(tomorrow.getHours()).padStart(2, "0")}:${String(tomorrow.getMinutes()).padStart(2, "0")}:${String(tomorrow.getSeconds()).padStart(2, "0")}`;
+
   const [form, setForm] = useState({
     title: "",
     description: "",
     category: "GUNDEM",
-    resolutionDate: "",
+    resolutionDate: defaultDate,
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -130,11 +134,12 @@ export default function CreateMarketPage() {
             {isTr ? "Bitis Tarihi" : "Resolution Date"}
           </label>
           <input
-            type="date"
+            type="datetime-local"
+            step="1"
             value={form.resolutionDate}
             onChange={(e) => updateField("resolutionDate", e.target.value)}
             required
-            min={new Date().toISOString().split("T")[0]}
+            min={new Date().toISOString().slice(0, 19)}
             className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
           />
         </div>
