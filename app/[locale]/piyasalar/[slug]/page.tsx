@@ -14,7 +14,7 @@ import { CATEGORIES, getLocalizedField } from "@/lib/helpers";
 
 async function getMarket(slug: string) {
   // Auto-close this market if expired
-  await prisma.market.updateMany({
+  const closed = await prisma.market.updateMany({
     where: {
       slug,
       status: "OPEN",
@@ -22,6 +22,14 @@ async function getMarket(slug: string) {
     },
     data: { status: "CLOSED" },
   });
+
+  // Trigger AI resolution in the background if just closed
+  if (closed.count > 0) {
+    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    fetch(`${baseUrl}/api/cron/resolve-markets`, {
+      headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
+    }).catch(() => {});
+  }
 
   const market = await prisma.market.findUnique({
     where: { slug },

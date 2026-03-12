@@ -14,13 +14,21 @@ const ORDER_BY: Record<SortOption, Record<string, string>> = {
 };
 
 async function closeExpiredMarkets() {
-  await prisma.market.updateMany({
+  const result = await prisma.market.updateMany({
     where: {
       status: "OPEN",
       resolutionDate: { lte: new Date() },
     },
     data: { status: "CLOSED" },
   });
+
+  // If any markets were just closed, trigger AI resolution in the background
+  if (result.count > 0) {
+    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    fetch(`${baseUrl}/api/cron/resolve-markets`, {
+      headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
+    }).catch(() => {}); // fire-and-forget
+  }
 }
 
 async function getMarkets(category?: string, sort?: string) {
