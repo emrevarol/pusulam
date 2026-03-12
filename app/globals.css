@@ -3,20 +3,10 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --color-background: #fafafa;
-  --color-foreground: #171717;
+  --color-background: #f9fafb;
+  --color-foreground: #111827;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-.dark {
-  --color-background: #030712;
-  --color-foreground: #f3f4f6;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
 }
 
 /* Smooth scrolling */
