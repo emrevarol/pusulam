@@ -13,7 +13,20 @@ const ORDER_BY: Record<SortOption, Record<string, string>> = {
   forecasters: { traderCount: "desc" },
 };
 
+async function closeExpiredMarkets() {
+  await prisma.market.updateMany({
+    where: {
+      status: "OPEN",
+      resolutionDate: { lte: new Date() },
+    },
+    data: { status: "CLOSED" },
+  });
+}
+
 async function getMarkets(category?: string, sort?: string) {
+  // Auto-close expired markets on every page load
+  await closeExpiredMarkets();
+
   const where = category && category !== "all"
     ? { category, status: "OPEN" }
     : { status: "OPEN" };

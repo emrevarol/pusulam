@@ -13,6 +13,16 @@ import { ResolveMarketButton } from "@/components/resolve-market-button";
 import { CATEGORIES, getLocalizedField } from "@/lib/helpers";
 
 async function getMarket(slug: string) {
+  // Auto-close this market if expired
+  await prisma.market.updateMany({
+    where: {
+      slug,
+      status: "OPEN",
+      resolutionDate: { lte: new Date() },
+    },
+    data: { status: "CLOSED" },
+  });
+
   const market = await prisma.market.findUnique({
     where: { slug },
     include: {
