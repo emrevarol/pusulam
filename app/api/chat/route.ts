@@ -136,15 +136,15 @@ Answer the user's question in the context of these markets. If they ask about a 
         ];
 
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 2048,
+    model: "claude-haiku-4-5-20251001",
+    max_tokens: 1024,
     system: systemPrompt,
     messages,
     tools: [
       {
         type: "web_search_20250305",
         name: "web_search",
-        max_uses: 3,
+        max_uses: 2,
       },
     ],
   });
