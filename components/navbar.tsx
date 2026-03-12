@@ -17,7 +17,6 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const locale = pathname.split("/")[1] || "tr";
-  const isTr = locale === "tr";
 
   useEffect(() => {
     if (session?.user) {
@@ -61,13 +60,13 @@ export function Navbar() {
               href={`/${locale}/skor`}
               className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
             >
-              {isTr ? "Skor" : "Leaderboard"}
+              {t("leaderboard")}
             </Link>
             <Link
               href={`/${locale}/asistan`}
               className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
             >
-              {isTr ? "AI Asistan" : "AI Assistant"}
+              {t("aiAssistant")}
             </Link>
           </div>
         </div>
@@ -82,7 +81,7 @@ export function Navbar() {
                 href={`/${locale}/piyasa-olustur`}
                 className="hidden rounded-lg border border-teal-200 px-3 py-1.5 text-xs font-semibold text-teal-600 hover:bg-teal-50 dark:border-teal-800 dark:hover:bg-teal-900/20 sm:block"
               >
-                + {isTr ? "Piyasa" : "Market"}
+                {t("createMarket")}
               </Link>
               <span className="text-sm font-medium text-emerald-600">
                 {balance !== null
@@ -132,7 +131,7 @@ export function Navbar() {
                         onClick={() => setMenuOpen(false)}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
                       >
-                        {isTr ? "Kredi Satin Al" : "Buy Credits"}
+                        {t("buyCredits")}
                       </Link>
                       <button
                         onClick={() => {

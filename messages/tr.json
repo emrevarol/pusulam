@@ -17,7 +17,18 @@
     "back": "Geri",
     "yes": "Evet",
     "no": "Hayir",
-    "askAi": "AI'a Sor"
+    "askAi": "AI'a Sor",
+    "leaderboard": "Skor Tablosu",
+    "aiAssistant": "AI Asistan",
+    "createMarket": "+ Piyasa",
+    "buyCredits": "Kredi Satin Al",
+    "loginRequired": "Giris Yap",
+    "lightMode": "Acik Mod",
+    "darkMode": "Koyu Mod",
+    "share": "Paylas:",
+    "copyLink": "Linki Kopyala",
+    "connectionError": "Baglanti hatasi.",
+    "genericError": "Bir hata olustu."
   },
   "home": {
     "hero": "Gelecegi tahmin et, yonunu belirle.",
@@ -35,7 +46,8 @@
     "step3Title": "Tahmin Yap",
     "step3Desc": "Evet veya Hayir oyu ver, oranlar topluluk oylamalarina gore degisir.",
     "step4Title": "Itibar Kazan",
-    "step4Desc": "Dogru tahminlerle Pul kazan, kalibrasyon skorunu yukselt, rozet topla."
+    "step4Desc": "Dogru tahminlerle Pul kazan, kalibrasyon skorunu yukselt, rozet topla.",
+    "noMarketsYet": "Henuz piyasa olusturulmadi. Ilk piyasayi sen olustur!"
   },
   "market": {
     "buy": "Oy Ver",
@@ -51,7 +63,7 @@
     "shares": "Oy",
     "cost": "Maliyet",
     "avgPrice": "Ort. Oran",
-    "yourPosition": "Oyun",
+    "yourPosition": "Oylarim",
     "noPosition": "Bu konuda henuz oy vermedin.",
     "comments": "Yorumlar",
     "noComments": "Henuz yorum yok.",
@@ -76,7 +88,17 @@
     "timeUntilResolution": "Cozulmeye Kalan Sure",
     "result": "Sonuc",
     "marketClosed": "Bu piyasa kapandi.",
-    "noMarkets": "Henuz bu kategoride piyasa yok."
+    "noMarkets": "Henuz bu kategoride piyasa yok.",
+    "weight": "Agirlik",
+    "free": "Ucretsiz",
+    "dailyFree": "Gunluk ucretsiz: {remaining}/{total}",
+    "creditsLabel": "kredi",
+    "creditsShort": "Kredi",
+    "rewardMultiplier": "Kazanc carpani",
+    "returnLabel": "Kazanc",
+    "buyCreditsLink": "Kredi Satin Al →",
+    "insufficientCredits": "Yetersiz kredi. Kredi satin alin.",
+    "people": "kisi"
   },
   "auth": {
     "loginTitle": "Giris Yap",
@@ -115,5 +137,72 @@
     "privacy": "Gizlilik",
     "contact": "Iletisim",
     "disclaimer": "Pusulam bir kolektif zeka platformudur. Gercek para kullanilmaz."
+  },
+  "countdown": {
+    "expired": "Sure doldu",
+    "days": "Gun",
+    "daysShort": "g",
+    "hours": "Saat",
+    "hoursShort": "s",
+    "minutes": "Dk",
+    "seconds": "Sn"
+  },
+  "profile": {
+    "portfolioValue": "Portfoy Degeri",
+    "pnl": "Kar/Zarar",
+    "voteHistory": "Oy Gecmisi",
+    "exploreMarkets": "Piyasalari Kesfet",
+    "noVotes": "Henuz oy vermediniz."
+  },
+  "createMarket": {
+    "title": "Yeni Piyasa Olustur",
+    "fieldTitle": "Baslik",
+    "fieldDescription": "Aciklama",
+    "fieldCategory": "Kategori",
+    "fieldEndDate": "Bitis Tarihi",
+    "titlePlaceholder": "Orn: 2026 sonunda dolar 40 TL'yi gecer mi?",
+    "descriptionPlaceholder": "Piyasanin nasil cozulecegini aciklayin...",
+    "submitButton": "Piyasa Olustur"
+  },
+  "credits": {
+    "creditBalance": "Kredi Bakiyen",
+    "dailyFree": "Gunluk Ucretsiz Tahmin",
+    "buyCredits": "Kredi Satin Al",
+    "popular": "Populer",
+    "credits": "Kredi",
+    "perCredit": "kredi",
+    "buyNow": "Satin Al",
+    "howCreditsWork": "Kredi Nasil Calisir?",
+    "rule1": "Her gun {count} ucretsiz tahmin hakkin var (1x agirlik).",
+    "rule2": "Ucretsiz hakkin bitince, her ek tahmin 1 Kredi.",
+    "rule3": "Agirlik artir: 2x = 2 Kredi, 5x = 5 Kredi, 10x = 10 Kredi.",
+    "rule4": "Yuksek agirlik = dogru tahminlerde daha fazla Pul ve itibar kazanci.",
+    "purchaseHistory": "Satin Alma Gecmisi",
+    "statusCompleted": "Tamamlandi",
+    "statusPending": "Bekliyor",
+    "statusFailed": "Basarisiz",
+    "paymentSuccess": "Odeme basarili! Krediler hesabina eklendi.",
+    "paymentCanceled": "Odeme iptal edildi.",
+    "checkoutError": "Odeme baglantisi alinamadi."
+  },
+  "assistant": {
+    "conversations": "Konusmalar",
+    "new": "Yeni",
+    "noConversations": "Henuz konusma yok",
+    "newConversation": "Yeni konusma",
+    "title": "Pusulam AI Asistan",
+    "shortTitle": "AI Asistan",
+    "askAboutMarket": "\"{market}\" hakkinda soru sor.",
+    "defaultDescription": "Piyasalar hakkinda sorular sor, analiz iste, farkli bakis acilarini ogren.",
+    "placeholder": "Piyasalar hakkinda bir soru sor...",
+    "disclaimer": "AI asistan tahmin danismanligi yapmaz. Sadece bilgi ve analiz sunar.",
+    "suggestion1": "Dolar Haziran'da 46'yi gecer mi?",
+    "suggestion2": "TCMB faiz indirimine ara verir mi?",
+    "suggestion3": "Iran savasi piyasalari nasil etkiler?",
+    "suggestion4": "Hangi piyasalarda firsat var?",
+    "drawerSuggestion1": "Bu piyasayi analiz et",
+    "drawerSuggestion2": "Olasiligin artma ihtimali nedir?",
+    "drawerSuggestion3": "Farkli bakis acilari neler?",
+    "drawerPlaceholder": "Soru sor..."
   }
 }

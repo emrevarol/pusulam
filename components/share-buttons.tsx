@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface ShareButtonsProps {
   title: string;
@@ -10,13 +10,12 @@ interface ShareButtonsProps {
 }
 
 export function ShareButtons({ title, yesPct, slug, locale }: ShareButtonsProps) {
-  const pathname = usePathname();
-  const isTr = locale === "tr";
+  const t = useTranslations("common");
 
   // Build share URL — in production this would be the real domain
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://pusulam.ai";
   const shareUrl = `${baseUrl}/${locale}/piyasalar/${slug}`;
-  const shareText = `${title} — %${yesPct} Evet | Pusulam`;
+  const shareText = `${title} — %${yesPct} ${t("yes")} | Pusulam`;
 
   const encoded = {
     url: encodeURIComponent(shareUrl),
@@ -74,7 +73,7 @@ export function ShareButtons({ title, yesPct, slug, locale }: ShareButtonsProps)
   return (
     <div className="flex items-center gap-2">
       <span className="text-xs font-medium text-gray-400 mr-1">
-        {isTr ? "Paylas:" : "Share:"}
+        {t("share")}
       </span>
       {links.map((link) => (
         <a
@@ -91,7 +90,7 @@ export function ShareButtons({ title, yesPct, slug, locale }: ShareButtonsProps)
       <button
         onClick={copyLink}
         className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-200 text-gray-600 transition hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300"
-        title={isTr ? "Linki kopyala" : "Copy link"}
+        title={t("copyLink")}
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
           <path d="M12.232 4.232a2.5 2.5 0 013.536 3.536l-1.225 1.224a.75.75 0 001.061 1.06l1.224-1.224a4 4 0 00-5.656-5.656l-3 3a4 4 0 00.225 5.865.75.75 0 00.977-1.138 2.5 2.5 0 01-.142-3.667l3-3z" />

@@ -75,7 +75,7 @@ export function MarketCard({ market }: MarketCardProps) {
       <div className="flex items-center justify-between text-xs text-gray-400">
         <span>
           {t("volume")}: {market.volume.toLocaleString("tr-TR")} P
-          {market.traderCount ? ` · ${market.traderCount} ${locale === "tr" ? "kisi" : "traders"}` : ""}
+          {market.traderCount ? ` · ${market.traderCount} ${t("people")}` : ""}
         </span>
         <Countdown targetDate={market.resolutionDate} locale={locale} compact />
       </div>

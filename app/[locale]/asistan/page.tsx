@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface Message {
   role: "user" | "assistant";
@@ -24,7 +25,9 @@ export default function AssistantPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const locale = pathname.split("/")[1] || "tr";
-  const isTr = locale === "tr";
+
+  const tc = useTranslations("common");
+  const ta = useTranslations("assistant");
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -111,32 +114,25 @@ export default function AssistantPage() {
       }
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: data.response || (isTr ? "Bir hata olustu." : "An error occurred.") },
+        { role: "assistant", content: data.response || tc("genericError") },
       ]);
       loadConversations();
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: isTr ? "Baglanti hatasi." : "Connection error." },
+        { role: "assistant", content: tc("connectionError") },
       ]);
     } finally {
       setLoading(false);
     }
   }
 
-  const suggestions = isTr
-    ? [
-        "Dolar Haziran'da 46'yi gecer mi?",
-        "TCMB faiz indirimine ara verir mi?",
-        "Iran savasi piyasalari nasil etkiler?",
-        "Hangi piyasalarda firsat var?",
-      ]
-    : [
-        "Will USD/TRY exceed 46 by June?",
-        "Will TCMB pause rate cuts?",
-        "How does the Iran war affect markets?",
-        "Which markets have opportunities?",
-      ];
+  const suggestions = [
+    ta("suggestion1"),
+    ta("suggestion2"),
+    ta("suggestion3"),
+    ta("suggestion4"),
+  ];
 
   if (status === "loading") return null;
 
@@ -150,18 +146,18 @@ export default function AssistantPage() {
       >
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-between border-b border-gray-200 p-3 dark:border-gray-800">
-            <h2 className="text-sm font-semibold">{isTr ? "Konusmalar" : "Conversations"}</h2>
+            <h2 className="text-sm font-semibold">{ta("conversations")}</h2>
             <button
               onClick={startNewConversation}
               className="rounded-lg bg-teal-600 px-3 py-1 text-xs font-medium text-white hover:bg-teal-700"
             >
-              + {isTr ? "Yeni" : "New"}
+              + {ta("new")}
             </button>
           </div>
           <div className="flex-1 overflow-y-auto">
             {conversations.length === 0 ? (
               <p className="p-4 text-center text-xs text-gray-400 dark:text-gray-500">
-                {isTr ? "Henuz konusma yok" : "No conversations yet"}
+                {ta("noConversations")}
               </p>
             ) : (
               conversations.map((conv) => (
@@ -173,7 +169,7 @@ export default function AssistantPage() {
                   }`}
                 >
                   <p className="truncate text-sm font-medium text-gray-800 dark:text-gray-200">
-                    {conv.title || (isTr ? "Yeni konusma" : "New conversation")}
+                    {conv.title || ta("newConversation")}
                   </p>
                   {conv.market && (
                     <p className="mt-0.5 truncate text-xs text-teal-600 dark:text-teal-400">
@@ -181,7 +177,7 @@ export default function AssistantPage() {
                     </p>
                   )}
                   <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
-                    {new Date(conv.createdAt).toLocaleDateString(locale === "tr" ? "tr-TR" : "en-US")}
+                    {new Date(conv.createdAt).toLocaleDateString(locale === "tr" ? "tr-TR" : locale)}
                   </p>
                 </button>
               ))
@@ -223,12 +219,12 @@ export default function AssistantPage() {
                 🧭
               </div>
               <h1 className="mb-2 text-xl font-bold">
-                {isTr ? "Pusulam AI Asistan" : "Pusulam AI Assistant"}
+                {ta("title")}
               </h1>
               <p className="mb-8 max-w-md text-center text-sm text-gray-500 dark:text-gray-400">
                 {marketTitle
-                  ? (isTr ? `"${decodeURIComponent(marketTitle)}" hakkinda soru sor.` : `Ask about "${decodeURIComponent(marketTitle)}".`)
-                  : (isTr ? "Piyasalar hakkinda sorular sor, analiz iste, farkli bakis acilarini ogren." : "Ask about markets, request analysis, learn different perspectives.")}
+                  ? ta("askAboutMarket", { market: decodeURIComponent(marketTitle) })
+                  : ta("defaultDescription")}
               </p>
               <div className="flex flex-wrap justify-center gap-2">
                 {suggestions.map((s) => (
@@ -283,7 +279,7 @@ export default function AssistantPage() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={isTr ? "Piyasalar hakkinda bir soru sor..." : "Ask about markets..."}
+              placeholder={ta("placeholder")}
               className="flex-1 rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500"
               disabled={loading}
             />
@@ -296,9 +292,7 @@ export default function AssistantPage() {
             </button>
           </form>
           <p className="mt-2 text-center text-[10px] text-gray-400 dark:text-gray-500">
-            {isTr
-              ? "AI asistan tahmin danismanligi yapmaz. Sadece bilgi ve analiz sunar."
-              : "AI assistant does not provide prediction advice. It only offers information and analysis."}
+            {ta("disclaimer")}
           </p>
         </div>
       </div>

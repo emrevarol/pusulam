@@ -38,6 +38,7 @@ interface Trade {
 export default function ProfilePage() {
   const t = useTranslations("common");
   const tm = useTranslations("market");
+  const tp = useTranslations("profile");
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const router = useRouter();
@@ -105,7 +106,7 @@ export default function ProfilePage() {
           </div>
           <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
             <p className="text-xs text-gray-500">
-              {locale === "tr" ? "Portfoy Degeri" : "Portfolio Value"}
+              {tp("portfolioValue")}
             </p>
             <p className="text-xl font-bold">
               {totalValue.toLocaleString("tr-TR", { maximumFractionDigits: 0 })} P
@@ -113,7 +114,7 @@ export default function ProfilePage() {
           </div>
           <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
             <p className="text-xs text-gray-500">
-              {locale === "tr" ? "Kar/Zarar" : "P&L"}
+              {tp("pnl")}
             </p>
             <p
               className={`text-xl font-bold ${
@@ -147,7 +148,7 @@ export default function ProfilePage() {
               : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
           }`}
         >
-          {locale === "tr" ? "Oy Gecmisi" : "Vote History"} ({trades.length})
+          {tp("voteHistory")} ({trades.length})
         </button>
       </div>
 
@@ -161,7 +162,7 @@ export default function ProfilePage() {
                 href={`/${locale}/piyasalar`}
                 className="mt-3 inline-block text-sm font-medium text-teal-600 hover:text-teal-700"
               >
-                {locale === "tr" ? "Piyasalari Kesfet" : "Explore Markets"} →
+                {tp("exploreMarkets")} →
               </Link>
             </div>
           ) : (
@@ -203,7 +204,7 @@ export default function ProfilePage() {
                         }`}
                       >
                         {pos.pnl >= 0 ? "+" : ""}
-                        {pos.pnl.toFixed(1)} K
+                        {pos.pnl.toFixed(1)} P
                       </p>
                     </div>
                   </div>
@@ -220,7 +221,7 @@ export default function ProfilePage() {
           {trades.length === 0 ? (
             <div className="rounded-xl border-2 border-dashed border-gray-200 p-12 text-center dark:border-gray-800">
               <p className="text-gray-400">
-                {locale === "tr" ? "Henuz oy vermediniz." : "No votes yet."}
+                {tp("noVotes")}
               </p>
             </div>
           ) : (
@@ -247,14 +248,14 @@ export default function ProfilePage() {
                     {trade.shares.toFixed(0)} {trade.side === "YES" ? tm("yesShares") : tm("noShares")}
                     {" · "}
                     {new Date(trade.createdAt).toLocaleDateString(
-                      locale === "tr" ? "tr-TR" : "en-US",
+                      locale === "tr" ? "tr-TR" : locale,
                       { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }
                     )}
                   </p>
                 </div>
                 <span className="text-sm font-semibold">
                   {trade.direction === "BUY" ? "-" : "+"}
-                  {trade.cost.toFixed(1)} K
+                  {trade.cost.toFixed(1)} P
                 </span>
               </Link>
             ))

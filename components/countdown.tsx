@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 interface CountdownProps {
   targetDate: string;
@@ -10,6 +11,7 @@ interface CountdownProps {
 
 export function Countdown({ targetDate, locale = "tr", compact = false }: CountdownProps) {
   const [timeLeft, setTimeLeft] = useState(getTimeLeft(targetDate));
+  const t = useTranslations("countdown");
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -18,12 +20,10 @@ export function Countdown({ targetDate, locale = "tr", compact = false }: Countd
     return () => clearInterval(timer);
   }, [targetDate]);
 
-  const isTr = locale === "tr";
-
   if (timeLeft.expired) {
     return (
       <span className="text-rose-500 font-medium text-xs">
-        {isTr ? "Sure doldu" : "Expired"}
+        {t("expired")}
       </span>
     );
   }
@@ -32,14 +32,14 @@ export function Countdown({ targetDate, locale = "tr", compact = false }: Countd
     if (timeLeft.days > 30) {
       return (
         <span className="text-xs text-gray-500">
-          {timeLeft.days} {isTr ? "gun" : "d"}
+          {timeLeft.days} {t("daysShort")}
         </span>
       );
     }
     if (timeLeft.days > 0) {
       return (
         <span className="text-xs font-medium text-amber-600">
-          {timeLeft.days}{isTr ? "g" : "d"} {timeLeft.hours}{isTr ? "s" : "h"}
+          {timeLeft.days}{t("daysShort")} {timeLeft.hours}{t("hoursShort")}
         </span>
       );
     }
@@ -54,16 +54,16 @@ export function Countdown({ targetDate, locale = "tr", compact = false }: Countd
   return (
     <div className="flex flex-col items-center">
       <div className="flex gap-1.5">
-        <TimeBlock value={timeLeft.days} label={isTr ? "Gun" : "Days"} />
+        <TimeBlock value={timeLeft.days} label={t("days")} />
         <span className="text-lg font-bold text-gray-400 self-start mt-1">:</span>
-        <TimeBlock value={timeLeft.hours} label={isTr ? "Saat" : "Hours"} />
+        <TimeBlock value={timeLeft.hours} label={t("hours")} />
         <span className="text-lg font-bold text-gray-400 self-start mt-1">:</span>
-        <TimeBlock value={timeLeft.minutes} label={isTr ? "Dk" : "Min"} />
+        <TimeBlock value={timeLeft.minutes} label={t("minutes")} />
         <span className="text-lg font-bold text-gray-400 self-start mt-1">:</span>
-        <TimeBlock value={timeLeft.seconds} label={isTr ? "Sn" : "Sec"} />
+        <TimeBlock value={timeLeft.seconds} label={t("seconds")} />
       </div>
       <p className="mt-1.5 text-[10px] text-gray-400">
-        {new Date(targetDate).toLocaleString(isTr ? "tr-TR" : "en-US", {
+        {new Date(targetDate).toLocaleString(locale === "tr" ? "tr-TR" : locale, {
           day: "numeric",
           month: "long",
           year: "numeric",
@@ -77,7 +77,7 @@ export function Countdown({ targetDate, locale = "tr", compact = false }: Countd
 }
 
 function TimeBlock({ value, label }: { value: number; label: string }) {
-  const isUrgent = label.includes("Gun") || label.includes("Day") ? value < 3 : false;
+  const isUrgent = value < 3 && (label.length > 2); // days-like labels are longer
   return (
     <div className="flex flex-col items-center">
       <div className={`rounded-lg px-2 py-1 text-center min-w-[36px] ${

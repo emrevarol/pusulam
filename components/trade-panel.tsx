@@ -23,11 +23,11 @@ interface TradePanelProps {
 
 export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
   const t = useTranslations("market");
+  const tc = useTranslations("common");
   const { data: session } = useSession();
   const pathname = usePathname();
   const router = useRouter();
   const locale = pathname.split("/")[1] || "tr";
-  const isTr = locale === "tr";
 
   const [direction, setDirection] = useState<"BUY" | "SELL">("BUY");
   const [side, setSide] = useState<"YES" | "NO">("YES");
@@ -113,7 +113,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
       if (!res.ok) {
         const data = await res.json();
         if (data.error === "Yetersiz kredi") {
-          setError(isTr ? "Yetersiz kredi. Kredi satin alin." : "Insufficient credits. Buy credits.");
+          setError(t("insufficientCredits"));
         } else {
           setError(data.error || t("insufficientBalance"));
         }
@@ -142,7 +142,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
         });
       router.refresh();
     } catch {
-      setError(isTr ? "Bir hata olustu." : "An error occurred.");
+      setError(tc("genericError"));
     } finally {
       setLoading(false);
     }
@@ -231,7 +231,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
         {direction === "BUY" && (
           <div className="mb-4">
             <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
-              {isTr ? "Agirlik" : "Weight"}
+              {t("weight")}
             </label>
             <div className="flex gap-1.5">
               {VALID_WEIGHTS.map((w) => {
@@ -254,7 +254,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
                     <span className="block">{w}x</span>
                     <span className="block text-[10px] font-normal opacity-75">
                       {wCredits === 0
-                        ? isTr ? "Ucretsiz" : "Free"
+                        ? t("free")
                         : `${wCredits} Kr`}
                     </span>
                   </button>
@@ -264,10 +264,8 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
             {/* Daily free remaining */}
             {session && (
               <p className="mt-1.5 text-[10px] text-gray-400 dark:text-gray-500">
-                {isTr
-                  ? `Gunluk ucretsiz: ${dailyRemaining}/${DAILY_FREE_PREDICTIONS}`
-                  : `Daily free: ${dailyRemaining}/${DAILY_FREE_PREDICTIONS}`}
-                {credits > 0 && ` · ${credits} ${isTr ? "kredi" : "credits"}`}
+                {t("dailyFree", { remaining: dailyRemaining, total: DAILY_FREE_PREDICTIONS })}
+                {credits > 0 && ` · ${credits} ${t("creditsLabel")}`}
               </p>
             )}
           </div>
@@ -291,7 +289,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
                 {creditsNeeded > 0 && (
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-500">
-                      {isTr ? "Kredi" : "Credits"}
+                      {t("creditsShort")}
                     </span>
                     <span className="font-semibold text-teal-600">
                       -{creditsNeeded} Kr
@@ -301,7 +299,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
                 {weight > 1 && (
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-500">
-                      {isTr ? "Kazanc carpani" : "Reward multiplier"}
+                      {t("rewardMultiplier")}
                     </span>
                     <span className="font-semibold text-emerald-600">{weight}x</span>
                   </div>
@@ -310,7 +308,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
             ) : (
               <div className="flex justify-between text-xs">
                 <span className="text-gray-500">
-                  {isTr ? "Kazanc" : "Return"}
+                  {t("returnLabel")}
                 </span>
                 <span className="font-semibold text-emerald-600">
                   +{returnAmount.toFixed(2)} P
@@ -328,7 +326,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
                 href={`/${locale}/kredi`}
                 className="mt-1 inline-block text-xs font-medium text-teal-600 hover:text-teal-700"
               >
-                {isTr ? "Kredi Satin Al →" : "Buy Credits →"}
+                {t("buyCreditsLink")}
               </Link>
             )}
           </div>
@@ -354,9 +352,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
               ? direction === "BUY"
                 ? `${t("buy")} ${sharesNum || 0} ${side === "YES" ? t("yesShares") : t("noShares")}${weight > 1 ? ` (${weight}x)` : ""}`
                 : `${t("sell")} ${sharesNum || 0} ${side === "YES" ? t("yesShares") : t("noShares")}`
-              : isTr
-                ? "Giris yap"
-                : "Log in"}
+              : tc("loginRequired")}
         </button>
       </div>
 

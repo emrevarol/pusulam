@@ -15,9 +15,9 @@ interface LeaderboardEntry {
 
 export default function LeaderboardPage() {
   const t = useTranslations("common");
+  const tl = useTranslations("leaderboard");
   const pathname = usePathname();
   const locale = pathname.split("/")[1] || "tr";
-  const isTr = locale === "tr";
 
   const [users, setUsers] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +44,7 @@ export default function LeaderboardPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <h1 className="mb-8 text-2xl font-bold">
-        {isTr ? "Liderlik Tablosu" : "Leaderboard"}
+        {tl("title")}
       </h1>
 
       <div className="space-y-2">
@@ -67,7 +67,7 @@ export default function LeaderboardPage() {
               <p className="text-sm font-semibold">{user.displayName}</p>
               <p className="text-xs text-gray-500">
                 @{user.username} · {user._count.trades}{" "}
-                {isTr ? "islem" : "trades"}
+                {tl("trades")}
               </p>
             </div>
             <div className="text-right">
@@ -75,7 +75,7 @@ export default function LeaderboardPage() {
                 {user.balance.toLocaleString("tr-TR", {
                   maximumFractionDigits: 0,
                 })}{" "}
-                K
+                P
               </p>
             </div>
           </div>
@@ -84,7 +84,7 @@ export default function LeaderboardPage() {
         {users.length === 0 && (
           <div className="rounded-xl border-2 border-dashed border-gray-200 p-12 text-center dark:border-gray-800">
             <p className="text-gray-400">
-              {isTr ? "Henuz kullanici yok." : "No users yet."}
+              {tl("noUsers")}
             </p>
           </div>
         )}

@@ -12,7 +12,8 @@ export function AskAiButton({
   marketTitle: string;
   locale: string;
 }) {
-  const t = useTranslations("common");
+  const tc = useTranslations("common");
+  const ta = useTranslations("assistant");
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [input, setInput] = useState("");
@@ -20,7 +21,6 @@ export function AskAiButton({
   const [conversationId, setConversationId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const isTr = locale === "tr";
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -69,29 +69,23 @@ export function AskAiButton({
       }
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: data.response || (isTr ? "Bir hata olustu." : "An error occurred.") },
+        { role: "assistant", content: data.response || tc("genericError") },
       ]);
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: isTr ? "Baglanti hatasi." : "Connection error." },
+        { role: "assistant", content: tc("connectionError") },
       ]);
     } finally {
       setLoading(false);
     }
   }
 
-  const suggestions = isTr
-    ? [
-        "Bu piyasayi analiz et",
-        "Olasiligin artma ihtimali nedir?",
-        "Farkli bakis acilari neler?",
-      ]
-    : [
-        "Analyze this market",
-        "What could increase the probability?",
-        "What are different perspectives?",
-      ];
+  const suggestions = [
+    ta("drawerSuggestion1"),
+    ta("drawerSuggestion2"),
+    ta("drawerSuggestion3"),
+  ];
 
   return (
     <>
@@ -101,7 +95,7 @@ export function AskAiButton({
         className="flex w-full items-center justify-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm font-medium text-teal-700 transition hover:bg-teal-100 dark:border-teal-800 dark:bg-teal-900/20 dark:text-teal-400 dark:hover:bg-teal-900/40"
       >
         <span className="text-lg">🧭</span>
-        {t("askAi")}
+        {tc("askAi")}
       </button>
 
       {/* Backdrop + Drawer */}
@@ -120,7 +114,7 @@ export function AskAiButton({
               <div className="flex items-center gap-2">
                 <span className="text-lg">🧭</span>
                 <h2 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
-                  {isTr ? "AI Asistan" : "AI Assistant"}
+                  {ta("shortTitle")}
                 </h2>
               </div>
               <button
@@ -146,9 +140,7 @@ export function AskAiButton({
               {messages.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center">
                   <p className="mb-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                    {isTr
-                      ? `"${marketTitle}" hakkinda soru sor.`
-                      : `Ask about "${marketTitle}".`}
+                    {ta("askAboutMarket", { market: marketTitle })}
                   </p>
                   <div className="flex flex-wrap justify-center gap-2">
                     {suggestions.map((s) => (
@@ -204,7 +196,7 @@ export function AskAiButton({
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={isTr ? "Soru sor..." : "Ask a question..."}
+                  placeholder={ta("drawerPlaceholder")}
                   className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500"
                   disabled={loading}
                 />

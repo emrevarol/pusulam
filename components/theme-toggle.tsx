@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 export function ThemeToggle() {
   const [dark, setDark] = useState(false);
+  const t = useTranslations("common");
 
   useEffect(() => {
     const stored = localStorage.getItem("pusulam-theme");
@@ -24,7 +26,7 @@ export function ThemeToggle() {
     <button
       onClick={toggle}
       className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-      title={dark ? "Light mode" : "Dark mode"}
+      title={dark ? t("lightMode") : t("darkMode")}
     >
       {dark ? (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">

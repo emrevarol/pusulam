@@ -17,7 +17,18 @@
     "back": "Back",
     "yes": "Yes",
     "no": "No",
-    "askAi": "Ask AI"
+    "askAi": "Ask AI",
+    "leaderboard": "Leaderboard",
+    "aiAssistant": "AI Assistant",
+    "createMarket": "+ Market",
+    "buyCredits": "Buy Credits",
+    "loginRequired": "Log In",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode",
+    "share": "Share:",
+    "copyLink": "Copy Link",
+    "connectionError": "Connection error.",
+    "genericError": "An error occurred."
   },
   "home": {
     "hero": "Predict the future, set your course.",
@@ -35,7 +46,8 @@
     "step3Title": "Make a Prediction",
     "step3Desc": "Cast Yes or No votes — rates change based on community consensus.",
     "step4Title": "Earn Reputation",
-    "step4Desc": "Earn Pul from correct predictions, improve your calibration score, collect badges."
+    "step4Desc": "Earn Pul from correct predictions, improve your calibration score, collect badges.",
+    "noMarketsYet": "No markets yet. Be the first to create one!"
   },
   "market": {
     "buy": "Vote",
@@ -76,7 +88,17 @@
     "timeUntilResolution": "Time Until Resolution",
     "result": "Result",
     "marketClosed": "This market is closed.",
-    "noMarkets": "No markets in this category yet."
+    "noMarkets": "No markets in this category yet.",
+    "weight": "Weight",
+    "free": "Free",
+    "dailyFree": "Daily free: {remaining}/{total}",
+    "creditsLabel": "credits",
+    "creditsShort": "Credits",
+    "rewardMultiplier": "Reward multiplier",
+    "returnLabel": "Return",
+    "buyCreditsLink": "Buy Credits →",
+    "insufficientCredits": "Insufficient credits. Buy credits.",
+    "people": "people"
   },
   "auth": {
     "loginTitle": "Log In",
@@ -115,5 +137,72 @@
     "privacy": "Privacy",
     "contact": "Contact",
     "disclaimer": "Pusulam is a collective intelligence platform. No real money is used."
+  },
+  "countdown": {
+    "expired": "Expired",
+    "days": "Days",
+    "daysShort": "d",
+    "hours": "Hours",
+    "hoursShort": "h",
+    "minutes": "Min",
+    "seconds": "Sec"
+  },
+  "profile": {
+    "portfolioValue": "Portfolio Value",
+    "pnl": "P&L",
+    "voteHistory": "Vote History",
+    "exploreMarkets": "Explore Markets",
+    "noVotes": "No votes yet."
+  },
+  "createMarket": {
+    "title": "Create New Market",
+    "fieldTitle": "Title",
+    "fieldDescription": "Description",
+    "fieldCategory": "Category",
+    "fieldEndDate": "Resolution Date",
+    "titlePlaceholder": "e.g. Will USD/TRY exceed 40 by end of 2026?",
+    "descriptionPlaceholder": "Explain how this market will be resolved...",
+    "submitButton": "Create Market"
+  },
+  "credits": {
+    "creditBalance": "Credit Balance",
+    "dailyFree": "Daily Free Predictions",
+    "buyCredits": "Buy Credits",
+    "popular": "Popular",
+    "credits": "Credits",
+    "perCredit": "credit",
+    "buyNow": "Buy Now",
+    "howCreditsWork": "How Credits Work?",
+    "rule1": "You get {count} free predictions every day (1x weight).",
+    "rule2": "After free predictions, each extra prediction costs 1 Credit.",
+    "rule3": "Increase weight: 2x = 2 Credits, 5x = 5 Credits, 10x = 10 Credits.",
+    "rule4": "Higher weight = more Pul and reputation earned on correct predictions.",
+    "purchaseHistory": "Purchase History",
+    "statusCompleted": "Completed",
+    "statusPending": "Pending",
+    "statusFailed": "Failed",
+    "paymentSuccess": "Payment successful! Credits have been added to your account.",
+    "paymentCanceled": "Payment was canceled.",
+    "checkoutError": "Could not get checkout link."
+  },
+  "assistant": {
+    "conversations": "Conversations",
+    "new": "New",
+    "noConversations": "No conversations yet",
+    "newConversation": "New conversation",
+    "title": "Pusulam AI Assistant",
+    "shortTitle": "AI Assistant",
+    "askAboutMarket": "Ask about \"{market}\".",
+    "defaultDescription": "Ask about markets, request analysis, learn different perspectives.",
+    "placeholder": "Ask about markets...",
+    "disclaimer": "AI assistant does not provide prediction advice. It only offers information and analysis.",
+    "suggestion1": "Will USD/TRY exceed 46 by June?",
+    "suggestion2": "Will TCMB pause rate cuts?",
+    "suggestion3": "How does the Iran war affect markets?",
+    "suggestion4": "Which markets have opportunities?",
+    "drawerSuggestion1": "Analyze this market",
+    "drawerSuggestion2": "What could increase the probability?",
+    "drawerSuggestion3": "What are different perspectives?",
+    "drawerPlaceholder": "Ask a question..."
   }
 }

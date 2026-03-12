@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CREDIT_PACKAGES, DAILY_FREE_PREDICTIONS } from "@/lib/credits";
 
@@ -19,7 +20,9 @@ export default function CreditsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const locale = pathname.split("/")[1] || "tr";
-  const isTr = locale === "tr";
+
+  const tc = useTranslations("common");
+  const t = useTranslations("credits");
 
   const [credits, setCredits] = useState(0);
   const [dailyRemaining, setDailyRemaining] = useState(DAILY_FREE_PREDICTIONS);
@@ -69,11 +72,11 @@ export default function CreditsPage() {
       if (data.url) {
         window.location.href = data.url;
       } else {
-        setError(isTr ? "Odeme baglantisi alinamadi." : "Could not get checkout link.");
+        setError(t("checkoutError"));
         setLoading(null);
       }
     } catch {
-      setError(isTr ? "Baglanti hatasi." : "Connection error.");
+      setError(tc("connectionError"));
       setLoading(null);
     }
   }
@@ -85,14 +88,12 @@ export default function CreditsPage() {
       {/* Success/Cancel banners */}
       {success && (
         <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400">
-          {isTr
-            ? "Odeme basarili! Krediler hesabina eklendi."
-            : "Payment successful! Credits have been added to your account."}
+          {t("paymentSuccess")}
         </div>
       )}
       {canceled && (
         <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center text-sm text-amber-700 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
-          {isTr ? "Odeme iptal edildi." : "Payment was canceled."}
+          {t("paymentCanceled")}
         </div>
       )}
 
@@ -101,13 +102,13 @@ export default function CreditsPage() {
         <div className="grid grid-cols-2 gap-6">
           <div className="text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              {isTr ? "Kredi Bakiyen" : "Credit Balance"}
+              {t("creditBalance")}
             </p>
             <p className="mt-1 text-3xl font-bold text-teal-600">{credits}</p>
           </div>
           <div className="text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              {isTr ? "Gunluk Ucretsiz Tahmin" : "Daily Free Predictions"}
+              {t("dailyFree")}
             </p>
             <p className="mt-1 text-3xl font-bold text-emerald-600">
               {dailyRemaining}/{DAILY_FREE_PREDICTIONS}
@@ -124,7 +125,7 @@ export default function CreditsPage() {
 
       {/* Credit Packages */}
       <h2 className="mb-4 text-lg font-bold">
-        {isTr ? "Kredi Satin Al" : "Buy Credits"}
+        {t("buyCredits")}
       </h2>
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
         {CREDIT_PACKAGES.map((pkg) => (
@@ -134,31 +135,27 @@ export default function CreditsPage() {
           >
             {pkg.id === "credits_150" && (
               <span className="absolute right-2 top-2 rounded-full bg-teal-600 px-2 py-0.5 text-[10px] font-bold text-white">
-                {isTr ? "Populer" : "Popular"}
+                {t("popular")}
               </span>
             )}
             <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
               {pkg.credits}
             </p>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {isTr ? "Kredi" : "Credits"}
+              {t("credits")}
             </p>
             <p className="mt-3 text-2xl font-bold text-teal-600">
               ${pkg.priceUsd}
             </p>
             <p className="text-xs text-gray-400">
-              ${(pkg.priceUsd / pkg.credits).toFixed(2)}/{isTr ? "kredi" : "credit"}
+              ${(pkg.priceUsd / pkg.credits).toFixed(2)}/{t("perCredit")}
             </p>
             <button
               onClick={() => buyPackage(pkg.id)}
               disabled={loading !== null}
               className="mt-4 w-full rounded-lg bg-teal-600 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50"
             >
-              {loading === pkg.id
-                ? "..."
-                : isTr
-                  ? "Satin Al"
-                  : "Buy Now"}
+              {loading === pkg.id ? "..." : t("buyNow")}
             </button>
           </div>
         ))}
@@ -167,29 +164,13 @@ export default function CreditsPage() {
       {/* How It Works */}
       <div className="mb-8 rounded-xl border border-gray-200 bg-gray-50 p-6 dark:border-gray-800 dark:bg-gray-800">
         <h3 className="mb-3 text-sm font-bold">
-          {isTr ? "Kredi Nasil Calisir?" : "How Credits Work?"}
+          {t("howCreditsWork")}
         </h3>
         <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-          <li>
-            {isTr
-              ? `• Her gun ${DAILY_FREE_PREDICTIONS} ucretsiz tahmin hakkin var (1x agirlik).`
-              : `• You get ${DAILY_FREE_PREDICTIONS} free predictions every day (1x weight).`}
-          </li>
-          <li>
-            {isTr
-              ? "• Ucretsiz hakkin bitince, her ek tahmin 1 Kredi."
-              : "• After free predictions, each extra prediction costs 1 Credit."}
-          </li>
-          <li>
-            {isTr
-              ? "• Agirlik artir: 2x = 2 Kredi, 5x = 5 Kredi, 10x = 10 Kredi."
-              : "• Increase weight: 2x = 2 Credits, 5x = 5 Credits, 10x = 10 Credits."}
-          </li>
-          <li>
-            {isTr
-              ? "• Yuksek agirlik = dogru tahminlerde daha fazla Pul ve itibar kazanci."
-              : "• Higher weight = more Pul and reputation earned on correct predictions."}
-          </li>
+          <li>• {t("rule1", { count: DAILY_FREE_PREDICTIONS })}</li>
+          <li>• {t("rule2")}</li>
+          <li>• {t("rule3")}</li>
+          <li>• {t("rule4")}</li>
         </ul>
       </div>
 
@@ -197,7 +178,7 @@ export default function CreditsPage() {
       {purchases.length > 0 && (
         <div>
           <h3 className="mb-3 text-sm font-bold">
-            {isTr ? "Satin Alma Gecmisi" : "Purchase History"}
+            {t("purchaseHistory")}
           </h3>
           <div className="space-y-2">
             {purchases.map((p) => (
@@ -207,11 +188,11 @@ export default function CreditsPage() {
               >
                 <div>
                   <p className="text-sm font-medium dark:text-gray-100">
-                    {p.amount} {isTr ? "Kredi" : "Credits"}
+                    {p.amount} {t("credits")}
                   </p>
                   <p className="text-xs text-gray-500">
                     {new Date(p.createdAt).toLocaleDateString(
-                      isTr ? "tr-TR" : "en-US",
+                      locale === "tr" ? "tr-TR" : locale,
                       { month: "short", day: "numeric", year: "numeric" }
                     )}
                   </p>
@@ -228,10 +209,10 @@ export default function CreditsPage() {
                     }`}
                   >
                     {p.status === "COMPLETED"
-                      ? isTr ? "Tamamlandi" : "Completed"
+                      ? t("statusCompleted")
                       : p.status === "PENDING"
-                        ? isTr ? "Bekliyor" : "Pending"
-                        : isTr ? "Basarisiz" : "Failed"}
+                        ? t("statusPending")
+                        : t("statusFailed")}
                   </span>
                 </div>
               </div>

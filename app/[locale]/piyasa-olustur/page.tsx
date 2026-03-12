@@ -8,6 +8,8 @@ import { CATEGORIES } from "@/lib/helpers";
 
 export default function CreateMarketPage() {
   const t = useTranslations("common");
+  const tcm = useTranslations("createMarket");
+  const tCat = useTranslations("categories");
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const router = useRouter();
@@ -62,54 +64,44 @@ export default function CreateMarketPage() {
     }
   }
 
-  const isTr = locale === "tr";
-
   return (
     <div className="mx-auto max-w-lg px-4 py-8">
       <h1 className="mb-8 text-2xl font-bold">
-        {isTr ? "Yeni Piyasa Olustur" : "Create New Market"}
+        {tcm("title")}
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="mb-1.5 block text-sm font-medium">
-            {isTr ? "Baslik" : "Title"}
+            {tcm("fieldTitle")}
           </label>
           <input
             type="text"
             value={form.title}
             onChange={(e) => updateField("title", e.target.value)}
             required
-            placeholder={
-              isTr
-                ? "Orn: 2026 sonunda dolar 40 TL'yi gecer mi?"
-                : "e.g. Will USD/TRY exceed 40 by end of 2026?"
-            }
+            placeholder={tcm("titlePlaceholder")}
             className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
           />
         </div>
 
         <div>
           <label className="mb-1.5 block text-sm font-medium">
-            {isTr ? "Aciklama" : "Description"}
+            {tcm("fieldDescription")}
           </label>
           <textarea
             value={form.description}
             onChange={(e) => updateField("description", e.target.value)}
             required
             rows={3}
-            placeholder={
-              isTr
-                ? "Piyasanin nasil cozulecegini aciklayin..."
-                : "Explain how this market will be resolved..."
-            }
+            placeholder={tcm("descriptionPlaceholder")}
             className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
           />
         </div>
 
         <div>
           <label className="mb-1.5 block text-sm font-medium">
-            {isTr ? "Kategori" : "Category"}
+            {tcm("fieldCategory")}
           </label>
           <div className="flex flex-wrap gap-2">
             {Object.entries(CATEGORIES).map(([key, cat]) => (
@@ -123,7 +115,7 @@ export default function CreateMarketPage() {
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
                 }`}
               >
-                {cat.emoji} {cat.label}
+                {cat.emoji} {tCat(key)}
               </button>
             ))}
           </div>
@@ -131,7 +123,7 @@ export default function CreateMarketPage() {
 
         <div>
           <label className="mb-1.5 block text-sm font-medium">
-            {isTr ? "Bitis Tarihi" : "Resolution Date"}
+            {tcm("fieldEndDate")}
           </label>
           <input
             type="datetime-local"
@@ -151,7 +143,7 @@ export default function CreateMarketPage() {
           disabled={loading}
           className="w-full rounded-lg bg-teal-600 py-3 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50"
         >
-          {loading ? "..." : isTr ? "Piyasa Olustur" : "Create Market"}
+          {loading ? "..." : tcm("submitButton")}
         </button>
       </form>
     </div>

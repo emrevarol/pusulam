@@ -91,9 +91,7 @@ function HomeContent({
         ) : (
           <div className="rounded-xl border-2 border-dashed border-gray-200 p-16 text-center dark:border-gray-800">
             <p className="text-lg text-gray-400">
-              {locale === "tr"
-                ? "Henüz piyasa oluşturulmadı. İlk piyasayı sen oluştur!"
-                : "No markets yet. Be the first to create one!"}
+              {t("noMarketsYet")}
             </p>
           </div>
         )}
