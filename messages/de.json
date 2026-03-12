@@ -5,7 +5,7 @@
     "login": "Anmelden",
     "register": "Registrieren",
     "logout": "Abmelden",
-    "balance": "Kurus",
+    "balance": "Pul",
     "markets": "Märkte",
     "profile": "Profil",
     "search": "Suchen...",
@@ -29,13 +29,13 @@
     "startTrading": "Jetzt Vorhersagen",
     "howItWorks": "So Funktioniert's",
     "step1Title": "Konto Erstellen",
-    "step1Desc": "Erstelle dein kostenloses Konto und erhalte 1.000 Kurus Startguthaben.",
+    "step1Desc": "Erstelle dein kostenloses Konto und erhalte 1.000 Pul Startguthaben.",
     "step2Title": "Markt Wählen",
     "step2Desc": "Entdecke Vorhersagemärkte zu Wirtschaft, Politik, Technologie und mehr.",
     "step3Title": "Vorhersage Machen",
     "step3Desc": "Kaufe Ja- oder Nein-Anteile — Preise ändern sich basierend auf Wahrscheinlichkeit.",
     "step4Title": "Reputation Verdienen",
-    "step4Desc": "Verdiene Kurus durch korrekte Vorhersagen, verbessere deinen Kalibrierungsscore, sammle Abzeichen."
+    "step4Desc": "Verdiene Pul durch korrekte Vorhersagen, verbessere deinen Kalibrierungsscore, sammle Abzeichen."
   },
   "market": {
     "buy": "Kaufen",
@@ -57,7 +57,7 @@
     "noComments": "Noch keine Kommentare.",
     "addComment": "Kommentar schreiben...",
     "trade": "Handeln",
-    "insufficientBalance": "Nicht genug Kurus",
+    "insufficientBalance": "Nicht genug Pul",
     "tradeSuccess": "Handel erfolgreich!",
     "category": "Kategorie",
     "createdBy": "Erstellt von",

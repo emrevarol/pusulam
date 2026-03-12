@@ -5,7 +5,7 @@
     "login": "Injira",
     "register": "Iyandikishe",
     "logout": "Sohoka",
-    "balance": "Kurus",
+    "balance": "Pul",
     "markets": "Amasoko",
     "profile": "Umwirondoro",
     "search": "Shakisha...",
@@ -29,13 +29,13 @@
     "startTrading": "Tangira Guteganya",
     "howItWorks": "Uko Bikora",
     "step1Title": "Fungura Konti",
-    "step1Desc": "Fungura konti yawe y'ubuntu ubone 1.000 Kurus nk'umutungo wo gutangira.",
+    "step1Desc": "Fungura konti yawe y'ubuntu ubone 1.000 Pul nk'umutungo wo gutangira.",
     "step2Title": "Hitamo Isoko",
     "step2Desc": "Shakisha amasoko y'ibiteganyizo ku bukungu, politiki, ikoranabuhanga n'ibindi.",
     "step3Title": "Kora Igiteganyizo",
     "step3Desc": "Gura imigabane ya Yego cyangwa Oya — ibiciro bihinduka hashingiwe ku bushobozi.",
     "step4Title": "Unguka Icyizere",
-    "step4Desc": "Unguka Kurus ku biteganyizo byiza, wongere amanota yawe, ushyireho ibimenyetso."
+    "step4Desc": "Unguka Pul ku biteganyizo byiza, wongere amanota yawe, ushyireho ibimenyetso."
   },
   "market": {
     "buy": "Gura",
@@ -57,7 +57,7 @@
     "noComments": "Nta bitekerezo bihari.",
     "addComment": "Andika igitekerezo...",
     "trade": "Guhana",
-    "insufficientBalance": "Kurus Idahagije",
+    "insufficientBalance": "Pul Idahagije",
     "tradeSuccess": "Iguhana ryagenze neza!",
     "category": "Icyiciro",
     "createdBy": "Yakozwe na",

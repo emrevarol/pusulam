@@ -5,7 +5,7 @@
     "login": "Connexion",
     "register": "Inscription",
     "logout": "Déconnexion",
-    "balance": "Kurus",
+    "balance": "Pul",
     "markets": "Marchés",
     "profile": "Profil",
     "search": "Rechercher...",
@@ -29,13 +29,13 @@
     "startTrading": "Commencer à Prédire",
     "howItWorks": "Comment ça Marche",
     "step1Title": "Créer un Compte",
-    "step1Desc": "Créez votre compte gratuit et obtenez 1 000 Kurus de solde initial.",
+    "step1Desc": "Créez votre compte gratuit et obtenez 1 000 Pul de solde initial.",
     "step2Title": "Choisir un Marché",
     "step2Desc": "Explorez les marchés de prédiction sur l'économie, la politique, la technologie et plus.",
     "step3Title": "Faire une Prédiction",
     "step3Desc": "Achetez des parts Oui ou Non — les prix changent selon la probabilité.",
     "step4Title": "Gagner en Réputation",
-    "step4Desc": "Gagnez des Kurus avec des prédictions correctes, améliorez votre score de calibration, collectionnez des badges."
+    "step4Desc": "Gagnez des Pul avec des prédictions correctes, améliorez votre score de calibration, collectionnez des badges."
   },
   "market": {
     "buy": "Acheter",
@@ -57,7 +57,7 @@
     "noComments": "Pas encore de commentaires.",
     "addComment": "Écrire un commentaire...",
     "trade": "Négocier",
-    "insufficientBalance": "Kurus insuffisants",
+    "insufficientBalance": "Pul insuffisants",
     "tradeSuccess": "Transaction réussie !",
     "category": "Catégorie",
     "createdBy": "Créé par",

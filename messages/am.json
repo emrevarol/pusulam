@@ -5,7 +5,7 @@
     "login": "ግባ",
     "register": "ተመዝገብ",
     "logout": "ውጣ",
-    "balance": "ኩሩሽ",
+    "balance": "Pul",
     "markets": "ገበያዎች",
     "profile": "መገለጫ",
     "search": "ፈልግ...",
@@ -29,13 +29,13 @@
     "startTrading": "ትንበያ ጀምር",
     "howItWorks": "እንዴት እንደሚሰራ",
     "step1Title": "መለያ ፍጠር",
-    "step1Desc": "ነፃ መለያህን ፍጠር እና 1,000 ኩሩሽ የመነሻ ሂሳብ አግኝ።",
+    "step1Desc": "ነፃ መለያህን ፍጠር እና 1,000 Pul የመነሻ ሂሳብ አግኝ።",
     "step2Title": "ገበያ ምረጥ",
     "step2Desc": "በኢኮኖሚ፣ ፖለቲካ፣ ቴክኖሎጂ እና ሌሎችም ላይ የትንበያ ገበያዎችን ያስሱ።",
     "step3Title": "ትንበያ አድርግ",
     "step3Desc": "አዎ ወይም አይ አክሲዮኖች ግዛ — ዋጋዎች በአጋጣሚ ይለወጣሉ።",
     "step4Title": "ስም አግኝ",
-    "step4Desc": "ትክክለኛ ትንበያዎችን በማድረግ ኩሩሽ አግኝ፣ የማረጋገጫ ነጥብህን ጨምር፣ ባጆችን ሰብስብ።"
+    "step4Desc": "ትክክለኛ ትንበያዎችን በማድረግ Pul አግኝ፣ የማረጋገጫ ነጥብህን ጨምር፣ ባጆችን ሰብስብ።"
   },
   "market": {
     "buy": "ግዛ",
@@ -57,7 +57,7 @@
     "noComments": "እስካሁን አስተያየት የለም።",
     "addComment": "አስተያየት ጻፍ...",
     "trade": "ግብይት",
-    "insufficientBalance": "በቂ ኩሩሽ የለም",
+    "insufficientBalance": "በቂ Pul የለም",
     "tradeSuccess": "ግብይቱ ተሳክቷል!",
     "category": "ምድብ",
     "createdBy": "የተፈጠረው በ",

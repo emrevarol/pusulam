@@ -280,7 +280,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
               <>
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-500">{t("cost")}</span>
-                  <span className="font-semibold">{cost.toFixed(2)} K</span>
+                  <span className="font-semibold">{cost.toFixed(2)} P</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-500">{t("avgPrice")}</span>
@@ -313,7 +313,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
                   {isTr ? "Kazanc" : "Return"}
                 </span>
                 <span className="font-semibold text-emerald-600">
-                  +{returnAmount.toFixed(2)} K
+                  +{returnAmount.toFixed(2)} P
                 </span>
               </div>
             )}
@@ -393,7 +393,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-gray-500">
-                      {value.toFixed(1)} K
+                      {value.toFixed(1)} P
                     </p>
                     <p
                       className={`text-xs font-medium ${

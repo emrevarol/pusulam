@@ -5,7 +5,7 @@
     "login": "Ingia",
     "register": "Jisajili",
     "logout": "Toka",
-    "balance": "Kurus",
+    "balance": "Pul",
     "markets": "Masoko",
     "profile": "Wasifu",
     "search": "Tafuta...",
@@ -29,13 +29,13 @@
     "startTrading": "Anza Kutabiri",
     "howItWorks": "Jinsi Inavyofanya Kazi",
     "step1Title": "Fungua Akaunti",
-    "step1Desc": "Fungua akaunti yako ya bure na upate Kurus 1,000 kama salio la kuanzia.",
+    "step1Desc": "Fungua akaunti yako ya bure na upate Pul 1,000 kama salio la kuanzia.",
     "step2Title": "Chagua Soko",
     "step2Desc": "Chunguza masoko ya utabiri kuhusu uchumi, siasa, teknolojia na zaidi.",
     "step3Title": "Fanya Utabiri",
     "step3Desc": "Nunua hisa za Ndiyo au Hapana — bei hubadilika kulingana na uwezekano.",
     "step4Title": "Pata Sifa",
-    "step4Desc": "Pata Kurus kutokana na utabiri sahihi, boresha alama yako ya urekebishaji, kusanya beji."
+    "step4Desc": "Pata Pul kutokana na utabiri sahihi, boresha alama yako ya urekebishaji, kusanya beji."
   },
   "market": {
     "buy": "Nunua",
@@ -57,7 +57,7 @@
     "noComments": "Bado hakuna maoni.",
     "addComment": "Andika maoni...",
     "trade": "Biashara",
-    "insufficientBalance": "Kurus haitoshi",
+    "insufficientBalance": "Pul haitoshi",
     "tradeSuccess": "Biashara imefanikiwa!",
     "category": "Kategoria",
     "createdBy": "Imeundwa na",

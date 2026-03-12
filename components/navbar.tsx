@@ -86,7 +86,7 @@ export function Navbar() {
               </Link>
               <span className="text-sm font-medium text-emerald-600">
                 {balance !== null
-                  ? `${balance.toLocaleString("tr-TR", { maximumFractionDigits: 0 })} K`
+                  ? `${balance.toLocaleString("tr-TR", { maximumFractionDigits: 0 })} P`
                   : "..."}
               </span>
               <Link

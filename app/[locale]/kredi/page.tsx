@@ -187,8 +187,8 @@ export default function CreditsPage() {
           </li>
           <li>
             {isTr
-              ? "• Yuksek agirlik = dogru tahminlerde daha fazla Kurus ve itibar kazanci."
-              : "• Higher weight = more Kurus and reputation earned on correct predictions."}
+              ? "• Yuksek agirlik = dogru tahminlerde daha fazla Pul ve itibar kazanci."
+              : "• Higher weight = more Pul and reputation earned on correct predictions."}
           </li>
         </ul>
       </div>

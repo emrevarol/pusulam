@@ -70,8 +70,8 @@ export async function POST(request: Request) {
     const specificMarket = markets.find((m) => m.id === targetMarketId);
     if (specificMarket) {
       specificMarketContext = isTr
-        ? `\n\nKULLANICI BU PIYASA HAKKINDA KONUSUYOR:\nBaslik: ${specificMarket.title}\nAciklama: ${specificMarket.description}\nKategori: ${specificMarket.category}\nEvet Olasiligi: %${((specificMarket.noPool / (specificMarket.yesPool + specificMarket.noPool)) * 100).toFixed(0)}\nHacim: ${specificMarket.volume} K\nTahminci: ${specificMarket.traderCount}\nBitis: ${specificMarket.resolutionDate.toISOString().split("T")[0]}`
-        : `\n\nUSER IS DISCUSSING THIS MARKET:\nTitle: ${specificMarket.title}\nDescription: ${specificMarket.description}\nCategory: ${specificMarket.category}\nYes Probability: ${((specificMarket.noPool / (specificMarket.yesPool + specificMarket.noPool)) * 100).toFixed(0)}%\nVolume: ${specificMarket.volume} K\nForecasters: ${specificMarket.traderCount}\nEnds: ${specificMarket.resolutionDate.toISOString().split("T")[0]}`;
+        ? `\n\nKULLANICI BU PIYASA HAKKINDA KONUSUYOR:\nBaslik: ${specificMarket.title}\nAciklama: ${specificMarket.description}\nKategori: ${specificMarket.category}\nEvet Olasiligi: %${((specificMarket.noPool / (specificMarket.yesPool + specificMarket.noPool)) * 100).toFixed(0)}\nHacim: ${specificMarket.volume} P\nTahminci: ${specificMarket.traderCount}\nBitis: ${specificMarket.resolutionDate.toISOString().split("T")[0]}`
+        : `\n\nUSER IS DISCUSSING THIS MARKET:\nTitle: ${specificMarket.title}\nDescription: ${specificMarket.description}\nCategory: ${specificMarket.category}\nYes Probability: ${((specificMarket.noPool / (specificMarket.yesPool + specificMarket.noPool)) * 100).toFixed(0)}%\nVolume: ${specificMarket.volume} P\nForecasters: ${specificMarket.traderCount}\nEnds: ${specificMarket.resolutionDate.toISOString().split("T")[0]}`;
     }
   }
 
@@ -79,8 +79,8 @@ export async function POST(request: Request) {
     .map((m) => {
       const yesPct = ((m.noPool / (m.yesPool + m.noPool)) * 100).toFixed(0);
       return isTr
-        ? `- ${m.title} | %${yesPct} Evet | Hacim: ${m.volume} K | ${m.traderCount} tahminci | Bitis: ${m.resolutionDate.toISOString().split("T")[0]}`
-        : `- ${m.title} | ${yesPct}% Yes | Volume: ${m.volume} K | ${m.traderCount} forecasters | Ends: ${m.resolutionDate.toISOString().split("T")[0]}`;
+        ? `- ${m.title} | %${yesPct} Evet | Hacim: ${m.volume} P | ${m.traderCount} tahminci | Bitis: ${m.resolutionDate.toISOString().split("T")[0]}`
+        : `- ${m.title} | ${yesPct}% Yes | Volume: ${m.volume} P | ${m.traderCount} forecasters | Ends: ${m.resolutionDate.toISOString().split("T")[0]}`;
     })
     .join("\n");
 

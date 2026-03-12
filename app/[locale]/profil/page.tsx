@@ -100,7 +100,7 @@ export default function ProfilePage() {
           <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
             <p className="text-xs text-gray-500">{t("balance")}</p>
             <p className="text-xl font-bold text-emerald-600">
-              {balance.toLocaleString("tr-TR", { maximumFractionDigits: 0 })} K
+              {balance.toLocaleString("tr-TR", { maximumFractionDigits: 0 })} P
             </p>
           </div>
           <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
@@ -108,7 +108,7 @@ export default function ProfilePage() {
               {locale === "tr" ? "Portfoy Degeri" : "Portfolio Value"}
             </p>
             <p className="text-xl font-bold">
-              {totalValue.toLocaleString("tr-TR", { maximumFractionDigits: 0 })} K
+              {totalValue.toLocaleString("tr-TR", { maximumFractionDigits: 0 })} P
             </p>
           </div>
           <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
@@ -121,7 +121,7 @@ export default function ProfilePage() {
               }`}
             >
               {totalPnl >= 0 ? "+" : ""}
-              {totalPnl.toLocaleString("tr-TR", { maximumFractionDigits: 0 })} K
+              {totalPnl.toLocaleString("tr-TR", { maximumFractionDigits: 0 })} P
             </p>
           </div>
         </div>

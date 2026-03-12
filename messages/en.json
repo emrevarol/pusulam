@@ -5,7 +5,7 @@
     "login": "Log In",
     "register": "Sign Up",
     "logout": "Log Out",
-    "balance": "Kurus",
+    "balance": "Pul",
     "markets": "Markets",
     "profile": "Profile",
     "search": "Search...",
@@ -29,13 +29,13 @@
     "startTrading": "Start Predicting",
     "howItWorks": "How It Works",
     "step1Title": "Create Account",
-    "step1Desc": "Create your free account and get 1,000 Kurus starting balance.",
+    "step1Desc": "Create your free account and get 1,000 Pul starting balance.",
     "step2Title": "Pick a Market",
     "step2Desc": "Explore prediction markets on economy, politics, technology and more.",
     "step3Title": "Make a Prediction",
     "step3Desc": "Buy Yes or No shares — prices change based on probability.",
     "step4Title": "Earn Reputation",
-    "step4Desc": "Earn Kurus from correct predictions, improve your calibration score, collect badges."
+    "step4Desc": "Earn Pul from correct predictions, improve your calibration score, collect badges."
   },
   "market": {
     "buy": "Buy",
@@ -57,7 +57,7 @@
     "noComments": "No comments yet.",
     "addComment": "Write a comment...",
     "trade": "Trade",
-    "insufficientBalance": "Insufficient Kurus",
+    "insufficientBalance": "Insufficient Pul",
     "tradeSuccess": "Trade successful!",
     "category": "Category",
     "createdBy": "Created by",

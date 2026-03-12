@@ -5,7 +5,7 @@
     "login": "Giris Yap",
     "register": "Kayit Ol",
     "logout": "Cikis",
-    "balance": "Kurus",
+    "balance": "Pul",
     "markets": "Piyasalar",
     "profile": "Profil",
     "search": "Ara...",
@@ -29,13 +29,13 @@
     "startTrading": "Tahmine Basla",
     "howItWorks": "Nasil Calisir?",
     "step1Title": "Hesap Ac",
-    "step1Desc": "Ucretsiz hesabini olustur ve 1.000 Kurus baslangic bakiyeni al.",
+    "step1Desc": "Ucretsiz hesabini olustur ve 1.000 Pul baslangic bakiyeni al.",
     "step2Title": "Piyasa Sec",
     "step2Desc": "Ekonomi, siyaset, teknoloji gibi konularda tahmin piyasalarini kesfet.",
     "step3Title": "Tahmin Yap",
     "step3Desc": "Evet veya Hayir hissesi al, fiyatlar olasiliklara gore degisir.",
     "step4Title": "Itibar Kazan",
-    "step4Desc": "Dogru tahminlerle Kurus kazan, kalibrasyon skorunu yukselt, rozet topla."
+    "step4Desc": "Dogru tahminlerle Pul kazan, kalibrasyon skorunu yukselt, rozet topla."
   },
   "market": {
     "buy": "Al",
@@ -57,7 +57,7 @@
     "noComments": "Henuz yorum yok.",
     "addComment": "Yorum yaz...",
     "trade": "Islem Yap",
-    "insufficientBalance": "Yetersiz Kurus",
+    "insufficientBalance": "Yetersiz Pul",
     "tradeSuccess": "Islem basarili!",
     "category": "Kategori",
     "createdBy": "Olusturan",

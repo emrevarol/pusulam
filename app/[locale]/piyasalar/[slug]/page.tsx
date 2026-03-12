@@ -100,7 +100,7 @@ export default async function MarketDetailPage({
                 {t("volume")}
               </p>
               <p className="text-lg font-bold">
-                {market.volume.toLocaleString("tr-TR")} K
+                {market.volume.toLocaleString("tr-TR")} P
               </p>
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-4 text-center dark:border-gray-800 dark:bg-gray-900">

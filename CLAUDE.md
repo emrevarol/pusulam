@@ -1,10 +1,10 @@
 # Pusulam — Turkiye'nin Kolektif Zeka Platformu
 
 ## What is this?
-Manifold+Metaculus hybrid prediction market for Turkey. Users predict outcomes of real-world events using virtual currency "Kurus" (NOT real money). Positioned as "Kolektif Zeka Platformu", never as gambling/betting.
+Manifold+Metaculus hybrid prediction market for Turkey. Users predict outcomes of real-world events using virtual currency "Pul" (NOT real money). Positioned as "Kolektif Zeka Platformu", never as gambling/betting.
 
 ## Core Concepts
-- **Currency**: Kurus (sanal para) — NOT real money. Never convertible to cash.
+- **Currency**: Pul (sanal para) — NOT real money. Never convertible to cash.
 - **Market Mechanism**: CPMM (Constant Product Market Maker) — prices change based on buy/sell volume
 - **Reputation**: Metaculus-style calibration score + badges + Pro Tahminci status
 - **Predictions**: Users can submit probability estimates with reasoning (Metaculus-style)
@@ -16,7 +16,7 @@ Manifold+Metaculus hybrid prediction market for Turkey. Users predict outcomes o
 ## FORBIDDEN — Legal Compliance
 - NEVER use words: bahis, kumar, sans, oran (betting/gambling terms)
 - NEVER add sports match outcome markets (Iddaa territory = Law 7258)
-- NEVER allow Kurus to be converted to real money
+- NEVER allow Pul to be converted to real money
 - NEVER add casino-style animations or "hot streak" gamification
 
 ## Tech Stack

@@ -15,7 +15,7 @@ model User {
   passwordHash String
   avatar       String?
   bio          String?
-  balance      Float    @default(1000) // Kurus - sanal para
+  balance      Float    @default(1000) // Pul - sanal para
   credits      Int      @default(0)    // Satin alinan kredi
   reputation   Float    @default(0)    // Kalibrasyon skoru
   streak       Int      @default(0)    // Gunluk tahmin serisi
