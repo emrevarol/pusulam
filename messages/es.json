@@ -98,7 +98,14 @@
     "returnLabel": "Ganancia",
     "buyCreditsLink": "Comprar Créditos →",
     "insufficientCredits": "Créditos insuficientes. Compra créditos.",
-    "people": "personas"
+    "people": "personas",
+    "adminResolve": "Resolver Mercado (Admin)",
+    "resolveYes": "Resolver como SÍ",
+    "resolveNo": "Resolver como NO",
+    "confirmResolve": "¿Está seguro de que desea resolver este mercado como {outcome}? Esta acción no se puede deshacer.",
+    "resolvedYes": "SÍ",
+    "resolvedNo": "NO",
+    "resolvedPayoutsDistributed": "Los pagos se han distribuido. Consulte su perfil para más detalles."
   },
   "auth": {
     "loginTitle": "Iniciar Sesión",

@@ -98,7 +98,14 @@
     "returnLabel": "Kazanc",
     "buyCreditsLink": "Kredi Satin Al →",
     "insufficientCredits": "Yetersiz kredi. Kredi satin alin.",
-    "people": "kisi"
+    "people": "kisi",
+    "adminResolve": "Piyasayi Sonuclandir (Admin)",
+    "resolveYes": "EVET olarak Sonuclandir",
+    "resolveNo": "HAYIR olarak Sonuclandir",
+    "confirmResolve": "Piyasayi {outcome} olarak sonuclandirmak istediginizden emin misiniz? Bu islem geri alinamaz.",
+    "resolvedYes": "EVET",
+    "resolvedNo": "HAYIR",
+    "resolvedPayoutsDistributed": "Kazanclar dagitildi. Profil sayfanizdan kontrol edebilirsiniz."
   },
   "auth": {
     "loginTitle": "Giris Yap",

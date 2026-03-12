@@ -28,10 +28,18 @@ export async function GET() {
   });
 
   const result = positions.map((p) => {
-    const currentPrice =
-      p.side === "YES"
-        ? getYesPrice(p.market.yesPool, p.market.noPool)
-        : 1 - getYesPrice(p.market.yesPool, p.market.noPool);
+    let currentPrice: number;
+
+    if (p.market.status === "RESOLVED") {
+      // Resolved: winning side = 1, losing side = 0
+      currentPrice = p.side === p.market.resolvedOutcome ? 1 : 0;
+    } else {
+      currentPrice =
+        p.side === "YES"
+          ? getYesPrice(p.market.yesPool, p.market.noPool)
+          : 1 - getYesPrice(p.market.yesPool, p.market.noPool);
+    }
+
     const currentValue = p.shares * currentPrice;
     const costBasis = p.shares * p.avgPrice;
     const pnl = currentValue - costBasis;

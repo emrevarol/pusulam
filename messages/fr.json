@@ -98,7 +98,14 @@
     "returnLabel": "Gain",
     "buyCreditsLink": "Acheter des Crédits →",
     "insufficientCredits": "Crédits insuffisants. Achetez des crédits.",
-    "people": "personnes"
+    "people": "personnes",
+    "adminResolve": "Résoudre le marché (Admin)",
+    "resolveYes": "Résoudre comme OUI",
+    "resolveNo": "Résoudre comme NON",
+    "confirmResolve": "Êtes-vous sûr de vouloir résoudre ce marché comme {outcome} ? Cette action est irréversible.",
+    "resolvedYes": "OUI",
+    "resolvedNo": "NON",
+    "resolvedPayoutsDistributed": "Les paiements ont été distribués. Consultez votre profil pour les détails."
   },
   "auth": {
     "loginTitle": "Connexion",

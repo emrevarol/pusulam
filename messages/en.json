@@ -98,7 +98,14 @@
     "returnLabel": "Return",
     "buyCreditsLink": "Buy Credits →",
     "insufficientCredits": "Insufficient credits. Buy credits.",
-    "people": "people"
+    "people": "people",
+    "adminResolve": "Resolve Market (Admin)",
+    "resolveYes": "Resolve as YES",
+    "resolveNo": "Resolve as NO",
+    "confirmResolve": "Are you sure you want to resolve this market as {outcome}? This action cannot be undone.",
+    "resolvedYes": "YES",
+    "resolvedNo": "NO",
+    "resolvedPayoutsDistributed": "Payouts have been distributed. Check your profile for details."
   },
   "auth": {
     "loginTitle": "Log In",

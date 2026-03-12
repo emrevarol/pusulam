@@ -98,7 +98,14 @@
     "returnLabel": "العائد",
     "buyCreditsLink": "شراء رصيد →",
     "insufficientCredits": "رصيد غير كافٍ. قم بشراء رصيد.",
-    "people": "شخص"
+    "people": "شخص",
+    "adminResolve": "حل السوق (مشرف)",
+    "resolveYes": "حل كـ نعم",
+    "resolveNo": "حل كـ لا",
+    "confirmResolve": "هل أنت متأكد أنك تريد حل هذا السوق كـ {outcome}؟ لا يمكن التراجع عن هذا الإجراء.",
+    "resolvedYes": "نعم",
+    "resolvedNo": "لا",
+    "resolvedPayoutsDistributed": "تم توزيع المدفوعات. تحقق من ملفك الشخصي للتفاصيل."
   },
   "auth": {
     "loginTitle": "تسجيل الدخول",

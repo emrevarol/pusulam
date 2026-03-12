@@ -98,7 +98,14 @@
     "returnLabel": "Gewinn",
     "buyCreditsLink": "Credits Kaufen →",
     "insufficientCredits": "Nicht genug Credits. Kaufe Credits.",
-    "people": "Personen"
+    "people": "Personen",
+    "adminResolve": "Markt auflösen (Admin)",
+    "resolveYes": "Als JA auflösen",
+    "resolveNo": "Als NEIN auflösen",
+    "confirmResolve": "Sind Sie sicher, dass Sie diesen Markt als {outcome} auflösen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "resolvedYes": "JA",
+    "resolvedNo": "NEIN",
+    "resolvedPayoutsDistributed": "Auszahlungen wurden verteilt. Überprüfen Sie Ihr Profil für Details."
   },
   "auth": {
     "loginTitle": "Anmelden",

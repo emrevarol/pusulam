@@ -98,7 +98,14 @@
     "returnLabel": "Inyungu",
     "buyCreditsLink": "Gura Amakredi →",
     "insufficientCredits": "Amakredi adahagije. Gura amakredi.",
-    "people": "abantu"
+    "people": "abantu",
+    "adminResolve": "Gukemura Isoko (Umuyobozi)",
+    "resolveYes": "Gukemura nk'YEGO",
+    "resolveNo": "Gukemura nk'OYA",
+    "confirmResolve": "Urizeye ko ushaka gukemura iri soko nka {outcome}? Igikorwa ntigishobora gusubizwa inyuma.",
+    "resolvedYes": "YEGO",
+    "resolvedNo": "OYA",
+    "resolvedPayoutsDistributed": "Ubwishyu bwasabwe. Reba umwirondoro wawe kubimenyetso."
   },
   "auth": {
     "loginTitle": "Injira",

@@ -98,7 +98,14 @@
     "returnLabel": "ትርፍ",
     "buyCreditsLink": "ክሬዲት ግዛ →",
     "insufficientCredits": "በቂ ክሬዲት የለም። ክሬዲት ይግዙ።",
-    "people": "ሰዎች"
+    "people": "ሰዎች",
+    "adminResolve": "ገበያ ይፍቱ (አስተዳዳሪ)",
+    "resolveYes": "አዎ ብለው ይፍቱ",
+    "resolveNo": "አይ ብለው ይፍቱ",
+    "confirmResolve": "ይህን ገበያ {outcome} ብለው ለመፍታት እርግጠኛ ነዎት? ይህ ድርጊት ሊመለስ አይችልም።",
+    "resolvedYes": "አዎ",
+    "resolvedNo": "አይ",
+    "resolvedPayoutsDistributed": "ክፍያዎች ተከፋፍለዋል። ዝርዝሮችን ለማየት መገለጫዎን ይመልከቱ።"
   },
   "auth": {
     "loginTitle": "ግባ",

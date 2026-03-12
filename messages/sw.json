@@ -98,7 +98,14 @@
     "returnLabel": "Faida",
     "buyCreditsLink": "Nunua Mikopo →",
     "insufficientCredits": "Mikopo haitoshi. Nunua mikopo.",
-    "people": "watu"
+    "people": "watu",
+    "adminResolve": "Tatua Soko (Msimamizi)",
+    "resolveYes": "Tatua kama NDIYO",
+    "resolveNo": "Tatua kama HAPANA",
+    "confirmResolve": "Je, una uhakika unataka kutatua soko hili kama {outcome}? Hatua hii haiwezi kutenduliwa.",
+    "resolvedYes": "NDIYO",
+    "resolvedNo": "HAPANA",
+    "resolvedPayoutsDistributed": "Malipo yamesambazwa. Angalia wasifu wako kwa maelezo."
   },
   "auth": {
     "loginTitle": "Ingia",

@@ -98,7 +98,14 @@
     "returnLabel": "Retorno",
     "buyCreditsLink": "Comprar Créditos →",
     "insufficientCredits": "Créditos insuficientes. Compre créditos.",
-    "people": "pessoas"
+    "people": "pessoas",
+    "adminResolve": "Resolver Mercado (Admin)",
+    "resolveYes": "Resolver como SIM",
+    "resolveNo": "Resolver como NÃO",
+    "confirmResolve": "Tem certeza de que deseja resolver este mercado como {outcome}? Esta ação não pode ser desfeita.",
+    "resolvedYes": "SIM",
+    "resolvedNo": "NÃO",
+    "resolvedPayoutsDistributed": "Os pagamentos foram distribuídos. Verifique seu perfil para detalhes."
   },
   "auth": {
     "loginTitle": "Entrar",

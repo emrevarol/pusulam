@@ -9,6 +9,7 @@ import { CommentSection } from "@/components/comment-section";
 import { Countdown } from "@/components/countdown";
 import { ShareButtons } from "@/components/share-buttons";
 import { AskAiButton } from "@/components/ask-ai-button";
+import { ResolveMarketButton } from "@/components/resolve-market-button";
 import { CATEGORIES, getLocalizedField } from "@/lib/helpers";
 
 async function getMarket(slug: string) {
@@ -46,6 +47,8 @@ export default async function MarketDetailPage({
   const cat = CATEGORIES[market.category];
 
   const isOpen = market.status === "OPEN";
+  const isResolved = market.status === "RESOLVED";
+  const isAdmin = (session?.user as { role?: string } | undefined)?.role === "ADMIN";
   const yesPct = (yesPrice * 100).toFixed(1);
   const noPct = (noPrice * 100).toFixed(1);
 
@@ -68,6 +71,22 @@ export default async function MarketDetailPage({
               {getLocalizedField(market.description, market.descriptionTranslations as Record<string, string> | null, locale)}
             </p>
           </div>
+
+          {/* Resolved banner */}
+          {isResolved && (
+            <div className={`mb-6 rounded-xl border-2 p-4 text-center ${
+              market.resolvedOutcome === "YES"
+                ? "border-emerald-300 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-900/20"
+                : "border-rose-300 bg-rose-50 dark:border-rose-700 dark:bg-rose-900/20"
+            }`}>
+              <p className="text-lg font-bold">
+                {t("result")}: {market.resolvedOutcome === "YES" ? t("resolvedYes") : t("resolvedNo")}
+              </p>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                {t("resolvedPayoutsDistributed")}
+              </p>
+            </div>
+          )}
 
           {/* Probability bar */}
           <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
@@ -180,6 +199,14 @@ export default async function MarketDetailPage({
                   : t("marketClosed")}
               </p>
             </div>
+          )}
+
+          {/* Admin resolve button */}
+          {isAdmin && !isResolved && (
+            <ResolveMarketButton
+              marketId={market.id}
+              status={market.status}
+            />
           )}
 
           {/* Ask AI button */}
