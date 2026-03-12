@@ -96,5 +96,43 @@ export function calculateSellReturn(
   return { returnAmount, newYesPool, newNoPool };
 }
 
-// Keep old name as alias for backwards compat in existing imports
-export const calculateBuyCost = calculateBuyShares;
+/**
+ * Calculate cost (Pul) for a desired number of outcome shares.
+ * Inverse of calculateBuyShares — solves the quadratic:
+ *   shares = b + y - k/(p + b)  →  b² + b(p + y - s) - s·p = 0
+ *
+ * @param shares - desired number of outcome shares (votes)
+ * @returns cost in Pul, new pool state, avg price per share
+ */
+export function calculateBuyCost(
+  yesPool: number,
+  noPool: number,
+  side: "YES" | "NO",
+  shares: number
+): { cost: number; newYesPool: number; newNoPool: number; avgPrice: number } {
+  if (shares <= 0) throw new Error("Geçersiz miktar");
+
+  // For YES: shares = b + yesPool - k/(noPool + b)
+  // Rearranges to: b² + b(noPool + yesPool - shares) - shares * noPool = 0
+  const p = side === "YES" ? noPool : yesPool;
+  const y = side === "YES" ? yesPool : noPool;
+
+  const a = 1;
+  const b = p + y - shares;
+  const c = -shares * p;
+
+  const discriminant = b * b - 4 * a * c;
+  const betAmount = (-b + Math.sqrt(discriminant)) / (2 * a);
+
+  if (betAmount <= 0) throw new Error("Hesaplama hatası");
+
+  // Now compute pool changes using the forward function
+  const result = calculateBuyShares(yesPool, noPool, side, betAmount);
+
+  return {
+    cost: betAmount,
+    newYesPool: result.newYesPool,
+    newNoPool: result.newNoPool,
+    avgPrice: betAmount / shares,
+  };
+}

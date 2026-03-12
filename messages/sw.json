@@ -169,7 +169,13 @@
     "exploreMarkets": "Chunguza Masoko",
     "noVotes": "Bado hujapiga kura.",
     "won": "Umeshinda",
-    "lost": "Umeshindwa"
+    "lost": "Umeshindwa",
+    "pastPredictions": "Utabiri wa zamani",
+    "noPastPredictions": "Hakuna utabiri uliomalizika bado.",
+    "totalPredictions": "Jumla",
+    "accuracy": "Usahihi",
+    "invested": "Uliowekeza",
+    "payout": "Malipo"
   },
   "createMarket": {
     "title": "Unda Soko Jipya",

@@ -169,7 +169,13 @@
     "exploreMarkets": "Shakisha Amasoko",
     "noVotes": "Ntabwo waratoye.",
     "won": "Watsinze",
-    "lost": "Watsinzwe"
+    "lost": "Watsinzwe",
+    "pastPredictions": "Ibyahanuwe byashize",
+    "noPastPredictions": "Nta byahanuwe byarangiye.",
+    "totalPredictions": "Igiteranyo",
+    "accuracy": "Ukuri",
+    "invested": "Ishoramari",
+    "payout": "Inyungu"
   },
   "createMarket": {
     "title": "Kora Isoko Rishya",

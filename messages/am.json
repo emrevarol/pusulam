@@ -169,7 +169,13 @@
     "exploreMarkets": "ገበያዎችን ያስሱ",
     "noVotes": "ገና ድምጽ አልሰጡም።",
     "won": "አሸነፍክ",
-    "lost": "ተሸንፈሃል"
+    "lost": "ተሸንፈሃል",
+    "pastPredictions": "ያለፉ ትንበያዎች",
+    "noPastPredictions": "እስካሁን የተፈቱ ትንበያዎች የሉም።",
+    "totalPredictions": "ጠቅላላ",
+    "accuracy": "ትክክለኛነት",
+    "invested": "የዋለ",
+    "payout": "ክፍያ"
   },
   "createMarket": {
     "title": "አዲስ ገበያ ፍጠር",

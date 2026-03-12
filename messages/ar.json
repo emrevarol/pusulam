@@ -169,7 +169,13 @@
     "exploreMarkets": "استكشف الأسواق",
     "noVotes": "لم تصوّت بعد.",
     "won": "فزت",
-    "lost": "خسرت"
+    "lost": "خسرت",
+    "pastPredictions": "التوقعات السابقة",
+    "noPastPredictions": "لا توجد توقعات محسومة بعد.",
+    "totalPredictions": "الإجمالي",
+    "accuracy": "الدقة",
+    "invested": "المستثمر",
+    "payout": "العائد"
   },
   "createMarket": {
     "title": "إنشاء سوق جديد",

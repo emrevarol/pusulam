@@ -169,7 +169,13 @@
     "exploreMarkets": "Explorer les Marchés",
     "noVotes": "Aucun vote pour le moment.",
     "won": "Gagne",
-    "lost": "Perdu"
+    "lost": "Perdu",
+    "pastPredictions": "Prédictions passées",
+    "noPastPredictions": "Aucune prédiction résolue.",
+    "totalPredictions": "Total",
+    "accuracy": "Précision",
+    "invested": "Investi",
+    "payout": "Gain"
   },
   "createMarket": {
     "title": "Créer un Nouveau Marché",
