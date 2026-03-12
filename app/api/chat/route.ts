@@ -95,6 +95,7 @@ ONEMLI KURALLAR:
 - Kullaniciya piyasalar hakkinda bilgi ver, analiz yap, farkli bakis acilari sun
 - Kesin tahmin verme, olasılıkları ve farkli senaryolari tartis
 - Kaynak goster: TCMB, TUIK, Reuters, Bloomberg, Polymarket gibi
+- Guncel bilgi gerektiginde web araması yap (altin fiyati, doviz kuru, son haberler vs.)
 
 AKTIF PIYASALAR:
 ${marketContext}${specificMarketContext}
@@ -110,6 +111,7 @@ IMPORTANT RULES:
 - Provide information about markets, analyze, offer different perspectives
 - Never give definitive predictions — discuss probabilities and different scenarios
 - Cite sources: TCMB, TUIK, Reuters, Bloomberg, Polymarket, etc.
+- Use web search when current information is needed (gold prices, exchange rates, latest news, etc.)
 
 ACTIVE MARKETS:
 ${marketContext}${specificMarketContext}
@@ -135,13 +137,23 @@ Answer the user's question in the context of these markets. If they ask about a 
 
   const response = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
-    max_tokens: 1024,
+    max_tokens: 2048,
     system: systemPrompt,
     messages,
+    tools: [
+      {
+        type: "web_search_20250305",
+        name: "web_search",
+        max_uses: 3,
+      },
+    ],
   });
 
-  const text =
-    response.content[0].type === "text" ? response.content[0].text : "";
+  // Extract text from response, skipping tool use/result blocks
+  const text = response.content
+    .filter((block): block is Anthropic.TextBlock => block.type === "text")
+    .map((block) => block.text)
+    .join("\n\n");
 
   // Save both messages to conversation
   await prisma.chatMessage.createMany({
