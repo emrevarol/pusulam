@@ -71,7 +71,7 @@ function HomeContent({
       </section>
 
       {/* Popular Markets */}
-      <section className="mx-auto max-w-6xl px-4 py-16">
+      <section className="mx-auto max-w-6xl px-4 py-16 dark:bg-gray-950">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-2xl font-bold">{t("popular")}</h2>
           <Link

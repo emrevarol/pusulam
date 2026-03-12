@@ -41,7 +41,7 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className="scroll-smooth">
+    <html lang={locale} className="scroll-smooth bg-gray-50 dark:bg-gray-950">
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100`}
       >
