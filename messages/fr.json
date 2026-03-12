@@ -105,7 +105,11 @@
     "confirmResolve": "Êtes-vous sûr de vouloir résoudre ce marché comme {outcome} ? Cette action est irréversible.",
     "resolvedYes": "OUI",
     "resolvedNo": "NON",
-    "resolvedPayoutsDistributed": "Les paiements ont été distribués. Consultez votre profil pour les détails."
+    "resolvedPayoutsDistributed": "Les paiements ont été distribués. Consultez votre profil pour les détails.",
+    "sortClosing": "Fin Proche",
+    "sortNewest": "Plus Recents",
+    "sortPopular": "Plus Populaires",
+    "sortForecasters": "Plus de Pronostiqueurs"
   },
   "auth": {
     "loginTitle": "Connexion",

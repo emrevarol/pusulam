@@ -105,7 +105,11 @@
     "confirmResolve": "Sind Sie sicher, dass Sie diesen Markt als {outcome} auflösen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
     "resolvedYes": "JA",
     "resolvedNo": "NEIN",
-    "resolvedPayoutsDistributed": "Auszahlungen wurden verteilt. Überprüfen Sie Ihr Profil für Details."
+    "resolvedPayoutsDistributed": "Auszahlungen wurden verteilt. Überprüfen Sie Ihr Profil für Details.",
+    "sortClosing": "Bald endend",
+    "sortNewest": "Neueste",
+    "sortPopular": "Beliebteste",
+    "sortForecasters": "Meiste Prognostiker"
   },
   "auth": {
     "loginTitle": "Anmelden",

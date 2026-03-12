@@ -105,7 +105,11 @@
     "confirmResolve": "ይህን ገበያ {outcome} ብለው ለመፍታት እርግጠኛ ነዎት? ይህ ድርጊት ሊመለስ አይችልም።",
     "resolvedYes": "አዎ",
     "resolvedNo": "አይ",
-    "resolvedPayoutsDistributed": "ክፍያዎች ተከፋፍለዋል። ዝርዝሮችን ለማየት መገለጫዎን ይመልከቱ።"
+    "resolvedPayoutsDistributed": "ክፍያዎች ተከፋፍለዋል። ዝርዝሮችን ለማየት መገለጫዎን ይመልከቱ።",
+    "sortClosing": "ለመዝጋት ቅርብ",
+    "sortNewest": "አዲስ",
+    "sortPopular": "በጣም ታዋቂ",
+    "sortForecasters": "በጣም ብዙ ተንባዮች"
   },
   "auth": {
     "loginTitle": "ግባ",

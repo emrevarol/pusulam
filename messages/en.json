@@ -105,7 +105,11 @@
     "confirmResolve": "Are you sure you want to resolve this market as {outcome}? This action cannot be undone.",
     "resolvedYes": "YES",
     "resolvedNo": "NO",
-    "resolvedPayoutsDistributed": "Payouts have been distributed. Check your profile for details."
+    "resolvedPayoutsDistributed": "Payouts have been distributed. Check your profile for details.",
+    "sortClosing": "Closing Soon",
+    "sortNewest": "Newest",
+    "sortPopular": "Most Popular",
+    "sortForecasters": "Most Forecasters"
   },
   "auth": {
     "loginTitle": "Log In",

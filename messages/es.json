@@ -105,7 +105,11 @@
     "confirmResolve": "¿Está seguro de que desea resolver este mercado como {outcome}? Esta acción no se puede deshacer.",
     "resolvedYes": "SÍ",
     "resolvedNo": "NO",
-    "resolvedPayoutsDistributed": "Los pagos se han distribuido. Consulte su perfil para más detalles."
+    "resolvedPayoutsDistributed": "Los pagos se han distribuido. Consulte su perfil para más detalles.",
+    "sortClosing": "Cierre Cercano",
+    "sortNewest": "Mas Recientes",
+    "sortPopular": "Mas Populares",
+    "sortForecasters": "Mas Pronosticadores"
   },
   "auth": {
     "loginTitle": "Iniciar Sesión",

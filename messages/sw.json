@@ -105,7 +105,11 @@
     "confirmResolve": "Je, una uhakika unataka kutatua soko hili kama {outcome}? Hatua hii haiwezi kutenduliwa.",
     "resolvedYes": "NDIYO",
     "resolvedNo": "HAPANA",
-    "resolvedPayoutsDistributed": "Malipo yamesambazwa. Angalia wasifu wako kwa maelezo."
+    "resolvedPayoutsDistributed": "Malipo yamesambazwa. Angalia wasifu wako kwa maelezo.",
+    "sortClosing": "Karibu Kufunga",
+    "sortNewest": "Mpya Zaidi",
+    "sortPopular": "Maarufu Zaidi",
+    "sortForecasters": "Watabiri Wengi"
   },
   "auth": {
     "loginTitle": "Ingia",

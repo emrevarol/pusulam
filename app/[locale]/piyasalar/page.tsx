@@ -2,15 +2,27 @@ import { prisma } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
 import { MarketCard } from "@/components/market-card";
 import { CategoryFilter } from "@/components/category-filter";
+import { SortFilter } from "@/components/sort-filter";
 
-async function getMarkets(category?: string) {
+type SortOption = "closing" | "newest" | "popular" | "forecasters";
+
+const ORDER_BY: Record<SortOption, Record<string, string>> = {
+  closing: { resolutionDate: "asc" },
+  newest: { createdAt: "desc" },
+  popular: { volume: "desc" },
+  forecasters: { traderCount: "desc" },
+};
+
+async function getMarkets(category?: string, sort?: string) {
   const where = category && category !== "all"
     ? { category, status: "OPEN" }
     : { status: "OPEN" };
 
+  const orderBy = ORDER_BY[(sort as SortOption)] || ORDER_BY.newest;
+
   const markets = await prisma.market.findMany({
     where,
-    orderBy: { createdAt: "desc" },
+    orderBy,
   });
 
   return markets.map((m) => ({
@@ -29,16 +41,19 @@ export default async function MarketsPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ kategori?: string }>;
+  searchParams: Promise<{ kategori?: string; sirala?: string }>;
 }) {
   const { locale } = await params;
-  const { kategori } = await searchParams;
-  const markets = await getMarkets(kategori);
+  const { kategori, sirala } = await searchParams;
+  const markets = await getMarkets(kategori, sirala);
   const t = await getTranslations({ locale, namespace: "market" });
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <CategoryFilter activeCategory={kategori} />
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <CategoryFilter activeCategory={kategori} />
+        <SortFilter />
+      </div>
 
       {markets.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

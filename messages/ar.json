@@ -105,7 +105,11 @@
     "confirmResolve": "هل أنت متأكد أنك تريد حل هذا السوق كـ {outcome}؟ لا يمكن التراجع عن هذا الإجراء.",
     "resolvedYes": "نعم",
     "resolvedNo": "لا",
-    "resolvedPayoutsDistributed": "تم توزيع المدفوعات. تحقق من ملفك الشخصي للتفاصيل."
+    "resolvedPayoutsDistributed": "تم توزيع المدفوعات. تحقق من ملفك الشخصي للتفاصيل.",
+    "sortClosing": "الأقرب للإغلاق",
+    "sortNewest": "الأحدث",
+    "sortPopular": "الأكثر شعبية",
+    "sortForecasters": "الأكثر متنبئين"
   },
   "auth": {
     "loginTitle": "تسجيل الدخول",

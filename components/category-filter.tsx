@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { CATEGORIES } from "@/lib/helpers";
 
 export function CategoryFilter({
@@ -12,10 +12,15 @@ export function CategoryFilter({
   const t = useTranslations("categories");
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   function setCategory(key: string) {
-    const params = new URLSearchParams();
-    if (key !== "all") params.set("kategori", key);
+    const params = new URLSearchParams(searchParams.toString());
+    if (key === "all") {
+      params.delete("kategori");
+    } else {
+      params.set("kategori", key);
+    }
     const qs = params.toString();
     router.push(qs ? `${pathname}?${qs}` : pathname);
   }
@@ -23,7 +28,7 @@ export function CategoryFilter({
   const active = activeCategory || "all";
 
   return (
-    <div className="mb-8 flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2">
       <button
         onClick={() => setCategory("all")}
         className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${

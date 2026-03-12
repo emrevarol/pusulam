@@ -105,7 +105,11 @@
     "confirmResolve": "Urizeye ko ushaka gukemura iri soko nka {outcome}? Igikorwa ntigishobora gusubizwa inyuma.",
     "resolvedYes": "YEGO",
     "resolvedNo": "OYA",
-    "resolvedPayoutsDistributed": "Ubwishyu bwasabwe. Reba umwirondoro wawe kubimenyetso."
+    "resolvedPayoutsDistributed": "Ubwishyu bwasabwe. Reba umwirondoro wawe kubimenyetso.",
+    "sortClosing": "Hafi yo Gufunga",
+    "sortNewest": "Bishya Cyane",
+    "sortPopular": "Bikunzwe Cyane",
+    "sortForecasters": "Abahanuzi Benshi"
   },
   "auth": {
     "loginTitle": "Injira",

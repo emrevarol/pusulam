@@ -105,7 +105,11 @@
     "confirmResolve": "Piyasayi {outcome} olarak sonuclandirmak istediginizden emin misiniz? Bu islem geri alinamaz.",
     "resolvedYes": "EVET",
     "resolvedNo": "HAYIR",
-    "resolvedPayoutsDistributed": "Kazanclar dagitildi. Profil sayfanizdan kontrol edebilirsiniz."
+    "resolvedPayoutsDistributed": "Kazanclar dagitildi. Profil sayfanizdan kontrol edebilirsiniz.",
+    "sortClosing": "Kapanisa En Yakin",
+    "sortNewest": "En Yeni",
+    "sortPopular": "En Populer",
+    "sortForecasters": "En Cok Tahminci"
   },
   "auth": {
     "loginTitle": "Giris Yap",
