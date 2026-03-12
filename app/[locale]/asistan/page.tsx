@@ -141,7 +141,7 @@ export default function AssistantPage() {
   if (status === "loading") return null;
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-5xl">
+    <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-5xl bg-white dark:bg-gray-950">
       {/* Sidebar - conversation history */}
       <div
         className={`${
@@ -196,7 +196,7 @@ export default function AssistantPage() {
       )}
 
       {/* Main chat area */}
-      <div className="flex flex-1 flex-col px-4">
+      <div className="flex flex-1 flex-col bg-white px-4 dark:bg-gray-950">
         {/* Top bar */}
         <div className="flex items-center gap-2 border-b border-gray-200 py-3 dark:border-gray-800">
           <button

@@ -147,7 +147,7 @@ export default function ProfilePage() {
               : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
           }`}
         >
-          {locale === "tr" ? "Islem Gecmisi" : "Trade History"} ({trades.length})
+          {locale === "tr" ? "Oy Gecmisi" : "Vote History"} ({trades.length})
         </button>
       </div>
 
@@ -220,7 +220,7 @@ export default function ProfilePage() {
           {trades.length === 0 ? (
             <div className="rounded-xl border-2 border-dashed border-gray-200 p-12 text-center dark:border-gray-800">
               <p className="text-gray-400">
-                {locale === "tr" ? "Henuz islem yapmadiniz." : "No trades yet."}
+                {locale === "tr" ? "Henuz oy vermediniz." : "No votes yet."}
               </p>
             </div>
           ) : (
