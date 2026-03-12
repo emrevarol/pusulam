@@ -109,7 +109,10 @@
     "sortClosing": "الأقرب للإغلاق",
     "sortNewest": "الأحدث",
     "sortPopular": "الأكثر شعبية",
-    "sortForecasters": "الأكثر متنبئين"
+    "sortForecasters": "الأكثر متنبئين",
+    "statusOpen": "مفتوح",
+    "statusResolved": "محلول",
+    "statusAll": "الكل"
   },
   "auth": {
     "loginTitle": "تسجيل الدخول",
@@ -163,7 +166,9 @@
     "pnl": "الربح/الخسارة",
     "voteHistory": "سجل التصويت",
     "exploreMarkets": "استكشف الأسواق",
-    "noVotes": "لم تصوّت بعد."
+    "noVotes": "لم تصوّت بعد.",
+    "won": "فزت",
+    "lost": "خسرت"
   },
   "createMarket": {
     "title": "إنشاء سوق جديد",

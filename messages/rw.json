@@ -109,7 +109,10 @@
     "sortClosing": "Hafi yo Gufunga",
     "sortNewest": "Bishya Cyane",
     "sortPopular": "Bikunzwe Cyane",
-    "sortForecasters": "Abahanuzi Benshi"
+    "sortForecasters": "Abahanuzi Benshi",
+    "statusOpen": "Ifunguye",
+    "statusResolved": "Byakemuwe",
+    "statusAll": "Byose"
   },
   "auth": {
     "loginTitle": "Injira",
@@ -163,7 +166,9 @@
     "pnl": "Inyungu/Igihombo",
     "voteHistory": "Amateka y'Amajwi",
     "exploreMarkets": "Shakisha Amasoko",
-    "noVotes": "Ntabwo waratoye."
+    "noVotes": "Ntabwo waratoye.",
+    "won": "Watsinze",
+    "lost": "Watsinzwe"
   },
   "createMarket": {
     "title": "Kora Isoko Rishya",

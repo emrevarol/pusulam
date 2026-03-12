@@ -109,7 +109,10 @@
     "sortClosing": "Cierre Cercano",
     "sortNewest": "Mas Recientes",
     "sortPopular": "Mas Populares",
-    "sortForecasters": "Mas Pronosticadores"
+    "sortForecasters": "Mas Pronosticadores",
+    "statusOpen": "Abiertos",
+    "statusResolved": "Resueltos",
+    "statusAll": "Todos"
   },
   "auth": {
     "loginTitle": "Iniciar Sesión",
@@ -163,7 +166,9 @@
     "pnl": "Ganancia/Pérdida",
     "voteHistory": "Historial de Votos",
     "exploreMarkets": "Explorar Mercados",
-    "noVotes": "Aún no has emitido votos."
+    "noVotes": "Aún no has emitido votos.",
+    "won": "Ganaste",
+    "lost": "Perdiste"
   },
   "createMarket": {
     "title": "Crear Nuevo Mercado",

@@ -18,6 +18,7 @@ interface MarketCardProps {
     volume: number;
     resolutionDate: string;
     traderCount?: number;
+    resolvedOutcome?: string | null;
     titleTranslations?: Record<string, string> | null;
   };
 }
@@ -48,10 +49,18 @@ export function MarketCard({ market }: MarketCardProps) {
           className={`ml-auto rounded-full px-2 py-0.5 text-xs font-medium ${
             market.status === "OPEN"
               ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-              : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+              : market.status === "RESOLVED"
+                ? market.resolvedOutcome === "YES"
+                  ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300"
+                  : "bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300"
+                : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
           }`}
         >
-          {market.status === "OPEN" ? t("open") : t("closed")}
+          {market.status === "OPEN"
+            ? t("open")
+            : market.status === "RESOLVED"
+              ? `${t("resolved")}: ${market.resolvedOutcome === "YES" ? t("yesShort") : t("noShort")}`
+              : t("closed")}
         </span>
       </div>
 

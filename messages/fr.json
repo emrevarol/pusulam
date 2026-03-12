@@ -109,7 +109,10 @@
     "sortClosing": "Fin Proche",
     "sortNewest": "Plus Recents",
     "sortPopular": "Plus Populaires",
-    "sortForecasters": "Plus de Pronostiqueurs"
+    "sortForecasters": "Plus de Pronostiqueurs",
+    "statusOpen": "Ouverts",
+    "statusResolved": "Resolus",
+    "statusAll": "Tous"
   },
   "auth": {
     "loginTitle": "Connexion",
@@ -163,7 +166,9 @@
     "pnl": "Gains/Pertes",
     "voteHistory": "Historique des Votes",
     "exploreMarkets": "Explorer les Marchés",
-    "noVotes": "Aucun vote pour le moment."
+    "noVotes": "Aucun vote pour le moment.",
+    "won": "Gagne",
+    "lost": "Perdu"
   },
   "createMarket": {
     "title": "Créer un Nouveau Marché",

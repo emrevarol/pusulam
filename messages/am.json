@@ -109,7 +109,10 @@
     "sortClosing": "ለመዝጋት ቅርብ",
     "sortNewest": "አዲስ",
     "sortPopular": "በጣም ታዋቂ",
-    "sortForecasters": "በጣም ብዙ ተንባዮች"
+    "sortForecasters": "በጣም ብዙ ተንባዮች",
+    "statusOpen": "ክፍት",
+    "statusResolved": "የተፈቱ",
+    "statusAll": "ሁሉም"
   },
   "auth": {
     "loginTitle": "ግባ",
@@ -163,7 +166,9 @@
     "pnl": "ትርፍ/ኪሳራ",
     "voteHistory": "የድምጽ ታሪክ",
     "exploreMarkets": "ገበያዎችን ያስሱ",
-    "noVotes": "ገና ድምጽ አልሰጡም።"
+    "noVotes": "ገና ድምጽ አልሰጡም።",
+    "won": "አሸነፍክ",
+    "lost": "ተሸንፈሃል"
   },
   "createMarket": {
     "title": "አዲስ ገበያ ፍጠር",

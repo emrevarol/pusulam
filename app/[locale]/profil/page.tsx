@@ -191,6 +191,19 @@ export default function ProfilePage() {
                         >
                           {pos.side === "YES" ? tm("yesShares") : tm("noShares")}
                         </span>
+                        {pos.market.status === "RESOLVED" && (
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                              pos.side === pos.market.resolvedOutcome
+                                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40"
+                                : "bg-rose-100 text-rose-800 dark:bg-rose-900/40"
+                            }`}
+                          >
+                            {pos.side === pos.market.resolvedOutcome
+                              ? tp("won")
+                              : tp("lost")}
+                          </span>
+                        )}
                       </div>
                       <h3 className="text-sm font-semibold">{pos.market.title}</h3>
                     </div>

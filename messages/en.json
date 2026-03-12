@@ -109,7 +109,10 @@
     "sortClosing": "Closing Soon",
     "sortNewest": "Newest",
     "sortPopular": "Most Popular",
-    "sortForecasters": "Most Forecasters"
+    "sortForecasters": "Most Forecasters",
+    "statusOpen": "Open",
+    "statusResolved": "Resolved",
+    "statusAll": "All"
   },
   "auth": {
     "loginTitle": "Log In",
@@ -163,7 +166,9 @@
     "pnl": "P&L",
     "voteHistory": "Vote History",
     "exploreMarkets": "Explore Markets",
-    "noVotes": "No votes yet."
+    "noVotes": "No votes yet.",
+    "won": "Won",
+    "lost": "Lost"
   },
   "createMarket": {
     "title": "Create New Market",

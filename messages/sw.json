@@ -109,7 +109,10 @@
     "sortClosing": "Karibu Kufunga",
     "sortNewest": "Mpya Zaidi",
     "sortPopular": "Maarufu Zaidi",
-    "sortForecasters": "Watabiri Wengi"
+    "sortForecasters": "Watabiri Wengi",
+    "statusOpen": "Wazi",
+    "statusResolved": "Yaliyotatuliwa",
+    "statusAll": "Yote"
   },
   "auth": {
     "loginTitle": "Ingia",
@@ -163,7 +166,9 @@
     "pnl": "Faida/Hasara",
     "voteHistory": "Historia ya Kura",
     "exploreMarkets": "Chunguza Masoko",
-    "noVotes": "Bado hujapiga kura."
+    "noVotes": "Bado hujapiga kura.",
+    "won": "Umeshinda",
+    "lost": "Umeshindwa"
   },
   "createMarket": {
     "title": "Unda Soko Jipya",

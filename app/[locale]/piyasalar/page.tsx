@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { MarketCard } from "@/components/market-card";
 import { CategoryFilter } from "@/components/category-filter";
 import { SortFilter } from "@/components/sort-filter";
+import { StatusFilter } from "@/components/status-filter";
 
 type SortOption = "closing" | "newest" | "popular" | "forecasters";
 
@@ -22,24 +23,30 @@ async function closeExpiredMarkets() {
     data: { status: "CLOSED" },
   });
 
-  // If any markets were just closed, trigger AI resolution in the background
   if (result.count > 0) {
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
     fetch(`${baseUrl}/api/cron/resolve-markets`, {
       headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
-    }).catch(() => {}); // fire-and-forget
+    }).catch(() => {});
   }
 }
 
-async function getMarkets(category?: string, sort?: string) {
-  // Auto-close expired markets on every page load
+async function getMarkets(category?: string, sort?: string, statusFilter?: string) {
   await closeExpiredMarkets();
 
-  const where = category && category !== "all"
-    ? { category, status: "OPEN" }
-    : { status: "OPEN" };
+  const statusWhere =
+    statusFilter === "resolved"
+      ? { status: "RESOLVED" }
+      : statusFilter === "all"
+        ? {}
+        : { status: "OPEN" };
 
-  const orderBy = ORDER_BY[(sort as SortOption)] || ORDER_BY.newest;
+  const where = category && category !== "all"
+    ? { category, ...statusWhere }
+    : { ...statusWhere };
+
+  const defaultSort = statusFilter === "resolved" ? "newest" : (sort || "newest");
+  const orderBy = ORDER_BY[(defaultSort as SortOption)] || ORDER_BY.newest;
 
   const markets = await prisma.market.findMany({
     where,
@@ -62,15 +69,18 @@ export default async function MarketsPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ kategori?: string; sirala?: string }>;
+  searchParams: Promise<{ kategori?: string; sirala?: string; durum?: string }>;
 }) {
   const { locale } = await params;
-  const { kategori, sirala } = await searchParams;
-  const markets = await getMarkets(kategori, sirala);
+  const { kategori, sirala, durum } = await searchParams;
+  const markets = await getMarkets(kategori, sirala, durum);
   const t = await getTranslations({ locale, namespace: "market" });
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
+      <div className="mb-4">
+        <StatusFilter activeStatus={durum} />
+      </div>
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <CategoryFilter activeCategory={kategori} />
         <SortFilter />

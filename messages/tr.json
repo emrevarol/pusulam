@@ -109,7 +109,10 @@
     "sortClosing": "Kapanisa En Yakin",
     "sortNewest": "En Yeni",
     "sortPopular": "En Populer",
-    "sortForecasters": "En Cok Tahminci"
+    "sortForecasters": "En Cok Tahminci",
+    "statusOpen": "Acik",
+    "statusResolved": "Sonuclanan",
+    "statusAll": "Tumu"
   },
   "auth": {
     "loginTitle": "Giris Yap",
@@ -163,7 +166,9 @@
     "pnl": "Kar/Zarar",
     "voteHistory": "Oy Gecmisi",
     "exploreMarkets": "Piyasalari Kesfet",
-    "noVotes": "Henuz oy vermediniz."
+    "noVotes": "Henuz oy vermediniz.",
+    "won": "Kazandin",
+    "lost": "Kaybettin"
   },
   "createMarket": {
     "title": "Yeni Piyasa Olustur",
