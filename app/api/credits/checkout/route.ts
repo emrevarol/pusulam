@@ -67,8 +67,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ url: checkoutSession.url });
   } catch (err) {
     console.error("Stripe checkout error:", err);
+    const message = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json(
-      { error: "Payment service error. Please try again later." },
+      { error: `Payment service error: ${message}` },
       { status: 500 }
     );
   }
