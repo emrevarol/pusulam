@@ -39,15 +39,16 @@ export async function POST(request: Request) {
     where: { marketId, direction: "BUY" },
   });
 
-  // Group trades by userId+side to calculate weighted average weight
-  const tradeWeights: Record<string, { totalShares: number; weightedSum: number }> = {};
+  // Calculate total cost and weighted average weight per user+side
+  const tradeStats: Record<string, { totalCost: number; totalShares: number; weightedSum: number }> = {};
   for (const trade of buyTrades) {
     const key = `${trade.userId}:${trade.side}`;
-    if (!tradeWeights[key]) {
-      tradeWeights[key] = { totalShares: 0, weightedSum: 0 };
+    if (!tradeStats[key]) {
+      tradeStats[key] = { totalCost: 0, totalShares: 0, weightedSum: 0 };
     }
-    tradeWeights[key].totalShares += trade.shares;
-    tradeWeights[key].weightedSum += trade.shares * trade.weight;
+    tradeStats[key].totalCost += trade.cost;
+    tradeStats[key].totalShares += trade.shares;
+    tradeStats[key].weightedSum += trade.shares * trade.weight;
   }
 
   // Build payout operations
@@ -56,20 +57,21 @@ export async function POST(request: Request) {
 
   for (const pos of positions) {
     const isWinner = pos.side === outcome;
+    const key = `${pos.userId}:${pos.side}`;
+    const stats = tradeStats[key];
 
     if (isWinner && pos.shares > 0) {
-      // Each winning share is worth 1 Pul
-      // Profit = shares - costBasis (costBasis = shares * avgPrice)
-      const costBasis = pos.shares * pos.avgPrice;
-      const baseProfit = pos.shares - costBasis;
+      const totalCost = stats?.totalCost ?? pos.shares * pos.avgPrice;
+      const avgWeight = stats ? stats.weightedSum / stats.totalShares : 1;
+      const baseValue = pos.shares; // each winning share = 1 Pul
+      const profit = baseValue - totalCost;
 
-      // Get weighted average weight for this position
-      const key = `${pos.userId}:${pos.side}`;
-      const tw = tradeWeights[key];
-      const avgWeight = tw ? tw.weightedSum / tw.totalShares : 1;
-
-      // Payout = costBasis + profit * avgWeight
-      const payout = costBasis + baseProfit * avgWeight;
+      let payout: number;
+      if (profit > 0) {
+        payout = totalCost + profit * avgWeight;
+      } else {
+        payout = baseValue;
+      }
 
       if (payout > 0) {
         payoutOps.push(
@@ -77,20 +79,19 @@ export async function POST(request: Request) {
             where: { id: pos.userId },
             data: {
               balance: { increment: payout },
-              reputation: { increment: Math.min(baseProfit * 0.1, 50) },
+              reputation: { increment: Math.min(Math.max(profit, 0) * 0.1, 50) },
             },
           })
         );
         payoutDetails.push({ userId: pos.userId, payout, side: pos.side });
       }
     } else if (!isWinner && pos.shares > 0) {
-      // Losing side: small reputation penalty
-      const costBasis = pos.shares * pos.avgPrice;
+      const totalCost = stats?.totalCost ?? pos.shares * pos.avgPrice;
       payoutOps.push(
         prisma.user.update({
           where: { id: pos.userId },
           data: {
-            reputation: { decrement: Math.min(costBasis * 0.05, 25) },
+            reputation: { decrement: Math.min(totalCost * 0.05, 25) },
           },
         })
       );

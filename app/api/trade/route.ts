@@ -71,6 +71,43 @@ export async function POST(request: Request) {
       );
     }
 
+    // Read existing position before transaction for weighted avg price calc
+    const existingPos = await prisma.position.findUnique({
+      where: {
+        userId_marketId_side: {
+          userId: user.id,
+          marketId: market.id,
+          side,
+        },
+      },
+    });
+
+    const positionOp = existingPos
+      ? prisma.position.update({
+          where: {
+            userId_marketId_side: {
+              userId: user.id,
+              marketId: market.id,
+              side,
+            },
+          },
+          data: {
+            shares: existingPos.shares + shares,
+            avgPrice:
+              (existingPos.shares * existingPos.avgPrice + shares * avgPrice) /
+              (existingPos.shares + shares),
+          },
+        })
+      : prisma.position.create({
+          data: {
+            userId: user.id,
+            marketId: market.id,
+            side,
+            shares,
+            avgPrice,
+          },
+        });
+
     const operations = [
       prisma.user.update({
         where: { id: user.id },
@@ -100,25 +137,7 @@ export async function POST(request: Request) {
           marketId: market.id,
         },
       }),
-      prisma.position.upsert({
-        where: {
-          userId_marketId_side: {
-            userId: user.id,
-            marketId: market.id,
-            side,
-          },
-        },
-        create: {
-          userId: user.id,
-          marketId: market.id,
-          side,
-          shares,
-          avgPrice,
-        },
-        update: {
-          shares: { increment: shares },
-        },
-      }),
+      positionOp,
       prisma.dailyPrediction.upsert({
         where: { userId_date: { userId: user.id, date: today } },
         create: { userId: user.id, date: today, count: 1 },
