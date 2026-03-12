@@ -96,6 +96,7 @@
     "creditsShort": "Kredi",
     "rewardMultiplier": "Kazanc carpani",
     "returnLabel": "Kazanc",
+    "potentialReturn": "Kazanirsan",
     "buyCreditsLink": "Kredi Satin Al →",
     "insufficientCredits": "Yetersiz kredi. Kredi satin alin.",
     "people": "kisi",
@@ -168,7 +169,13 @@
     "exploreMarkets": "Piyasalari Kesfet",
     "noVotes": "Henuz oy vermediniz.",
     "won": "Kazandin",
-    "lost": "Kaybettin"
+    "lost": "Kaybettin",
+    "pastPredictions": "Gecmis Tahminler",
+    "noPastPredictions": "Henuz sonuclanan tahmin yok.",
+    "totalPredictions": "Toplam",
+    "accuracy": "Isabet",
+    "invested": "Yatirim",
+    "payout": "Kazanc"
   },
   "createMarket": {
     "title": "Yeni Piyasa Olustur",

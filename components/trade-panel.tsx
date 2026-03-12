@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getYesPrice, getNoPrice, calculateBuyCost, calculateSellReturn } from "@/lib/amm";
+import { getYesPrice, getNoPrice, calculateBuyShares, calculateSellReturn } from "@/lib/amm";
 import { VALID_WEIGHTS, DAILY_FREE_PREDICTIONS, getCreditsRequired } from "@/lib/credits";
 
 interface Position {
@@ -31,7 +31,8 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
 
   const [direction, setDirection] = useState<"BUY" | "SELL">("BUY");
   const [side, setSide] = useState<"YES" | "NO">("YES");
-  const [shares, setShares] = useState("");
+  const [amount, setAmount] = useState("");
+  const [sellShares, setSellShares] = useState("");
   const [weight, setWeight] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -40,7 +41,8 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
   const [credits, setCredits] = useState(0);
   const [dailyRemaining, setDailyRemaining] = useState(DAILY_FREE_PREDICTIONS);
 
-  const sharesNum = parseFloat(shares) || 0;
+  const amountNum = parseFloat(amount) || 0;
+  const sellSharesNum = parseFloat(sellShares) || 0;
 
   useEffect(() => {
     if (session?.user) {
@@ -66,22 +68,20 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
     }
   }, [session, pathname]);
 
-  let cost = 0;
+  let sharesReceived = 0;
   let avgPrice = 0;
   let returnAmount = 0;
   try {
-    if (sharesNum > 0) {
-      if (direction === "BUY") {
-        const result = calculateBuyCost(yesPool, noPool, side, sharesNum);
-        cost = result.cost;
-        avgPrice = result.avgPrice;
-      } else {
-        const result = calculateSellReturn(yesPool, noPool, side, sharesNum);
-        returnAmount = result.returnAmount;
-      }
+    if (direction === "BUY" && amountNum > 0) {
+      const result = calculateBuyShares(yesPool, noPool, side, amountNum);
+      sharesReceived = result.shares;
+      avgPrice = result.avgPrice;
+    } else if (direction === "SELL" && sellSharesNum > 0) {
+      const result = calculateSellReturn(yesPool, noPool, side, sellSharesNum);
+      returnAmount = result.returnAmount;
     }
   } catch {
-    cost = 0;
+    sharesReceived = 0;
     avgPrice = 0;
     returnAmount = 0;
   }
@@ -107,7 +107,13 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
       const res = await fetch("/api/trade", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ marketId, side, shares: sharesNum, direction, weight }),
+        body: JSON.stringify({
+          marketId,
+          side,
+          direction,
+          weight,
+          ...(direction === "BUY" ? { amount: amountNum } : { shares: sellSharesNum }),
+        }),
       });
 
       if (!res.ok) {
@@ -120,7 +126,8 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
         return;
       }
 
-      setShares("");
+      setAmount("");
+      setSellShares("");
       setWeight(1);
       setSuccess(t("tradeSuccess"));
       setTimeout(() => setSuccess(""), 2000);
@@ -201,30 +208,45 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
           </button>
         </div>
 
-        {/* Shares input */}
+        {/* Amount input (BUY) or Shares input (SELL) */}
         <div className="mb-4">
-          <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
-            {t("shares")}
-            {direction === "SELL" && currentPosition && (
-              <span className="ml-1 text-gray-400">
-                (max: {currentPosition.shares.toFixed(0)})
-              </span>
-            )}
-          </label>
-          <input
-            type="number"
-            value={shares}
-            onChange={(e) => setShares(e.target.value)}
-            placeholder="0"
-            min="1"
-            step="1"
-            max={
-              direction === "SELL" && currentPosition
-                ? currentPosition.shares
-                : undefined
-            }
-            className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
-          />
+          {direction === "BUY" ? (
+            <>
+              <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
+                {t("cost")} (Pul)
+              </label>
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="10"
+                min="1"
+                step="1"
+                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+              />
+            </>
+          ) : (
+            <>
+              <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
+                {t("shares")}
+                {currentPosition && (
+                  <span className="ml-1 text-gray-400">
+                    (max: {currentPosition.shares.toFixed(0)})
+                  </span>
+                )}
+              </label>
+              <input
+                type="number"
+                value={sellShares}
+                onChange={(e) => setSellShares(e.target.value)}
+                placeholder="0"
+                min="1"
+                step="1"
+                max={currentPosition ? currentPosition.shares : undefined}
+                className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+              />
+            </>
+          )}
         </div>
 
         {/* Weight selector (only for BUY) */}
@@ -272,18 +294,24 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
         )}
 
         {/* Cost/Return breakdown */}
-        {sharesNum > 0 && (
+        {((direction === "BUY" && amountNum > 0) || (direction === "SELL" && sellSharesNum > 0)) && (
           <div className="mb-4 space-y-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
             {direction === "BUY" ? (
               <>
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">{t("cost")}</span>
-                  <span className="font-semibold">{cost.toFixed(2)} P</span>
+                  <span className="text-gray-500">{t("shares")}</span>
+                  <span className="font-semibold">{sharesReceived.toFixed(1)}</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-500">{t("avgPrice")}</span>
                   <span className="font-semibold">
                     %{(avgPrice * 100).toFixed(1)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-500">{t("potentialReturn")}</span>
+                  <span className="font-semibold text-emerald-600">
+                    +{(sharesReceived - amountNum).toFixed(1)} P
                   </span>
                 </div>
                 {creditsNeeded > 0 && (
@@ -337,7 +365,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
 
         <button
           onClick={handleTrade}
-          disabled={loading || sharesNum <= 0}
+          disabled={loading || (direction === "BUY" ? amountNum <= 0 : sellSharesNum <= 0)}
           className={`w-full rounded-lg py-3 text-sm font-semibold text-white transition ${
             direction === "BUY"
               ? side === "YES"
@@ -350,8 +378,8 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
             ? "..."
             : session
               ? direction === "BUY"
-                ? `${t("buy")} ${sharesNum || 0} ${side === "YES" ? t("yesShares") : t("noShares")}${weight > 1 ? ` (${weight}x)` : ""}`
-                : `${t("sell")} ${sharesNum || 0} ${side === "YES" ? t("yesShares") : t("noShares")}`
+                ? `${t("buy")} ${amountNum || 0} P → ${sharesReceived.toFixed(1)} ${side === "YES" ? t("yesShort") : t("noShort")}${weight > 1 ? ` (${weight}x)` : ""}`
+                : `${t("sell")} ${sellSharesNum || 0} ${side === "YES" ? t("yesShares") : t("noShares")}`
               : tc("loginRequired")}
         </button>
       </div>

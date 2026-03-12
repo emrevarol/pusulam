@@ -47,7 +47,7 @@ export default function ProfilePage() {
   const [balance, setBalance] = useState<number>(0);
   const [positions, setPositions] = useState<Position[]>([]);
   const [trades, setTrades] = useState<Trade[]>([]);
-  const [tab, setTab] = useState<"positions" | "history">("positions");
+  const [tab, setTab] = useState<"positions" | "past" | "history">("positions");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -79,8 +79,12 @@ export default function ProfilePage() {
 
   if (!session) return null;
 
-  const totalValue = positions.reduce((sum, p) => sum + p.currentValue, 0);
+  const activePositions = positions.filter((p) => p.market.status !== "RESOLVED");
+  const pastPositions = positions.filter((p) => p.market.status === "RESOLVED");
+  const totalValue = activePositions.reduce((sum, p) => sum + p.currentValue, 0);
   const totalPnl = positions.reduce((sum, p) => sum + p.pnl, 0);
+  const pastWins = pastPositions.filter((p) => p.side === p.market.resolvedOutcome).length;
+  const pastLosses = pastPositions.length - pastWins;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
@@ -138,7 +142,17 @@ export default function ProfilePage() {
               : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
           }`}
         >
-          {tm("yourPosition")} ({positions.length})
+          {tm("yourPosition")} ({activePositions.length})
+        </button>
+        <button
+          onClick={() => setTab("past")}
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+            tab === "past"
+              ? "bg-teal-600 text-white"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
+          }`}
+        >
+          {tp("pastPredictions")} ({pastPositions.length})
         </button>
         <button
           onClick={() => setTab("history")}
@@ -152,10 +166,10 @@ export default function ProfilePage() {
         </button>
       </div>
 
-      {/* Positions tab */}
+      {/* Active Positions tab */}
       {tab === "positions" && (
         <div className="space-y-3">
-          {positions.length === 0 ? (
+          {activePositions.length === 0 ? (
             <div className="rounded-xl border-2 border-dashed border-gray-200 p-12 text-center dark:border-gray-800">
               <p className="text-gray-400">{tm("noPosition")}</p>
               <Link
@@ -166,7 +180,7 @@ export default function ProfilePage() {
               </Link>
             </div>
           ) : (
-            positions.map((pos) => {
+            activePositions.map((pos) => {
               const cat = CATEGORIES[pos.market.category];
               return (
                 <Link
@@ -191,25 +205,12 @@ export default function ProfilePage() {
                         >
                           {pos.side === "YES" ? tm("yesShares") : tm("noShares")}
                         </span>
-                        {pos.market.status === "RESOLVED" && (
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-xs font-bold ${
-                              pos.side === pos.market.resolvedOutcome
-                                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40"
-                                : "bg-rose-100 text-rose-800 dark:bg-rose-900/40"
-                            }`}
-                          >
-                            {pos.side === pos.market.resolvedOutcome
-                              ? tp("won")
-                              : tp("lost")}
-                          </span>
-                        )}
                       </div>
                       <h3 className="text-sm font-semibold">{pos.market.title}</h3>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-bold">
-                        {pos.shares.toFixed(0)} {tm("shares").toLowerCase()}
+                        {pos.shares.toFixed(1)} {tm("shares").toLowerCase()}
                       </p>
                       <p
                         className={`text-xs font-medium ${
@@ -219,6 +220,98 @@ export default function ProfilePage() {
                         {pos.pnl >= 0 ? "+" : ""}
                         {pos.pnl.toFixed(1)} P
                       </p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {/* Past Predictions tab */}
+      {tab === "past" && (
+        <div className="space-y-3">
+          {/* Summary bar */}
+          {pastPositions.length > 0 && (
+            <div className="mb-2 flex items-center gap-4 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+              <span className="text-xs text-gray-500">{tp("totalPredictions")}: {pastPositions.length}</span>
+              <span className="text-xs font-medium text-emerald-600">{tp("won")}: {pastWins}</span>
+              <span className="text-xs font-medium text-rose-500">{tp("lost")}: {pastLosses}</span>
+              {pastPositions.length > 0 && (
+                <span className="text-xs font-medium text-teal-600">
+                  {tp("accuracy")}: %{((pastWins / pastPositions.length) * 100).toFixed(0)}
+                </span>
+              )}
+            </div>
+          )}
+          {pastPositions.length === 0 ? (
+            <div className="rounded-xl border-2 border-dashed border-gray-200 p-12 text-center dark:border-gray-800">
+              <p className="text-gray-400">{tp("noPastPredictions")}</p>
+            </div>
+          ) : (
+            pastPositions.map((pos) => {
+              const cat = CATEGORIES[pos.market.category];
+              const isWin = pos.side === pos.market.resolvedOutcome;
+              const costBasis = pos.shares * pos.avgPrice;
+              const payout = isWin ? pos.shares : 0;
+              const profit = payout - costBasis;
+
+              return (
+                <Link
+                  key={pos.id}
+                  href={`/${locale}/piyasalar/${pos.market.slug}`}
+                  className="block rounded-xl border border-gray-200 bg-white p-4 transition hover:border-gray-300 hover:shadow-sm dark:border-gray-800 dark:bg-gray-900"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="mb-1 flex flex-wrap items-center gap-2">
+                        {cat && (
+                          <span className="text-xs text-gray-500">
+                            {cat.emoji} {cat.label}
+                          </span>
+                        )}
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                            pos.side === "YES"
+                              ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30"
+                              : "bg-rose-50 text-rose-700 dark:bg-rose-900/30"
+                          }`}
+                        >
+                          {pos.side === "YES" ? tm("yesShort") : tm("noShort")}
+                        </span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                            isWin
+                              ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40"
+                              : "bg-rose-100 text-rose-800 dark:bg-rose-900/40"
+                          }`}
+                        >
+                          {isWin ? tp("won") : tp("lost")}
+                        </span>
+                        <span className="text-[10px] text-gray-400">
+                          {tm("result")}: {pos.market.resolvedOutcome === "YES" ? tm("resolvedYes") : tm("resolvedNo")}
+                        </span>
+                      </div>
+                      <h3 className="text-sm font-semibold">{pos.market.title}</h3>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {tp("invested")}: {costBasis.toFixed(1)} P · {pos.shares.toFixed(1)} {tm("shares").toLowerCase()} · {tm("avgPrice")}: %{(pos.avgPrice * 100).toFixed(0)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p
+                        className={`text-lg font-bold ${
+                          profit >= 0 ? "text-emerald-600" : "text-rose-500"
+                        }`}
+                      >
+                        {profit >= 0 ? "+" : ""}
+                        {profit.toFixed(1)} P
+                      </p>
+                      {isWin && (
+                        <p className="text-xs text-gray-500">
+                          {tp("payout")}: {payout.toFixed(1)} P
+                        </p>
+                      )}
                     </div>
                   </div>
                 </Link>

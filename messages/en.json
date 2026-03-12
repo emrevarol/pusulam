@@ -96,6 +96,7 @@
     "creditsShort": "Credits",
     "rewardMultiplier": "Reward multiplier",
     "returnLabel": "Return",
+    "potentialReturn": "If you win",
     "buyCreditsLink": "Buy Credits →",
     "insufficientCredits": "Insufficient credits. Buy credits.",
     "people": "people",
@@ -168,7 +169,13 @@
     "exploreMarkets": "Explore Markets",
     "noVotes": "No votes yet.",
     "won": "Won",
-    "lost": "Lost"
+    "lost": "Lost",
+    "pastPredictions": "Past Predictions",
+    "noPastPredictions": "No resolved predictions yet.",
+    "totalPredictions": "Total",
+    "accuracy": "Accuracy",
+    "invested": "Invested",
+    "payout": "Payout"
   },
   "createMarket": {
     "title": "Create New Market",

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { calculateBuyCost, calculateSellReturn } from "@/lib/amm";
+import { calculateBuyShares, calculateSellReturn } from "@/lib/amm";
 import {
   VALID_WEIGHTS,
   DAILY_FREE_PREDICTIONS,
@@ -16,13 +16,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
   }
 
-  const { marketId, side, shares, direction, weight = 1 } = await request.json();
+  const { marketId, side, amount, shares, direction, weight = 1 } = await request.json();
 
-  if (!marketId || !side || !shares || !direction) {
+  if (!marketId || !side || !direction) {
     return NextResponse.json({ error: "Eksik alan" }, { status: 400 });
   }
 
-  if (shares <= 0) {
+  if (direction === "BUY" && (!amount || amount <= 0)) {
+    return NextResponse.json({ error: "Gecersiz miktar" }, { status: 400 });
+  }
+
+  if (direction === "SELL" && (!shares || shares <= 0)) {
     return NextResponse.json({ error: "Gecersiz miktar" }, { status: 400 });
   }
 
@@ -44,14 +48,15 @@ export async function POST(request: Request) {
   }
 
   if (direction === "BUY") {
-    const { cost, newYesPool, newNoPool, avgPrice } = calculateBuyCost(
+    const betAmount = amount;
+    const { shares: sharesReceived, newYesPool, newNoPool, avgPrice } = calculateBuyShares(
       market.yesPool,
       market.noPool,
       side,
-      shares
+      betAmount
     );
 
-    if (cost > user.balance) {
+    if (betAmount > user.balance) {
       return NextResponse.json({ error: "Yetersiz bakiye" }, { status: 400 });
     }
 
@@ -92,10 +97,10 @@ export async function POST(request: Request) {
             },
           },
           data: {
-            shares: existingPos.shares + shares,
+            shares: existingPos.shares + sharesReceived,
             avgPrice:
-              (existingPos.shares * existingPos.avgPrice + shares * avgPrice) /
-              (existingPos.shares + shares),
+              (existingPos.shares * existingPos.avgPrice + sharesReceived * avgPrice) /
+              (existingPos.shares + sharesReceived),
           },
         })
       : prisma.position.create({
@@ -103,7 +108,7 @@ export async function POST(request: Request) {
             userId: user.id,
             marketId: market.id,
             side,
-            shares,
+            shares: sharesReceived,
             avgPrice,
           },
         });
@@ -112,7 +117,7 @@ export async function POST(request: Request) {
       prisma.user.update({
         where: { id: user.id },
         data: {
-          balance: user.balance - cost,
+          balance: user.balance - betAmount,
           ...(creditsNeeded > 0 ? { credits: { decrement: creditsNeeded } } : {}),
         },
       }),
@@ -121,7 +126,7 @@ export async function POST(request: Request) {
         data: {
           yesPool: newYesPool,
           noPool: newNoPool,
-          volume: market.volume + cost,
+          volume: market.volume + betAmount,
           traderCount: { increment: 1 },
         },
       }),
@@ -129,9 +134,9 @@ export async function POST(request: Request) {
         data: {
           direction: "BUY",
           side,
-          shares,
+          shares: sharesReceived,
           price: avgPrice,
-          cost,
+          cost: betAmount,
           weight,
           userId: user.id,
           marketId: market.id,
@@ -147,7 +152,7 @@ export async function POST(request: Request) {
 
     await prisma.$transaction(operations);
 
-    return NextResponse.json({ success: true, cost, avgPrice, creditsUsed: creditsNeeded });
+    return NextResponse.json({ success: true, cost: betAmount, shares: sharesReceived, avgPrice, creditsUsed: creditsNeeded });
   }
 
   if (direction === "SELL") {
