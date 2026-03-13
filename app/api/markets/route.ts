@@ -29,6 +29,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
     }
 
+    // Only admins can create markets directly
+    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    if (!user || user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
+    }
+
     const { title, description, category, resolutionDate } =
       await request.json();
 

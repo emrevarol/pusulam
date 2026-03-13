@@ -81,7 +81,7 @@ export function Navbar() {
                 href={`/${locale}/piyasa-olustur`}
                 className="hidden rounded-lg border border-teal-200 px-3 py-1.5 text-xs font-semibold text-teal-600 hover:bg-teal-50 dark:border-teal-800 dark:hover:bg-teal-900/20 sm:block"
               >
-                {t("createMarket")}
+                {(session.user as { role?: string }).role === "ADMIN" ? t("createMarket") : t("suggestMarket")}
               </Link>
               <Link
                 href={`/${locale}/kredi`}

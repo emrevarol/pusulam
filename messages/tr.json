@@ -21,7 +21,8 @@
     "askAi": "AI'a Sor",
     "leaderboard": "Skor Tablosu",
     "aiAssistant": "AI Asistan",
-    "createMarket": "+ Piyasa",
+    "createMarket": "+ Piyasa Olustur",
+    "suggestMarket": "+ Piyasa Oner",
     "buyCredits": "Oy Hakki Satin Al",
     "loginRequired": "Giris Yap",
     "lightMode": "Acik Mod",
@@ -200,7 +201,11 @@
     "fieldEndDate": "Bitis Tarihi",
     "titlePlaceholder": "Orn: 2026 sonunda dolar 40 TL'yi gecer mi?",
     "descriptionPlaceholder": "Piyasanin nasil cozulecegini aciklayin...",
-    "submitButton": "Piyasa Olustur"
+    "submitButton": "Piyasa Olustur",
+    "suggestTitle": "Piyasa Oner",
+    "suggestDescription": "Oneriniz admin onayindan sonra yayinlanacaktir.",
+    "suggestButton": "Oneri Gonder",
+    "suggestionSent": "Oneriniz basariyla gonderildi! Admin inceledikten sonra yayinlanacak."
   },
   "credits": {
     "creditBalance": "Oy Hakki Bakiyen",

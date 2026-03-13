@@ -21,7 +21,8 @@
     "askAi": "Ask AI",
     "leaderboard": "Leaderboard",
     "aiAssistant": "AI Assistant",
-    "createMarket": "+ Market",
+    "createMarket": "+ Create Market",
+    "suggestMarket": "+ Suggest Market",
     "buyCredits": "Buy Vote Rights",
     "loginRequired": "Log In",
     "lightMode": "Light Mode",
@@ -200,7 +201,11 @@
     "fieldEndDate": "Resolution Date",
     "titlePlaceholder": "e.g. Will USD/TRY exceed 40 by end of 2026?",
     "descriptionPlaceholder": "Explain how this market will be resolved...",
-    "submitButton": "Create Market"
+    "submitButton": "Create Market",
+    "suggestTitle": "Suggest a Market",
+    "suggestDescription": "Your suggestion will be published after admin approval.",
+    "suggestButton": "Submit Suggestion",
+    "suggestionSent": "Your suggestion has been submitted! It will be published after admin review."
   },
   "credits": {
     "creditBalance": "Vote Rights Balance",

@@ -15,6 +15,8 @@ export default function CreateMarketPage() {
   const router = useRouter();
   const locale = pathname.split("/")[1] || "tr";
 
+  const isAdmin = (session?.user as { role?: string })?.role === "ADMIN";
+
   // Default: tomorrow at current time
   const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const defaultDate = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}T${String(tomorrow.getHours()).padStart(2, "0")}:${String(tomorrow.getMinutes()).padStart(2, "0")}:${String(tomorrow.getSeconds()).padStart(2, "0")}`;
@@ -26,6 +28,7 @@ export default function CreateMarketPage() {
     resolutionDate: defaultDate,
   });
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   if (status === "unauthenticated") {
@@ -41,23 +44,40 @@ export default function CreateMarketPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
 
     try {
-      const res = await fetch("/api/markets", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        setError(data?.error || t("error"));
+      if (isAdmin) {
+        // Admin: create market directly
+        const res = await fetch("/api/markets", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+          setError(data?.error || t("error"));
+          setLoading(false);
+          return;
+        }
+        router.push(`/${locale}/piyasalar/${data.slug}`);
+      } else {
+        // Regular user: suggest market
+        const res = await fetch("/api/market-suggestions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok) {
+          setError(data?.error || t("error"));
+          setLoading(false);
+          return;
+        }
+        setSuccess(tcm("suggestionSent"));
+        setForm({ title: "", description: "", category: "GUNDEM", resolutionDate: defaultDate });
         setLoading(false);
-        return;
       }
-
-      router.push(`/${locale}/piyasalar/${data.slug}`);
     } catch {
       setError(t("error"));
       setLoading(false);
@@ -66,9 +86,14 @@ export default function CreateMarketPage() {
 
   return (
     <div className="mx-auto max-w-lg px-4 py-8">
-      <h1 className="mb-8 text-2xl font-bold">
-        {tcm("title")}
+      <h1 className="mb-2 text-2xl font-bold">
+        {isAdmin ? tcm("title") : tcm("suggestTitle")}
       </h1>
+      {!isAdmin && (
+        <p className="mb-8 text-sm text-gray-500 dark:text-gray-400">
+          {tcm("suggestDescription")}
+        </p>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
@@ -137,13 +162,18 @@ export default function CreateMarketPage() {
         </div>
 
         {error && <p className="text-sm text-rose-500">{error}</p>}
+        {success && (
+          <div className="rounded-lg bg-emerald-50 p-4 text-sm text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400">
+            {success}
+          </div>
+        )}
 
         <button
           type="submit"
           disabled={loading}
           className="w-full rounded-lg bg-teal-600 py-3 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50"
         >
-          {loading ? "..." : tcm("submitButton")}
+          {loading ? "..." : isAdmin ? tcm("submitButton") : tcm("suggestButton")}
         </button>
       </form>
     </div>
