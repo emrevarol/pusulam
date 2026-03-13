@@ -31,7 +31,8 @@
     "copyLink": "Linki Kopyala",
     "buyOyHakki": "Oy Hakki Satin Al",
     "connectionError": "Baglanti hatasi.",
-    "genericError": "Bir hata olustu."
+    "genericError": "Bir hata olustu.",
+    "adminSuggestions": "Piyasa Onerileri"
   },
   "home": {
     "hero": "Gelecegi tahmin et, yonunu belirle.",

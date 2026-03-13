@@ -31,7 +31,8 @@
     "copyLink": "Copy Link",
     "buyOyHakki": "Buy Vote Rights",
     "connectionError": "Connection error.",
-    "genericError": "An error occurred."
+    "genericError": "An error occurred.",
+    "adminSuggestions": "Market Suggestions"
   },
   "home": {
     "hero": "Predict the future, set your course.",

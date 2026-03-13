@@ -133,6 +133,15 @@ export function Navbar() {
                       >
                         {t("buyOyHakki")}
                       </Link>
+                      {(session.user as { role?: string }).role === "ADMIN" && (
+                        <Link
+                          href={`/${locale}/admin/oneriler`}
+                          onClick={() => setMenuOpen(false)}
+                          className="block px-4 py-2 text-sm text-amber-600 hover:bg-gray-50 dark:text-amber-400 dark:hover:bg-gray-800"
+                        >
+                          {t("adminSuggestions")}
+                        </Link>
+                      )}
                       <button
                         onClick={() => {
                           setMenuOpen(false);
