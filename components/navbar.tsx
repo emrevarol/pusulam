@@ -15,8 +15,10 @@ export function Navbar() {
   const [oyHakki, setOyHakki] = useState<number | null>(null);
   const [dailyFree, setDailyFree] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
 
   const locale = pathname.split("/")[1] || "tr";
+  const isAdmin = (session?.user as { role?: string } | undefined)?.role === "ADMIN";
 
   function fetchBalance() {
     fetch("/api/user/balance")
@@ -29,7 +31,17 @@ export function Navbar() {
 
   useEffect(() => {
     if (session?.user) fetchBalance();
-  }, [session, pathname]);
+    if (isAdmin) {
+      fetch("/api/admin/market-suggestions")
+        .then((r) => r.json())
+        .then((data) => {
+          if (Array.isArray(data)) {
+            setPendingCount(data.filter((s: { status: string }) => s.status === "PENDING").length);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [session, pathname, isAdmin]);
 
   useEffect(() => {
     function onTradeComplete() {
@@ -68,6 +80,17 @@ export function Navbar() {
             >
               {t("aiAssistant")}
             </Link>
+            {isAdmin && pendingCount > 0 && (
+              <Link
+                href={`/${locale}/admin/oneriler`}
+                className="flex items-center gap-1 text-sm font-medium text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
+              >
+                {t("adminSuggestions")}
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white">
+                  {pendingCount}
+                </span>
+              </Link>
+            )}
           </div>
         </div>
 
