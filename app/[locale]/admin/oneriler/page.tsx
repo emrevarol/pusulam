@@ -16,6 +16,8 @@ interface Suggestion {
   suggestedDate: string;
   probability: number | null;
   status: string;
+  rejectReason: string | null;
+  suggestedBy: { displayName: string; username: string; email: string } | null;
   createdAt: string;
 }
 
@@ -29,6 +31,8 @@ export default function AdminSuggestionsPage() {
   const [loading, setLoading] = useState(true);
   const [fetching, setFetching] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
 
   const isAdmin = (session?.user as { role?: string } | undefined)?.role === "ADMIN";
 
@@ -60,17 +64,37 @@ export default function AdminSuggestionsPage() {
     setFetching(false);
   }
 
-  async function handleAction(id: string, action: "APPROVE" | "REJECT") {
+  async function handleAction(id: string, action: "APPROVE" | "REJECT", reason?: string) {
     setActionLoading(id);
     const res = await fetch("/api/admin/market-suggestions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ suggestionId: id, action }),
+      body: JSON.stringify({ suggestionId: id, action, rejectReason: reason }),
     });
     if (res.ok) {
+      setRejectingId(null);
+      setRejectReason("");
       await loadSuggestions();
     }
     setActionLoading(null);
+  }
+
+  function sourceLabel(source: string) {
+    switch (source) {
+      case "POLYMARKET": return "Polymarket";
+      case "NEWS_AI": return "AI Haber";
+      case "USER": return "Kullanici";
+      default: return source;
+    }
+  }
+
+  function sourceBadgeClass(source: string) {
+    switch (source) {
+      case "POLYMARKET": return "bg-purple-100 text-purple-700 dark:bg-purple-900/30";
+      case "NEWS_AI": return "bg-blue-100 text-blue-700 dark:bg-blue-900/30";
+      case "USER": return "bg-amber-100 text-amber-700 dark:bg-amber-900/30";
+      default: return "bg-gray-100 text-gray-700";
+    }
   }
 
   if (status === "loading" || loading) {
@@ -103,7 +127,7 @@ export default function AdminSuggestionsPage() {
       </h2>
       {pending.length === 0 ? (
         <div className="mb-8 rounded-xl border-2 border-dashed border-gray-200 p-8 text-center dark:border-gray-800">
-          <p className="text-gray-400">Bekleyen oneri yok. &quot;Yeni Onerileri Getir&quot; ile AI&apos;dan oneri isteyin.</p>
+          <p className="text-gray-400">Bekleyen oneri yok.</p>
         </div>
       ) : (
         <div className="mb-8 space-y-3">
@@ -116,15 +140,9 @@ export default function AdminSuggestionsPage() {
               >
                 <div className="mb-2 flex items-start justify-between gap-3">
                   <div className="flex-1">
-                    <div className="mb-1 flex items-center gap-2">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                          s.source === "POLYMARKET"
-                            ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30"
-                            : "bg-blue-100 text-blue-700 dark:bg-blue-900/30"
-                        }`}
-                      >
-                        {s.source === "POLYMARKET" ? "Polymarket" : "AI Haber"}
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${sourceBadgeClass(s.source)}`}>
+                        {sourceLabel(s.source)}
                       </span>
                       {cat && (
                         <span className="text-xs text-gray-500">
@@ -142,27 +160,59 @@ export default function AdminSuggestionsPage() {
                       <p className="text-xs text-gray-400">{s.titleEn}</p>
                     )}
                     <p className="mt-1 text-xs text-gray-500">{s.descriptionTr}</p>
-                    <p className="mt-1 text-[10px] text-gray-400">
-                      Kapanis: {new Date(s.suggestedDate).toLocaleDateString("tr-TR")}
-                    </p>
+                    <div className="mt-1 flex items-center gap-3 text-[10px] text-gray-400">
+                      <span>Kapanis: {new Date(s.suggestedDate).toLocaleDateString("tr-TR")}</span>
+                      {s.suggestedBy && (
+                        <span>Oneren: <strong>@{s.suggestedBy.username}</strong> ({s.suggestedBy.displayName})</span>
+                      )}
+                      <span>{new Date(s.createdAt).toLocaleDateString("tr-TR")}</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleAction(s.id, "APPROVE")}
-                    disabled={actionLoading !== null}
-                    className="flex-1 rounded-lg bg-emerald-600 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
-                  >
-                    {actionLoading === s.id ? "..." : "Onayla"}
-                  </button>
-                  <button
-                    onClick={() => handleAction(s.id, "REJECT")}
-                    disabled={actionLoading !== null}
-                    className="flex-1 rounded-lg bg-rose-600 py-2 text-sm font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
-                  >
-                    Reddet
-                  </button>
-                </div>
+
+                {rejectingId === s.id ? (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={rejectReason}
+                      onChange={(e) => setRejectReason(e.target.value)}
+                      placeholder="Red sebebi (opsiyonel)..."
+                      className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleAction(s.id, "REJECT", rejectReason)}
+                        disabled={actionLoading !== null}
+                        className="flex-1 rounded-lg bg-rose-600 py-2 text-sm font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
+                      >
+                        {actionLoading === s.id ? "..." : "Reddet"}
+                      </button>
+                      <button
+                        onClick={() => { setRejectingId(null); setRejectReason(""); }}
+                        className="flex-1 rounded-lg border border-gray-300 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-400"
+                      >
+                        Iptal
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleAction(s.id, "APPROVE")}
+                      disabled={actionLoading !== null}
+                      className="flex-1 rounded-lg bg-emerald-600 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                    >
+                      {actionLoading === s.id ? "..." : "Onayla"}
+                    </button>
+                    <button
+                      onClick={() => setRejectingId(s.id)}
+                      disabled={actionLoading !== null}
+                      className="flex-1 rounded-lg bg-rose-600 py-2 text-sm font-semibold text-white hover:bg-rose-700 disabled:opacity-50"
+                    >
+                      Reddet
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -181,9 +231,15 @@ export default function AdminSuggestionsPage() {
                 key={s.id}
                 className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-900"
               >
-                <div>
+                <div className="flex-1">
                   <p className="text-sm font-medium">{s.titleTr}</p>
-                  <p className="text-xs text-gray-400">{s.source}</p>
+                  <div className="flex items-center gap-2 text-[10px] text-gray-400">
+                    <span className={`rounded-full px-1.5 py-0.5 font-bold ${sourceBadgeClass(s.source)}`}>
+                      {sourceLabel(s.source)}
+                    </span>
+                    {s.suggestedBy && <span>@{s.suggestedBy.username}</span>}
+                    {s.rejectReason && <span>Sebep: {s.rejectReason}</span>}
+                  </div>
                 </div>
                 <span
                   className={`rounded-full px-2 py-0.5 text-xs font-bold ${

@@ -192,7 +192,13 @@
     "totalPredictions": "Total",
     "accuracy": "Accuracy",
     "invested": "Invested",
-    "payout": "Payout"
+    "payout": "Payout",
+    "mySuggestions": "My Suggestions",
+    "suggestionPending": "Pending",
+    "suggestionApproved": "Approved",
+    "suggestionRejected": "Rejected",
+    "suggestedDate": "Closing",
+    "rejectReason": "Reason"
   },
   "createMarket": {
     "title": "Create New Market",

@@ -25,6 +25,7 @@ export async function POST(request: Request) {
         category,
         suggestedDate: new Date(resolutionDate),
         status: "PENDING",
+        suggestedById: session.user.id,
       },
     });
 

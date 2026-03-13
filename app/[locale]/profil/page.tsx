@@ -35,6 +35,16 @@ interface Trade {
   market: { title: string; slug: string; category: string };
 }
 
+interface MySuggestion {
+  id: string;
+  titleTr: string;
+  category: string;
+  suggestedDate: string;
+  status: string;
+  rejectReason: string | null;
+  createdAt: string;
+}
+
 export default function ProfilePage() {
   const t = useTranslations("common");
   const tm = useTranslations("market");
@@ -47,7 +57,8 @@ export default function ProfilePage() {
   const [oyHakki, setOyHakki] = useState<number>(0);
   const [positions, setPositions] = useState<Position[]>([]);
   const [trades, setTrades] = useState<Trade[]>([]);
-  const [tab, setTab] = useState<"positions" | "past" | "history">("positions");
+  const [suggestions, setSuggestions] = useState<MySuggestion[]>([]);
+  const [tab, setTab] = useState<"positions" | "past" | "history" | "suggestions">("positions");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,10 +71,12 @@ export default function ProfilePage() {
         fetch("/api/user/balance").then((r) => r.json()),
         fetch("/api/user/positions").then((r) => r.json()),
         fetch("/api/user/trades").then((r) => r.json()),
-      ]).then(([balData, posData, tradeData]) => {
+        fetch("/api/user/suggestions").then((r) => r.json()),
+      ]).then(([balData, posData, tradeData, sugData]) => {
         setOyHakki(balData.oyHakki ?? 0);
         setPositions(posData);
         setTrades(tradeData);
+        setSuggestions(Array.isArray(sugData) ? sugData : []);
         setLoading(false);
       });
     }
@@ -164,6 +177,18 @@ export default function ProfilePage() {
         >
           {tp("voteHistory")} ({trades.length})
         </button>
+        {suggestions.length > 0 && (
+          <button
+            onClick={() => setTab("suggestions")}
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+              tab === "suggestions"
+                ? "bg-teal-600 text-white"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
+            }`}
+          >
+            {tp("mySuggestions")} ({suggestions.length})
+          </button>
+        )}
       </div>
 
       {/* Active Positions tab */}
@@ -366,6 +391,55 @@ export default function ProfilePage() {
               </Link>
             ))
           )}
+        </div>
+      )}
+
+      {/* My Suggestions tab */}
+      {tab === "suggestions" && (
+        <div className="space-y-3">
+          {suggestions.map((s) => {
+            const cat = CATEGORIES[s.category];
+            return (
+              <div
+                key={s.id}
+                className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900"
+              >
+                <div className="mb-1 flex items-center gap-2">
+                  {cat && (
+                    <span className="text-xs text-gray-500">
+                      {cat.emoji} {cat.label}
+                    </span>
+                  )}
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                      s.status === "PENDING"
+                        ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30"
+                        : s.status === "APPROVED"
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30"
+                          : "bg-rose-100 text-rose-700 dark:bg-rose-900/30"
+                    }`}
+                  >
+                    {s.status === "PENDING"
+                      ? tp("suggestionPending")
+                      : s.status === "APPROVED"
+                        ? tp("suggestionApproved")
+                        : tp("suggestionRejected")}
+                  </span>
+                </div>
+                <h3 className="text-sm font-semibold">{s.titleTr}</h3>
+                <p className="mt-1 text-[10px] text-gray-400">
+                  {tp("suggestedDate")}: {new Date(s.suggestedDate).toLocaleDateString("tr-TR")}
+                  {" · "}
+                  {new Date(s.createdAt).toLocaleDateString("tr-TR")}
+                </p>
+                {s.rejectReason && (
+                  <p className="mt-1 text-xs text-rose-500">
+                    {tp("rejectReason")}: {s.rejectReason}
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

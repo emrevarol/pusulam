@@ -27,6 +27,9 @@ export async function GET() {
   const suggestions = await prisma.marketSuggestion.findMany({
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],
     take: 50,
+    include: {
+      suggestedBy: { select: { displayName: true, username: true, email: true } },
+    },
   });
 
   return NextResponse.json(suggestions);
@@ -44,7 +47,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 403 });
   }
 
-  const { suggestionId, action, edits } = await request.json();
+  const { suggestionId, action, edits, rejectReason } = await request.json();
 
   if (!suggestionId || !["APPROVE", "REJECT"].includes(action)) {
     return NextResponse.json({ error: "Gecersiz veri" }, { status: 400 });
@@ -61,7 +64,7 @@ export async function POST(request: Request) {
   if (action === "REJECT") {
     await prisma.marketSuggestion.update({
       where: { id: suggestionId },
-      data: { status: "REJECTED", reviewedAt: new Date(), reviewedById: user.id },
+      data: { status: "REJECTED", rejectReason: rejectReason || null, reviewedAt: new Date(), reviewedById: user.id },
     });
     return NextResponse.json({ success: true, action: "REJECTED" });
   }

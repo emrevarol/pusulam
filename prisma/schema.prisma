@@ -32,6 +32,7 @@ model User {
   conversations    Conversation[]
   dailyPredictions DailyPrediction[]
   creditPurchases  CreditPurchase[]
+  suggestions      MarketSuggestion[]
 
   @@index([reputation])
   @@index([oyHakki])
@@ -228,7 +229,7 @@ model CreditPurchase {
 
 model MarketSuggestion {
   id              String    @id @default(cuid())
-  source          String    // POLYMARKET, NEWS_AI, MANUAL
+  source          String    // POLYMARKET, NEWS_AI, MANUAL, USER
   sourceId        String?   // External market ID (dedup key)
   titleTr         String
   titleEn         String?
@@ -238,10 +239,14 @@ model MarketSuggestion {
   suggestedDate   DateTime  // Suggested resolution date
   probability     Float?    // Current probability from source
   status          String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  rejectReason    String?
   reviewedAt      DateTime?
   reviewedById    String?
+  suggestedById   String?
+  suggestedBy     User?     @relation(fields: [suggestedById], references: [id])
   createdAt       DateTime  @default(now())
 
   @@unique([source, sourceId])
   @@index([status])
+  @@index([suggestedById])
 }
