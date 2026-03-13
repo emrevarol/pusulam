@@ -21,14 +21,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  // 1. Checkout completed — deliver credits
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     const userId = session.metadata?.userId;
     const purchaseId = session.metadata?.purchaseId;
-    const credits = parseInt(session.metadata?.credits || "0", 10);
+    const oyHakki = parseInt(session.metadata?.oyHakki || session.metadata?.credits || "0", 10);
 
-    if (userId && purchaseId && credits > 0) {
+    if (userId && purchaseId && oyHakki > 0) {
       await prisma.$transaction([
         prisma.creditPurchase.update({
           where: { id: purchaseId },
@@ -40,17 +39,15 @@ export async function POST(request: Request) {
         }),
         prisma.user.update({
           where: { id: userId },
-          data: { credits: { increment: credits } },
+          data: { oyHakki: { increment: oyHakki } },
         }),
       ]);
     }
   }
 
-  // 2. Checkout expired — mark purchase as failed
   if (event.type === "checkout.session.expired") {
     const session = event.data.object;
     const purchaseId = session.metadata?.purchaseId;
-
     if (purchaseId) {
       await prisma.creditPurchase.update({
         where: { id: purchaseId },
@@ -59,16 +56,13 @@ export async function POST(request: Request) {
     }
   }
 
-  // 3. Refund — revoke credits
   if (event.type === "charge.refunded") {
     const charge = event.data.object;
     const paymentIntentId = charge.payment_intent as string;
-
     if (paymentIntentId) {
       const purchase = await prisma.creditPurchase.findFirst({
         where: { stripePaymentId: paymentIntentId, status: "COMPLETED" },
       });
-
       if (purchase) {
         await prisma.$transaction([
           prisma.creditPurchase.update({
@@ -77,23 +71,20 @@ export async function POST(request: Request) {
           }),
           prisma.user.update({
             where: { id: purchase.userId },
-            data: { credits: { decrement: purchase.amount } },
+            data: { oyHakki: { decrement: purchase.amount } },
           }),
         ]);
       }
     }
   }
 
-  // 4. Dispute/chargeback — revoke credits
   if (event.type === "charge.dispute.created") {
     const dispute = event.data.object;
     const paymentIntentId = dispute.payment_intent as string;
-
     if (paymentIntentId) {
       const purchase = await prisma.creditPurchase.findFirst({
         where: { stripePaymentId: paymentIntentId, status: "COMPLETED" },
       });
-
       if (purchase) {
         await prisma.$transaction([
           prisma.creditPurchase.update({
@@ -102,7 +93,7 @@ export async function POST(request: Request) {
           }),
           prisma.user.update({
             where: { id: purchase.userId },
-            data: { credits: { decrement: purchase.amount } },
+            data: { oyHakki: { decrement: purchase.amount } },
           }),
         ]);
       }

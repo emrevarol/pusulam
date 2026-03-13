@@ -49,15 +49,15 @@ export default function CreateMarketPage() {
         body: JSON.stringify(form),
       });
 
+      const data = await res.json().catch(() => null);
+
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.error || t("error"));
+        setError(data?.error || t("error"));
         setLoading(false);
         return;
       }
 
-      const market = await res.json();
-      router.push(`/${locale}/piyasalar/${market.slug}`);
+      router.push(`/${locale}/piyasalar/${data.slug}`);
     } catch {
       setError(t("error"));
       setLoading(false);

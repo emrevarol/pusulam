@@ -10,6 +10,7 @@ import { Countdown } from "@/components/countdown";
 import { ShareButtons } from "@/components/share-buttons";
 import { AskAiButton } from "@/components/ask-ai-button";
 import { ResolveMarketButton } from "@/components/resolve-market-button";
+import { HaltMarketButton } from "@/components/halt-market-button";
 import { CATEGORIES, getLocalizedField } from "@/lib/helpers";
 
 async function getMarket(slug: string) {
@@ -66,6 +67,7 @@ export default async function MarketDetailPage({
 
   const isOpen = market.status === "OPEN";
   const isResolved = market.status === "RESOLVED";
+  const isHalted = market.status === "HALTED";
   const isAdmin = (session?.user as { role?: string } | undefined)?.role === "ADMIN";
   const yesPct = (yesPrice * 100).toFixed(1);
   const noPct = (noPrice * 100).toFixed(1);
@@ -103,6 +105,19 @@ export default async function MarketDetailPage({
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 {t("resolvedPayoutsDistributed")}
               </p>
+            </div>
+          )}
+
+          {isHalted && (
+            <div className="mb-6 rounded-xl border-2 border-amber-300 bg-amber-50 p-4 text-center dark:border-amber-700 dark:bg-amber-900/20">
+              <p className="text-lg font-bold text-amber-700 dark:text-amber-400">
+                ⚠️ {t("marketHalted")}
+              </p>
+              {market.haltReason && (
+                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                  {market.haltReason}
+                </p>
+              )}
             </div>
           )}
 
@@ -214,7 +229,9 @@ export default async function MarketDetailPage({
               <p className="font-medium text-gray-500">
                 {market.status === "RESOLVED"
                   ? `${t("result")}: ${market.resolvedOutcome}`
-                  : t("marketClosed")}
+                  : market.status === "HALTED"
+                    ? t("marketHalted")
+                    : t("marketClosed")}
               </p>
             </div>
           )}
@@ -222,6 +239,14 @@ export default async function MarketDetailPage({
           {/* Admin resolve button */}
           {isAdmin && !isResolved && (
             <ResolveMarketButton
+              marketId={market.id}
+              status={market.status}
+            />
+          )}
+
+          {/* Admin halt button */}
+          {isAdmin && market.status === "OPEN" && (
+            <HaltMarketButton
               marketId={market.id}
               status={market.status}
             />

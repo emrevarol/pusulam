@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getYesPrice, getNoPrice, calculateBuyCost, calculateSellReturn } from "@/lib/amm";
-import { VALID_WEIGHTS, DAILY_FREE_PREDICTIONS, getCreditsRequired } from "@/lib/credits";
+import { DAILY_FREE_OY_HAKKI } from "@/lib/credits";
 
 interface Position {
   id: string;
@@ -32,13 +32,12 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
   const [direction, setDirection] = useState<"BUY" | "SELL">("BUY");
   const [side, setSide] = useState<"YES" | "NO">("YES");
   const [shares, setShares] = useState("");
-  const [weight, setWeight] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [positions, setPositions] = useState<Position[]>([]);
-  const [credits, setCredits] = useState(0);
-  const [dailyRemaining, setDailyRemaining] = useState(DAILY_FREE_PREDICTIONS);
+  const [dailyFree, setDailyFree] = useState(DAILY_FREE_OY_HAKKI);
+  const [oyHakki, setOyHakki] = useState(0);
 
   const sharesNum = parseFloat(shares) || 0;
 
@@ -48,20 +47,15 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
         .then((r) => r.json())
         .then((data) => {
           if (Array.isArray(data)) {
-            const marketPositions = data.filter(
-              (p: { market: { slug: string } }) => {
-                const slug = pathname.split("/").pop();
-                return p.market.slug === slug;
-              }
-            );
-            setPositions(marketPositions);
+            const slug = pathname.split("/").pop();
+            setPositions(data.filter((p: { market: { slug: string } }) => p.market.slug === slug));
           }
         });
       fetch("/api/user/balance")
         .then((r) => r.json())
         .then((d) => {
-          setCredits(d.credits ?? 0);
-          setDailyRemaining(d.dailyPredictionsRemaining ?? DAILY_FREE_PREDICTIONS);
+          setOyHakki(d.oyHakki ?? 0);
+          setDailyFree(d.dailyFreeRemaining ?? 0);
         });
     }
   }, [session, pathname]);
@@ -87,9 +81,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
   const yesPrice = getYesPrice(yesPool, noPool);
   const noPrice = getNoPrice(yesPool, noPool);
   const currentPosition = positions.find((p) => p.side === side);
-
-  const isFree = dailyRemaining > 0 && weight === 1;
-  const creditsNeeded = direction === "BUY" ? getCreditsRequired(weight, isFree) : 0;
+  const isFree = dailyFree > 0;
 
   async function handleTrade() {
     if (!session) {
@@ -105,25 +97,23 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
       const res = await fetch("/api/trade", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ marketId, side, shares: sharesNum, direction, weight }),
+        body: JSON.stringify({ marketId, side, shares: sharesNum, direction }),
       });
 
       if (!res.ok) {
         const data = await res.json();
-        if (data.error === "Yetersiz kredi") {
-          setError(t("insufficientCredits"));
+        if (data.error === "Yetersiz oy hakki") {
+          setError(t("insufficientOyHakki"));
         } else {
-          setError(data.error || t("insufficientBalance"));
+          setError(data.error || tc("genericError"));
         }
         return;
       }
 
       setShares("");
-      setWeight(1);
       setSuccess(t("tradeSuccess"));
       setTimeout(() => setSuccess(""), 2000);
       window.dispatchEvent(new Event("trade-complete"));
-      // Refresh positions + credits
       fetch("/api/user/positions")
         .then((r) => r.json())
         .then((data) => {
@@ -135,8 +125,8 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
       fetch("/api/user/balance")
         .then((r) => r.json())
         .then((d) => {
-          setCredits(d.credits ?? 0);
-          setDailyRemaining(d.dailyPredictionsRemaining ?? DAILY_FREE_PREDICTIONS);
+          setOyHakki(d.oyHakki ?? 0);
+          setDailyFree(d.dailyFreeRemaining ?? 0);
         });
       router.refresh();
     } catch {
@@ -154,7 +144,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
         {/* Buy/Sell toggle */}
         <div className="mb-4 flex gap-2">
           <button
-            onClick={() => { setDirection("BUY"); setWeight(1); }}
+            onClick={() => setDirection("BUY")}
             className={`flex-1 rounded-lg py-2 text-sm font-semibold transition ${
               direction === "BUY"
                 ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900"
@@ -164,7 +154,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
             {t("buy")}
           </button>
           <button
-            onClick={() => { setDirection("SELL"); setWeight(1); }}
+            onClick={() => setDirection("SELL")}
             className={`flex-1 rounded-lg py-2 text-sm font-semibold transition ${
               direction === "SELL"
                 ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900"
@@ -225,106 +215,52 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
           />
         </div>
 
-        {/* Weight selector (only for BUY) */}
-        {direction === "BUY" && (
-          <div className="mb-4">
-            <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
-              {t("weight")}
-            </label>
-            <div className="flex gap-1.5">
-              {VALID_WEIGHTS.map((w) => {
-                const wIsFree = dailyRemaining > 0 && w === 1;
-                const wCredits = getCreditsRequired(w, wIsFree);
-                const canAfford = wCredits === 0 || credits >= wCredits;
-                return (
-                  <button
-                    key={w}
-                    onClick={() => setWeight(w)}
-                    disabled={!canAfford}
-                    className={`flex-1 rounded-lg py-2 text-xs font-semibold transition ${
-                      weight === w
-                        ? "bg-teal-600 text-white"
-                        : canAfford
-                          ? "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
-                          : "bg-gray-50 text-gray-300 dark:bg-gray-800/50 dark:text-gray-600"
-                    }`}
-                  >
-                    <span className="block">{w}x</span>
-                    <span className="block text-[10px] font-normal opacity-75">
-                      {wCredits === 0
-                        ? t("free")
-                        : `${wCredits} Kr`}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            {/* Daily free remaining */}
-            {session && (
-              <p className="mt-1.5 text-[10px] text-gray-400 dark:text-gray-500">
-                {t("dailyFree", { remaining: dailyRemaining, total: DAILY_FREE_PREDICTIONS })}
-                {credits > 0 && ` · ${credits} ${t("creditsLabel")}`}
-              </p>
-            )}
-          </div>
-        )}
-
-        {/* Cost/Return breakdown */}
+        {/* Cost breakdown */}
         {sharesNum > 0 && (
           <div className="mb-4 space-y-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
             {direction === "BUY" ? (
               <>
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">{t("cost")}</span>
-                  <span className="font-semibold">{cost.toFixed(2)} P</span>
+                  <span className="text-gray-500">{t("oyHakkiCost")}</span>
+                  <span className="font-semibold">
+                    {isFree ? t("freeVote") : `1 ${tc("oyHakki")}`}
+                  </span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-500">{t("potentialReturn")}</span>
                   <span className="font-semibold text-emerald-600">
-                    +{(sharesNum - cost).toFixed(1)} P
+                    +{(sharesNum - cost).toFixed(1)} {tc("oyHakki")}
                   </span>
                 </div>
-                {creditsNeeded > 0 && (
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-500">
-                      {t("creditsShort")}
-                    </span>
-                    <span className="font-semibold text-teal-600">
-                      -{creditsNeeded} Kr
-                    </span>
-                  </div>
-                )}
-                {weight > 1 && (
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-500">
-                      {t("rewardMultiplier")}
-                    </span>
-                    <span className="font-semibold text-emerald-600">{weight}x</span>
-                  </div>
-                )}
               </>
             ) : (
               <div className="flex justify-between text-xs">
-                <span className="text-gray-500">
-                  {t("returnLabel")}
-                </span>
+                <span className="text-gray-500">{t("returnLabel")}</span>
                 <span className="font-semibold text-emerald-600">
-                  +{returnAmount.toFixed(2)} P
+                  +{returnAmount.toFixed(1)} {tc("oyHakki")}
                 </span>
               </div>
             )}
           </div>
         )}
 
+        {/* Daily free info */}
+        {session && direction === "BUY" && (
+          <p className="mb-3 text-[10px] text-gray-400 dark:text-gray-500">
+            {t("dailyFreeRemaining", { remaining: dailyFree, total: DAILY_FREE_OY_HAKKI })}
+            {` · ${oyHakki} ${tc("oyHakki")}`}
+          </p>
+        )}
+
         {error && (
           <div className="mb-3">
             <p className="text-xs text-rose-500">{error}</p>
-            {error.includes("kredi") && (
+            {error.includes("oy hakki") && (
               <Link
                 href={`/${locale}/kredi`}
                 className="mt-1 inline-block text-xs font-medium text-teal-600 hover:text-teal-700"
               >
-                {t("buyCreditsLink")}
+                {t("buyOyHakkiLink")}
               </Link>
             )}
           </div>
@@ -347,21 +283,18 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
           {loading
             ? "..."
             : session
-              ? direction === "BUY"
-                ? `${sharesNum || 0} ${side === "YES" ? t("yesShares") : t("noShares")} ${t("buy")}${weight > 1 ? ` (${weight}x)` : ""}`
-                : `${sharesNum || 0} ${side === "YES" ? t("yesShares") : t("noShares")} ${t("sell")}`
+              ? `${sharesNum || 0} ${side === "YES" ? t("yesShort") : t("noShort")} ${direction === "BUY" ? t("buy") : t("sell")}`
               : tc("loginRequired")}
         </button>
       </div>
 
-      {/* User positions in this market */}
+      {/* User positions */}
       {session && positions.length > 0 && (
         <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
           <h4 className="mb-3 text-sm font-bold">{t("yourPosition")}</h4>
           <div className="space-y-2">
             {positions.map((pos) => {
-              const curPrice =
-                pos.side === "YES" ? yesPrice : noPrice;
+              const curPrice = pos.side === "YES" ? yesPrice : noPrice;
               const value = pos.shares * curPrice;
               const costBasis = pos.shares * pos.avgPrice;
               const pnl = value - costBasis;
@@ -382,13 +315,10 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
                       {pos.side}
                     </span>
                     <span className="ml-2 text-sm font-medium">
-                      {pos.shares.toFixed(0)} {t("shares").toLowerCase()}
+                      {pos.shares.toFixed(1)} {t("shares").toLowerCase()}
                     </span>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-gray-500">
-                      {value.toFixed(1)} P
-                    </p>
                     <p
                       className={`text-xs font-medium ${
                         pnl >= 0 ? "text-emerald-600" : "text-rose-500"

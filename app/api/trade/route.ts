@@ -3,12 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { calculateBuyCost, calculateSellReturn } from "@/lib/amm";
-import {
-  VALID_WEIGHTS,
-  DAILY_FREE_PREDICTIONS,
-  getCreditsRequired,
-  getTodayIstanbul,
-} from "@/lib/credits";
+import { DAILY_FREE_OY_HAKKI, getTodayIstanbul } from "@/lib/credits";
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -16,7 +11,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
   }
 
-  const { marketId, side, shares, direction, weight = 1 } = await request.json();
+  const { marketId, side, shares, direction } = await request.json();
 
   if (!marketId || !side || !shares || !direction) {
     return NextResponse.json({ error: "Eksik alan" }, { status: 400 });
@@ -24,10 +19,6 @@ export async function POST(request: Request) {
 
   if (shares <= 0) {
     return NextResponse.json({ error: "Gecersiz miktar" }, { status: 400 });
-  }
-
-  if (!VALID_WEIGHTS.includes(weight)) {
-    return NextResponse.json({ error: "Gecersiz agirlik" }, { status: 400 });
   }
 
   const market = await prisma.market.findUnique({ where: { id: marketId } });
@@ -51,27 +42,23 @@ export async function POST(request: Request) {
       shares
     );
 
-    if (cost > user.balance) {
-      return NextResponse.json({ error: "Yetersiz bakiye" }, { status: 400 });
-    }
-
-    // Check daily prediction limit and credits
+    // Check daily free oy hakki
     const today = getTodayIstanbul();
     const daily = await prisma.dailyPrediction.findUnique({
       where: { userId_date: { userId: user.id, date: today } },
     });
     const usedToday = daily?.count ?? 0;
-    const isFree = usedToday < DAILY_FREE_PREDICTIONS && weight === 1;
-    const creditsNeeded = getCreditsRequired(weight, isFree);
+    const isFree = usedToday < DAILY_FREE_OY_HAKKI;
+    const oyHakkiCost = isFree ? 0 : 1;
 
-    if (creditsNeeded > 0 && user.credits < creditsNeeded) {
+    if (oyHakkiCost > 0 && user.oyHakki < oyHakkiCost) {
       return NextResponse.json(
-        { error: "Yetersiz kredi", creditsNeeded },
+        { error: "Yetersiz oy hakki" },
         { status: 400 }
       );
     }
 
-    // Read existing position before transaction for weighted avg price calc
+    // Read existing position for weighted avg price calc
     const existingPos = await prisma.position.findUnique({
       where: {
         userId_marketId_side: {
@@ -112,8 +99,7 @@ export async function POST(request: Request) {
       prisma.user.update({
         where: { id: user.id },
         data: {
-          balance: user.balance - cost,
-          ...(creditsNeeded > 0 ? { credits: { decrement: creditsNeeded } } : {}),
+          ...(oyHakkiCost > 0 ? { oyHakki: { decrement: oyHakkiCost } } : {}),
         },
       }),
       prisma.market.update({
@@ -132,7 +118,7 @@ export async function POST(request: Request) {
           shares,
           price: avgPrice,
           cost,
-          weight,
+          weight: 1,
           userId: user.id,
           marketId: market.id,
         },
@@ -147,7 +133,7 @@ export async function POST(request: Request) {
 
     await prisma.$transaction(operations);
 
-    return NextResponse.json({ success: true, cost, shares, avgPrice, creditsUsed: creditsNeeded });
+    return NextResponse.json({ success: true, cost, shares, avgPrice, free: isFree });
   }
 
   if (direction === "SELL") {
@@ -162,7 +148,7 @@ export async function POST(request: Request) {
     });
 
     if (!position || position.shares < shares) {
-      return NextResponse.json({ error: "Yetersiz hisse" }, { status: 400 });
+      return NextResponse.json({ error: "Yetersiz oy" }, { status: 400 });
     }
 
     const { returnAmount, newYesPool, newNoPool } = calculateSellReturn(
@@ -173,10 +159,6 @@ export async function POST(request: Request) {
     );
 
     await prisma.$transaction([
-      prisma.user.update({
-        where: { id: user.id },
-        data: { balance: user.balance + returnAmount },
-      }),
       prisma.market.update({
         where: { id: market.id },
         data: {

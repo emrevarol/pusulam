@@ -9,7 +9,7 @@ interface LeaderboardEntry {
   id: string;
   displayName: string;
   username: string;
-  balance: number;
+  oyHakki: number;
   _count: { trades: number };
 }
 
@@ -72,10 +72,10 @@ export default function LeaderboardPage() {
             </div>
             <div className="text-right">
               <p className="text-sm font-bold text-emerald-600">
-                {user.balance.toLocaleString("tr-TR", {
+                {user.oyHakki.toLocaleString("tr-TR", {
                   maximumFractionDigits: 0,
                 })}{" "}
-                P
+                {tl("oyHakki")}
               </p>
             </div>
           </div>

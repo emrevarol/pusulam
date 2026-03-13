@@ -15,8 +15,7 @@ model User {
   passwordHash String
   avatar       String?
   bio          String?
-  balance      Float    @default(1000) // Pul - sanal para
-  credits      Int      @default(0)    // Satin alinan kredi
+  oyHakki      Int      @default(50)   // Oy hakki (tek birim)
   reputation   Float    @default(0)    // Kalibrasyon skoru
   streak       Int      @default(0)    // Gunluk tahmin serisi
   lastActiveAt DateTime @default(now())
@@ -35,7 +34,7 @@ model User {
   creditPurchases  CreditPurchase[]
 
   @@index([reputation])
-  @@index([balance])
+  @@index([oyHakki])
 }
 
 model Market {
@@ -46,10 +45,13 @@ model Market {
   descriptionTranslations Json?  // { en: "...", es: "...", fr: "...", ... }
   category        String
   slug            String    @unique
-  status          String    @default("OPEN") // OPEN, CLOSED, RESOLVED
+  status          String    @default("OPEN") // OPEN, HALTED, CLOSED, RESOLVED
   resolutionDate  DateTime
   resolvedAt      DateTime?
   resolvedOutcome String?   // YES, NO
+  haltedAt        DateTime?
+  haltReason      String?
+  earlyResolution Boolean   @default(false)
   yesPool         Float     @default(100)
   noPool          Float     @default(100)
   volume          Float     @default(0)
@@ -79,7 +81,7 @@ model Trade {
   shares    Float
   price     Float
   cost      Float
-  weight    Int      @default(1) // 1, 2, 5, 10
+  weight    Int      @default(1) // legacy, always 1
   createdAt DateTime @default(now())
 
   userId   String
@@ -222,4 +224,24 @@ model CreditPurchase {
 
   @@index([userId])
   @@index([stripeSessionId])
+}
+
+model MarketSuggestion {
+  id              String    @id @default(cuid())
+  source          String    // POLYMARKET, NEWS_AI, MANUAL
+  sourceId        String?   // External market ID (dedup key)
+  titleTr         String
+  titleEn         String?
+  descriptionTr   String
+  descriptionEn   String?
+  category        String
+  suggestedDate   DateTime  // Suggested resolution date
+  probability     Float?    // Current probability from source
+  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  reviewedAt      DateTime?
+  reviewedById    String?
+  createdAt       DateTime  @default(now())
+
+  @@unique([source, sourceId])
+  @@index([status])
 }

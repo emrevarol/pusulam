@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma migrate deploy && next build",
+    "build": "prisma generate && prisma db push && next build",
     "postinstall": "prisma generate",
-    "start": "next start"
+    "start": "next start",
+    "seed:nearterm": "npx tsx prisma/seed-nearterm.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

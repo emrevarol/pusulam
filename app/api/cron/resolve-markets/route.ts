@@ -65,73 +65,30 @@ async function distributePayouts(marketId: string, outcome: "YES" | "NO") {
     where: { marketId, shares: { gt: 0 } },
   });
 
-  const buyTrades = await prisma.trade.findMany({
-    where: { marketId, direction: "BUY" },
-  });
-
-  // Calculate total cost and weighted average weight per user+side
-  const tradeStats: Record<
-    string,
-    { totalCost: number; totalShares: number; weightedSum: number }
-  > = {};
-  for (const trade of buyTrades) {
-    const key = `${trade.userId}:${trade.side}`;
-    if (!tradeStats[key]) {
-      tradeStats[key] = { totalCost: 0, totalShares: 0, weightedSum: 0 };
-    }
-    tradeStats[key].totalCost += trade.cost;
-    tradeStats[key].totalShares += trade.shares;
-    tradeStats[key].weightedSum += trade.shares * trade.weight;
-  }
-
   const payoutOps = [];
 
   for (const pos of positions) {
     const isWinner = pos.side === outcome;
-    const key = `${pos.userId}:${pos.side}`;
-    const stats = tradeStats[key];
 
     if (isWinner && pos.shares > 0) {
-      // Payout = total cost they paid + profit * weight
-      // Each winning share resolves to 1 Pul
-      // But in CPMM, cost can exceed shares (when price > 0.5)
-      // So payout = what they paid back (cost) + net gain * weight
-      const totalCost = stats?.totalCost ?? pos.shares * pos.avgPrice;
-      const avgWeight = stats ? stats.weightedSum / stats.totalShares : 1;
-
-      // Winning payout: they get their shares value (1 Pul each)
-      // Plus bonus from weight on the profit portion
-      const baseValue = pos.shares; // each winning share = 1 Pul
-      const profit = baseValue - totalCost;
-
-      let payout: number;
-      if (profit > 0) {
-        // They bought cheap, profit is positive
-        payout = totalCost + profit * avgWeight;
-      } else {
-        // They bought expensive (price > 1 in CPMM), just return the share value
-        payout = baseValue;
-      }
-
+      const payout = Math.floor(pos.shares); // each winning share = 1 oy hakki
       if (payout > 0) {
         payoutOps.push(
           prisma.user.update({
             where: { id: pos.userId },
             data: {
-              balance: { increment: payout },
-              reputation: { increment: Math.min(Math.max(profit, 0) * 0.1, 50) },
+              oyHakki: { increment: payout },
+              reputation: { increment: Math.min(payout * 0.1, 50) },
             },
           })
         );
       }
     } else if (!isWinner && pos.shares > 0) {
-      // Losing side: cost already deducted, small reputation penalty
-      const totalCost = stats?.totalCost ?? pos.shares * pos.avgPrice;
       payoutOps.push(
         prisma.user.update({
           where: { id: pos.userId },
           data: {
-            reputation: { decrement: Math.min(totalCost * 0.05, 25) },
+            reputation: { decrement: Math.min(pos.shares * 0.05, 25) },
           },
         })
       );

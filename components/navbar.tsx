@@ -12,28 +12,28 @@ export function Navbar() {
   const t = useTranslations("common");
   const { data: session } = useSession();
   const pathname = usePathname();
-  const [balance, setBalance] = useState<number | null>(null);
-  const [credits, setCredits] = useState<number | null>(null);
+  const [oyHakki, setOyHakki] = useState<number | null>(null);
+  const [dailyFree, setDailyFree] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const locale = pathname.split("/")[1] || "tr";
 
+  function fetchBalance() {
+    fetch("/api/user/balance")
+      .then((r) => r.json())
+      .then((d) => {
+        setOyHakki(d.oyHakki ?? 0);
+        setDailyFree(d.dailyFreeRemaining ?? 0);
+      });
+  }
+
   useEffect(() => {
-    if (session?.user) {
-      fetch("/api/user/balance")
-        .then((r) => r.json())
-        .then((d) => { setBalance(d.balance); setCredits(d.credits ?? 0); });
-    }
+    if (session?.user) fetchBalance();
   }, [session, pathname]);
 
-  // Listen for trade events to refresh balance
   useEffect(() => {
     function onTradeComplete() {
-      if (session?.user) {
-        fetch("/api/user/balance")
-          .then((r) => r.json())
-          .then((d) => { setBalance(d.balance); setCredits(d.credits ?? 0); });
-      }
+      if (session?.user) fetchBalance();
     }
     window.addEventListener("trade-complete", onTradeComplete);
     return () => window.removeEventListener("trade-complete", onTradeComplete);
@@ -83,17 +83,17 @@ export function Navbar() {
               >
                 {t("createMarket")}
               </Link>
-              <span className="text-sm font-medium text-emerald-600">
-                {balance !== null
-                  ? `${balance.toLocaleString("tr-TR", { maximumFractionDigits: 0 })} P`
-                  : "..."}
-              </span>
               <Link
                 href={`/${locale}/kredi`}
-                className="flex items-center gap-1 rounded-lg bg-teal-50 px-2 py-1 text-xs font-medium text-teal-600 hover:bg-teal-100 dark:bg-teal-900/20 dark:text-teal-400 dark:hover:bg-teal-900/40"
+                className="flex items-center gap-1.5 rounded-lg bg-teal-50 px-3 py-1.5 text-sm font-medium text-teal-600 hover:bg-teal-100 dark:bg-teal-900/20 dark:text-teal-400 dark:hover:bg-teal-900/40"
               >
-                {credits !== null ? credits : "0"} Kr
-                <span className="text-teal-400">+</span>
+                <span>{oyHakki !== null ? oyHakki : "..."}</span>
+                <span className="text-xs opacity-70">{t("oyHakki")}</span>
+                {dailyFree > 0 && (
+                  <span className="rounded bg-emerald-100 px-1 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+                    +{dailyFree}
+                  </span>
+                )}
               </Link>
 
               {/* Profile dropdown */}
@@ -131,7 +131,7 @@ export function Navbar() {
                         onClick={() => setMenuOpen(false)}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
                       >
-                        {t("buyCredits")}
+                        {t("buyOyHakki")}
                       </Link>
                       <button
                         onClick={() => {

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { CREDIT_PACKAGES, DAILY_FREE_PREDICTIONS } from "@/lib/credits";
+import { OY_HAKKI_PACKAGES, DAILY_FREE_OY_HAKKI } from "@/lib/credits";
 
 interface Purchase {
   id: string;
@@ -14,7 +14,7 @@ interface Purchase {
   createdAt: string;
 }
 
-export default function CreditsPage() {
+export default function OyHakkiPage() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const router = useRouter();
@@ -24,8 +24,8 @@ export default function CreditsPage() {
   const tc = useTranslations("common");
   const t = useTranslations("credits");
 
-  const [credits, setCredits] = useState(0);
-  const [dailyRemaining, setDailyRemaining] = useState(DAILY_FREE_PREDICTIONS);
+  const [oyHakki, setOyHakki] = useState(0);
+  const [dailyFree, setDailyFree] = useState(DAILY_FREE_OY_HAKKI);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -40,8 +40,8 @@ export default function CreditsPage() {
       fetch("/api/user/balance")
         .then((r) => r.json())
         .then((d) => {
-          setCredits(d.credits ?? 0);
-          setDailyRemaining(d.dailyPredictionsRemaining ?? DAILY_FREE_PREDICTIONS);
+          setOyHakki(d.oyHakki ?? 0);
+          setDailyFree(d.dailyFreeRemaining ?? DAILY_FREE_OY_HAKKI);
         });
       fetch("/api/credits/history")
         .then((r) => r.json())
@@ -85,7 +85,6 @@ export default function CreditsPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      {/* Success/Cancel banners */}
       {success && (
         <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-400">
           {t("paymentSuccess")}
@@ -102,16 +101,16 @@ export default function CreditsPage() {
         <div className="grid grid-cols-2 gap-6">
           <div className="text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              {t("creditBalance")}
+              {tc("oyHakki")}
             </p>
-            <p className="mt-1 text-3xl font-bold text-teal-600">{credits}</p>
+            <p className="mt-1 text-3xl font-bold text-teal-600">{oyHakki}</p>
           </div>
           <div className="text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {t("dailyFree")}
             </p>
             <p className="mt-1 text-3xl font-bold text-emerald-600">
-              {dailyRemaining}/{DAILY_FREE_PREDICTIONS}
+              {dailyFree}/{DAILY_FREE_OY_HAKKI}
             </p>
           </div>
         </div>
@@ -123,32 +122,27 @@ export default function CreditsPage() {
         </div>
       )}
 
-      {/* Credit Packages */}
-      <h2 className="mb-4 text-lg font-bold">
-        {t("buyCredits")}
-      </h2>
+      {/* Packages */}
+      <h2 className="mb-4 text-lg font-bold">{t("buyCredits")}</h2>
       <div className="mb-8 grid gap-4 sm:grid-cols-3">
-        {CREDIT_PACKAGES.map((pkg) => (
+        {OY_HAKKI_PACKAGES.map((pkg) => (
           <div
             key={pkg.id}
             className="relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 text-center transition hover:border-teal-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-teal-700"
           >
-            {pkg.id === "credits_150" && (
+            {pkg.id === "oh_75" && (
               <span className="absolute right-2 top-2 rounded-full bg-teal-600 px-2 py-0.5 text-[10px] font-bold text-white">
                 {t("popular")}
               </span>
             )}
             <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-              {pkg.credits}
+              {pkg.amount}
             </p>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {t("credits")}
+              {tc("oyHakki")}
             </p>
             <p className="mt-3 text-2xl font-bold text-teal-600">
               ${pkg.priceUsd}
-            </p>
-            <p className="text-xs text-gray-400">
-              ${(pkg.priceUsd / pkg.credits).toFixed(2)}/{t("perCredit")}
             </p>
             <button
               onClick={() => buyPackage(pkg.id)}
@@ -163,23 +157,18 @@ export default function CreditsPage() {
 
       {/* How It Works */}
       <div className="mb-8 rounded-xl border border-gray-200 bg-gray-50 p-6 dark:border-gray-800 dark:bg-gray-800">
-        <h3 className="mb-3 text-sm font-bold">
-          {t("howCreditsWork")}
-        </h3>
+        <h3 className="mb-3 text-sm font-bold">{t("howCreditsWork")}</h3>
         <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-          <li>• {t("rule1", { count: DAILY_FREE_PREDICTIONS })}</li>
+          <li>• {t("rule1", { count: DAILY_FREE_OY_HAKKI })}</li>
           <li>• {t("rule2")}</li>
           <li>• {t("rule3")}</li>
-          <li>• {t("rule4")}</li>
         </ul>
       </div>
 
       {/* Purchase History */}
       {purchases.length > 0 && (
         <div>
-          <h3 className="mb-3 text-sm font-bold">
-            {t("purchaseHistory")}
-          </h3>
+          <h3 className="mb-3 text-sm font-bold">{t("purchaseHistory")}</h3>
           <div className="space-y-2">
             {purchases.map((p) => (
               <div
@@ -188,7 +177,7 @@ export default function CreditsPage() {
               >
                 <div>
                   <p className="text-sm font-medium dark:text-gray-100">
-                    {p.amount} {t("credits")}
+                    {p.amount} {tc("oyHakki")}
                   </p>
                   <p className="text-xs text-gray-500">
                     {new Date(p.createdAt).toLocaleDateString(

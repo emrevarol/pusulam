@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { DAILY_FREE_PREDICTIONS, getTodayIstanbul } from "@/lib/credits";
+import { DAILY_FREE_OY_HAKKI, getTodayIstanbul } from "@/lib/credits";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -12,7 +12,7 @@ export async function GET() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { balance: true, credits: true },
+    select: { oyHakki: true },
   });
 
   const today = getTodayIstanbul();
@@ -21,11 +21,10 @@ export async function GET() {
   });
 
   const usedToday = daily?.count ?? 0;
-  const dailyPredictionsRemaining = Math.max(0, DAILY_FREE_PREDICTIONS - usedToday);
+  const dailyFreeRemaining = Math.max(0, DAILY_FREE_OY_HAKKI - usedToday);
 
   return NextResponse.json({
-    balance: user?.balance ?? 0,
-    credits: user?.credits ?? 0,
-    dailyPredictionsRemaining,
+    oyHakki: user?.oyHakki ?? 0,
+    dailyFreeRemaining,
   });
 }

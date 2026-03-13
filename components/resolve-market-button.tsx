@@ -29,7 +29,14 @@ export function ResolveMarketButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ marketId, outcome }),
       });
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        setError(tc("genericError"));
+        setLoading(false);
+        return;
+      }
       if (!res.ok) {
         setError(data.error || tc("genericError"));
         setLoading(false);

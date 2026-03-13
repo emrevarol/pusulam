@@ -44,7 +44,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const locale = pathname.split("/")[1] || "tr";
 
-  const [balance, setBalance] = useState<number>(0);
+  const [oyHakki, setOyHakki] = useState<number>(0);
   const [positions, setPositions] = useState<Position[]>([]);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [tab, setTab] = useState<"positions" | "past" | "history">("positions");
@@ -61,7 +61,7 @@ export default function ProfilePage() {
         fetch("/api/user/positions").then((r) => r.json()),
         fetch("/api/user/trades").then((r) => r.json()),
       ]).then(([balData, posData, tradeData]) => {
-        setBalance(balData.balance);
+        setOyHakki(balData.oyHakki ?? 0);
         setPositions(posData);
         setTrades(tradeData);
         setLoading(false);
@@ -103,9 +103,9 @@ export default function ProfilePage() {
         {/* Stats */}
         <div className="mt-6 grid grid-cols-3 gap-4">
           <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
-            <p className="text-xs text-gray-500">{t("balance")}</p>
+            <p className="text-xs text-gray-500">{t("oyHakki")}</p>
             <p className="text-xl font-bold text-emerald-600">
-              {balance.toLocaleString("tr-TR", { maximumFractionDigits: 0 })} P
+              {oyHakki}
             </p>
           </div>
           <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
@@ -113,7 +113,7 @@ export default function ProfilePage() {
               {tp("portfolioValue")}
             </p>
             <p className="text-xl font-bold">
-              {totalValue.toLocaleString("tr-TR", { maximumFractionDigits: 0 })} P
+              {totalValue.toLocaleString("tr-TR", { maximumFractionDigits: 0 })}
             </p>
           </div>
           <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
@@ -126,7 +126,7 @@ export default function ProfilePage() {
               }`}
             >
               {totalPnl >= 0 ? "+" : ""}
-              {totalPnl.toLocaleString("tr-TR", { maximumFractionDigits: 0 })} P
+              {totalPnl.toLocaleString("tr-TR", { maximumFractionDigits: 0 })}
             </p>
           </div>
         </div>

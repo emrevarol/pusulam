@@ -23,38 +23,46 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
-  }
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
+    }
 
-  const { title, description, category, resolutionDate } =
-    await request.json();
+    const { title, description, category, resolutionDate } =
+      await request.json();
 
-  if (!title || !description || !category || !resolutionDate) {
-    return NextResponse.json({ error: "Eksik alan" }, { status: 400 });
-  }
+    if (!title || !description || !category || !resolutionDate) {
+      return NextResponse.json({ error: "Eksik alan" }, { status: 400 });
+    }
 
-  const slug = slugify(title);
+    const slug = slugify(title);
 
-  const existing = await prisma.market.findUnique({ where: { slug } });
-  if (existing) {
+    const existing = await prisma.market.findUnique({ where: { slug } });
+    if (existing) {
+      return NextResponse.json(
+        { error: "Bu baslikta bir piyasa zaten var." },
+        { status: 409 }
+      );
+    }
+
+    const market = await prisma.market.create({
+      data: {
+        title,
+        description,
+        category,
+        slug,
+        resolutionDate: new Date(resolutionDate),
+        createdById: session.user.id,
+      },
+    });
+
+    return NextResponse.json(market, { status: 201 });
+  } catch (err) {
+    console.error("Create market error:", err);
     return NextResponse.json(
-      { error: "Bu başlıkta bir piyasa zaten var." },
-      { status: 409 }
+      { error: "Piyasa olusturulurken bir hata olustu." },
+      { status: 500 }
     );
   }
-
-  const market = await prisma.market.create({
-    data: {
-      title,
-      description,
-      category,
-      slug,
-      resolutionDate: new Date(resolutionDate),
-      createdById: session.user.id,
-    },
-  });
-
-  return NextResponse.json(market, { status: 201 });
 }

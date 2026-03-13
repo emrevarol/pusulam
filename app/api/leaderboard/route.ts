@@ -3,13 +3,13 @@ import { prisma } from "@/lib/db";
 
 export async function GET() {
   const users = await prisma.user.findMany({
-    orderBy: { balance: "desc" },
+    orderBy: { oyHakki: "desc" },
     take: 50,
     select: {
       id: true,
       displayName: true,
       username: true,
-      balance: true,
+      oyHakki: true,
       reputation: true,
       _count: { select: { trades: true } },
     },
