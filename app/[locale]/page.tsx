@@ -53,7 +53,7 @@ function HomeContent({
           <p className="mx-auto mb-8 max-w-2xl text-lg text-teal-100">
             {t("heroSub")}
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4">
             <Link
               href={`/${locale}/piyasalar`}
               className="rounded-xl bg-white px-6 py-3 text-sm font-semibold text-teal-700 shadow-lg transition hover:bg-teal-50 dark:bg-gray-800 dark:text-teal-400"

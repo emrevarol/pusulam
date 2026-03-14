@@ -118,7 +118,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Stats */}
-        <div className="mt-6 grid grid-cols-4 gap-4">
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
             <p className="text-xs text-gray-500">{t("oyHakki")}</p>
             <p className="text-xl font-bold text-emerald-600">
@@ -173,7 +173,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 flex gap-2">
+      <div className="mb-6 flex flex-wrap gap-1.5 sm:gap-2">
         <button
           onClick={() => setTab("positions")}
           className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
