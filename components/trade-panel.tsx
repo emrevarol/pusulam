@@ -352,7 +352,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
                       }`}
                     >
                       {pnl >= 0 ? "+" : ""}
-                      {pnl.toFixed(1)} K/Z
+                      {pnl >= 0 ? "Kâr" : "Zarar"}: {Math.abs(pnl).toFixed(1)}
                     </p>
                   </div>
                 </div>

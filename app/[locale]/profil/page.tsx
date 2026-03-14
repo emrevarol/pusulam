@@ -269,8 +269,7 @@ export default function ProfilePage() {
                           pos.pnl >= 0 ? "text-emerald-600" : "text-rose-500"
                         }`}
                       >
-                        {pos.pnl >= 0 ? "+" : ""}
-                        {pos.pnl.toFixed(1)} P
+                        {pos.pnl >= 0 ? `Kâr: +${pos.pnl.toFixed(1)}` : `Zarar: ${pos.pnl.toFixed(1)}`}
                       </p>
                     </div>
                   </div>

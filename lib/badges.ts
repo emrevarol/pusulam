@@ -184,12 +184,18 @@ export async function checkAndAwardBadges(userId: string) {
     }
 
     if (qualifies) {
-      newBadges.push(badge.id);
-      await prisma.userBadge.create({
-        data: { userId, badgeId: badge.id },
+      // Use upsert to prevent duplicate badge awards from concurrent requests
+      const result = await prisma.userBadge.upsert({
+        where: { userId_badgeId: { userId, badgeId: badge.id } },
+        update: {},
+        create: { userId, badgeId: badge.id },
       });
-      // Notify user
-      notifyBadgeEarned(userId, badge.name, badge.icon).catch(() => {});
+      // Only notify if badge was just created (not already existing)
+      const isNew = result.earnedAt.getTime() > Date.now() - 5000;
+      if (isNew) {
+        newBadges.push(badge.id);
+        await notifyBadgeEarned(userId, badge.name, badge.icon).catch(() => {});
+      }
     }
   }
 
