@@ -1,12 +1,27 @@
 @import "tailwindcss";
 
+/* Dark mode: class-based only (not media query) */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --color-background: #f9fafb;
-  --color-foreground: #111827;
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+/* Light mode defaults */
+:root {
+  --bg: #f9fafb;
+  --fg: #111827;
+  color-scheme: light;
+}
+
+/* Dark mode overrides */
+.dark {
+  --bg: #030712;
+  --fg: #f3f4f6;
+  color-scheme: dark;
 }
 
 /* Smooth scrolling */

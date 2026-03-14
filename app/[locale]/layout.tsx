@@ -46,6 +46,12 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className="scroll-smooth bg-gray-50 dark:bg-gray-950">
       <head>
+        {/* Prevent flash of wrong theme — runs before React hydration */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('pusulam-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}})()`,
+          }}
+        />
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
           strategy="afterInteractive"
