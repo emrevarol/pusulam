@@ -46,13 +46,13 @@
     "startTrading": "Start Predicting",
     "howItWorks": "How It Works",
     "step1Title": "Create Account",
-    "step1Desc": "Create your free account and get 1,000 Pul starting balance.",
+    "step1Desc": "Create your free account and get 50 vote rights to start.",
     "step2Title": "Pick a Market",
     "step2Desc": "Explore prediction markets on economy, politics, technology and more.",
     "step3Title": "Make a Prediction",
     "step3Desc": "Cast Yes or No votes — rates change based on community consensus.",
     "step4Title": "Earn Reputation",
-    "step4Desc": "Earn Pul from correct predictions, improve your calibration score, collect badges.",
+    "step4Desc": "Earn vote rights from correct predictions, improve your calibration score, collect badges.",
     "noMarketsYet": "No markets yet. Be the first to create one!"
   },
   "market": {

@@ -2,9 +2,9 @@
 // Uses "complete set" mechanism so cost/share ≈ displayed probability
 //
 // How it works:
-// - Buying YES with X Pul: create X complete sets (X YES + X NO tokens),
+// - Buying YES with X Oy Hakki: create X complete sets (X YES + X NO tokens),
 //   sell unwanted NO tokens to AMM pool, keep all YES tokens
-// - Each winning share resolves to 1 Pul
+// - Each winning share resolves to 1 Oy Hakki
 // - This ensures cost per share ≈ probability
 
 export function getYesPrice(yesPool: number, noPool: number): number {
@@ -16,10 +16,10 @@ export function getNoPrice(yesPool: number, noPool: number): number {
 }
 
 /**
- * Calculate shares received for a given Pul amount (BUY).
+ * Calculate shares received for a given Oy Hakki amount (BUY).
  * Uses Manifold-style complete set creation.
  *
- * @param betAmount - Pul to spend
+ * @param betAmount - Oy Hakki to spend
  * @returns shares received, new pool state, avg price per share
  */
 export function calculateBuyShares(
@@ -60,10 +60,10 @@ export function calculateBuyShares(
 /**
  * Calculate return for selling shares (SELL).
  * Reverse of complete set: sell outcome tokens to pool, get opposite tokens,
- * burn complete sets, return Pul.
+ * burn complete sets, return Oy Hakki.
  *
  * @param shares - number of outcome shares to sell
- * @returns Pul returned, new pool state
+ * @returns Oy Hakki returned, new pool state
  */
 export function calculateSellReturn(
   yesPool: number,
@@ -84,7 +84,7 @@ export function calculateSellReturn(
     newYesPool = yesPool + shares;
     newNoPool = k / newYesPool;
     const noTokensReceived = noPool - newNoPool;
-    // Burn min(shares, noTokensReceived) complete sets → return that as Pul
+    // Burn min(shares, noTokensReceived) complete sets → return that as Oy Hakki
     returnAmount = noTokensReceived;
   } else {
     newNoPool = noPool + shares;
@@ -97,12 +97,12 @@ export function calculateSellReturn(
 }
 
 /**
- * Calculate cost (Pul) for a desired number of outcome shares.
+ * Calculate cost (Oy Hakki) for a desired number of outcome shares.
  * Inverse of calculateBuyShares — solves the quadratic:
  *   shares = b + y - k/(p + b)  →  b² + b(p + y - s) - s·p = 0
  *
  * @param shares - desired number of outcome shares (votes)
- * @returns cost in Pul, new pool state, avg price per share
+ * @returns cost in Oy Hakki, new pool state, avg price per share
  */
 export function calculateBuyCost(
   yesPool: number,
