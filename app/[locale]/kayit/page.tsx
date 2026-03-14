@@ -1,16 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export default function RegisterPage() {
   const t = useTranslations("auth");
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const locale = pathname.split("/")[1] || "tr";
+  const refCode = searchParams.get("ref") || "";
 
   const [form, setForm] = useState({
     email: "",
@@ -19,8 +21,17 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
   });
+  const [referrerName, setReferrerName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (refCode) {
+      fetch(`/api/users?q=${refCode}&page=1`)
+        .then((r) => r.json())
+        .catch(() => {});
+    }
+  }, [refCode]);
 
   function updateField(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -46,6 +57,7 @@ export default function RegisterPage() {
           username: form.username,
           displayName: form.displayName,
           password: form.password,
+          ...(refCode ? { referralCode: refCode } : {}),
         }),
       });
 

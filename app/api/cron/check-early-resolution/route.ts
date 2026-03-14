@@ -5,14 +5,9 @@ import Anthropic from "@anthropic-ai/sdk";
 const anthropic = new Anthropic();
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get("authorization");
-  const isAuthorized =
-    authHeader === `Bearer ${process.env.CRON_SECRET}` ||
-    authHeader === `Bearer ${process.env.INTERNAL_SECRET}`;
-
-  if (process.env.CRON_SECRET && !isAuthorized) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const { verifyCronAuth } = await import("@/lib/cron-auth");
+  const authError = verifyCronAuth(request);
+  if (authError) return authError;
 
   // Get all OPEN markets
   const openMarkets = await prisma.market.findMany({

@@ -32,7 +32,9 @@
     "buyOyHakki": "Oy Hakki Satin Al",
     "connectionError": "Baglanti hatasi.",
     "genericError": "Bir hata olustu.",
-    "adminSuggestions": "Piyasa Onerileri"
+    "adminSuggestions": "Piyasa Onerileri",
+    "users": "Kullanicilar",
+    "friends": "Arkadaslar"
   },
   "home": {
     "hero": "Gelecegi tahmin et, yonunu belirle.",
@@ -129,7 +131,9 @@
     "confirmHalt": "Durdur",
     "cancelHalt": "Iptal",
     "marketHalted": "Bu piyasa durduruldu.",
-    "earlyResolved": "Erken sonuclandi"
+    "earlyResolved": "Erken sonuclandi",
+    "createdAt": "Acilis",
+    "resolvedAt": "Sonuclandi"
   },
   "auth": {
     "loginTitle": "Giris Yap",
@@ -161,7 +165,11 @@
     "reputation": "Kalibrasyon",
     "trades": "oy",
     "noUsers": "Henuz kullanici yok.",
-    "oyHakki": "Oy Hakki"
+    "oyHakki": "Oy Hakki",
+    "global": "Genel",
+    "friends": "Arkadaslar",
+    "noFriends": "Arkadaslarini ekle ve siralamanizi karsilastir!",
+    "findFriends": "Arkadas Bul"
   },
   "footer": {
     "about": "Hakkinda",
@@ -222,8 +230,8 @@
     "credits": "Oy Hakki",
     "buyNow": "Satin Al",
     "howCreditsWork": "Nasil Calisir?",
-    "rule1": "Her gun {count} ucretsiz oy hakkin var.",
-    "rule2": "Ucretsiz hakkin bitince, her tahmin 1 oy hakki harcar.",
+    "rule1": "Her gun hesabina +3 oy hakki eklenir.",
+    "rule2": "Her oy 1 oy hakki harcar.",
     "rule3": "Dogru tahminlerde oy hakki geri kazanirsin + bonus.",
     "purchaseHistory": "Satin Alma Gecmisi",
     "statusCompleted": "Tamamlandi",
@@ -232,6 +240,70 @@
     "paymentSuccess": "Odeme basarili! Oy hakki hesabina eklendi.",
     "paymentCanceled": "Odeme iptal edildi.",
     "checkoutError": "Odeme baglantisi alinamadi."
+  },
+  "users": {
+    "title": "Kullanicilar",
+    "searchPlaceholder": "Kullanici ara...",
+    "noResults": "Kullanici bulunamadi."
+  },
+  "friends": {
+    "title": "Arkadaslar",
+    "myFriends": "Arkadaslarim",
+    "requests": "Istekler",
+    "addFriend": "Arkadas Ekle",
+    "removeFriend": "Cikar",
+    "accept": "Kabul Et",
+    "reject": "Reddet",
+    "pending": "Bekliyor",
+    "alreadyFriends": "Arkadas",
+    "noFriends": "Henuz arkadasin yok.",
+    "noRequests": "Bekleyen istek yok.",
+    "requestSent": "Istek gonderildi!",
+    "requestAccepted": "Arkadas eklendi!",
+    "findFriends": "Arkadas Bul"
+  },
+  "referral": {
+    "title": "Davet Et",
+    "yourCode": "Davet Kodun",
+    "copyLink": "Davet Linkini Kopyala",
+    "linkCopied": "Kopyalandi!",
+    "howItWorks": "Nasil Calisir?",
+    "rule1": "Davet linkini arkadasinla paylas.",
+    "rule2": "Arkadasin kayit olsun.",
+    "rule3": "3 farkli gun oy verdikten sonra 25 Oy Hakki bonus kazan!",
+    "invited": "Davet Edilen",
+    "qualified": "Aktif",
+    "earned": "Kazanilan Bonus"
+  },
+  "notifications": {
+    "title": "Bildirimler",
+    "markAllRead": "Tumunu Okundu Isaretle",
+    "noNotifications": "Bildirim yok.",
+    "unread": "Okunmamis",
+    "all": "Tumu"
+  },
+  "activity": {
+    "title": "Akis",
+    "friends": "Arkadaslar",
+    "global": "Herkes",
+    "noActivity": "Henuz aktivite yok.",
+    "traded": "oy verdi",
+    "commented": "yorum yapti",
+    "bought": "aldi",
+    "sold": "satti",
+    "on": "—"
+  },
+  "badges": {
+    "title": "Rozetler",
+    "noBadges": "Henuz rozet kazanilmadi.",
+    "earned": "Kazanildi"
+  },
+  "publicProfile": {
+    "trades": "Islem",
+    "joined": "Katilim",
+    "addFriend": "Arkadas Ekle",
+    "positions": "Pozisyonlar",
+    "noPredictions": "Henuz tahmin yok."
   },
   "assistant": {
     "conversations": "Konusmalar",

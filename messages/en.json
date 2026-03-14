@@ -32,7 +32,9 @@
     "buyOyHakki": "Buy Vote Rights",
     "connectionError": "Connection error.",
     "genericError": "An error occurred.",
-    "adminSuggestions": "Market Suggestions"
+    "adminSuggestions": "Market Suggestions",
+    "users": "Users",
+    "friends": "Friends"
   },
   "home": {
     "hero": "Predict the future, set your course.",
@@ -129,7 +131,9 @@
     "confirmHalt": "Halt",
     "cancelHalt": "Cancel",
     "marketHalted": "This market has been halted.",
-    "earlyResolved": "Early resolved"
+    "earlyResolved": "Early resolved",
+    "createdAt": "Opened",
+    "resolvedAt": "Resolved"
   },
   "auth": {
     "loginTitle": "Log In",
@@ -161,7 +165,11 @@
     "reputation": "Calibration",
     "trades": "votes",
     "noUsers": "No users yet.",
-    "oyHakki": "Voting Power"
+    "oyHakki": "Voting Power",
+    "global": "Global",
+    "friends": "Friends",
+    "noFriends": "Add friends and compare your rankings!",
+    "findFriends": "Find Friends"
   },
   "footer": {
     "about": "About",
@@ -222,8 +230,8 @@
     "credits": "Vote Rights",
     "buyNow": "Buy Now",
     "howCreditsWork": "How It Works",
-    "rule1": "You get {count} free vote rights every day.",
-    "rule2": "After free votes, each prediction costs 1 vote right.",
+    "rule1": "You receive +3 vote rights every day.",
+    "rule2": "Each vote costs 1 vote right.",
     "rule3": "Correct predictions earn vote rights back + bonus.",
     "purchaseHistory": "Purchase History",
     "statusCompleted": "Completed",
@@ -232,6 +240,70 @@
     "paymentSuccess": "Payment successful! Vote rights have been added to your account.",
     "paymentCanceled": "Payment was canceled.",
     "checkoutError": "Could not get checkout link."
+  },
+  "users": {
+    "title": "Users",
+    "searchPlaceholder": "Search users...",
+    "noResults": "No users found."
+  },
+  "friends": {
+    "title": "Friends",
+    "myFriends": "My Friends",
+    "requests": "Requests",
+    "addFriend": "Add Friend",
+    "removeFriend": "Remove",
+    "accept": "Accept",
+    "reject": "Reject",
+    "pending": "Pending",
+    "alreadyFriends": "Friends",
+    "noFriends": "No friends yet.",
+    "noRequests": "No pending requests.",
+    "requestSent": "Request sent!",
+    "requestAccepted": "Friend added!",
+    "findFriends": "Find Friends"
+  },
+  "referral": {
+    "title": "Invite Friends",
+    "yourCode": "Your Referral Code",
+    "copyLink": "Copy Invite Link",
+    "linkCopied": "Copied!",
+    "howItWorks": "How It Works",
+    "rule1": "Share your invite link with a friend.",
+    "rule2": "Your friend signs up.",
+    "rule3": "Earn 25 Vote Rights bonus after they vote on 3 different days!",
+    "invited": "Invited",
+    "qualified": "Qualified",
+    "earned": "Bonus Earned"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark All as Read",
+    "noNotifications": "No notifications.",
+    "unread": "Unread",
+    "all": "All"
+  },
+  "activity": {
+    "title": "Feed",
+    "friends": "Friends",
+    "global": "Everyone",
+    "noActivity": "No activity yet.",
+    "traded": "voted",
+    "commented": "commented",
+    "bought": "bought",
+    "sold": "sold",
+    "on": "on"
+  },
+  "badges": {
+    "title": "Badges",
+    "noBadges": "No badges earned yet.",
+    "earned": "Earned"
+  },
+  "publicProfile": {
+    "trades": "Trades",
+    "joined": "Joined",
+    "addFriend": "Add Friend",
+    "positions": "Positions",
+    "noPredictions": "No predictions yet."
   },
   "assistant": {
     "conversations": "Conversations",

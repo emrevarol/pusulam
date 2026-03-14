@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import Anthropic from "@anthropic-ai/sdk";
+import { notifyMarketResolved, notifyPayout } from "@/lib/notifications";
 
 const anthropic = new Anthropic();
 
@@ -11,32 +12,35 @@ async function resolveMarketWithAI(market: {
   resolutionDate: Date;
 }): Promise<"YES" | "NO" | null> {
   try {
+    const today = new Date().toISOString().split("T")[0];
     const response = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 256,
+      model: "claude-sonnet-4-6",
+      max_tokens: 512,
       tools: [
         {
           type: "web_search_20250305",
           name: "web_search",
-          max_uses: 2,
+          max_uses: 3,
         },
       ],
       messages: [
         {
           role: "user",
-          content: `You are resolving a prediction market. Search the internet for current information and determine the outcome.
+          content: `You are resolving a prediction market. Today is ${today}. Search the internet for current, factual information and determine the outcome.
 
 MARKET TITLE: ${market.title}
 MARKET DESCRIPTION: ${market.description}
 RESOLUTION DATE: ${market.resolutionDate.toISOString()}
 
 Instructions:
-1. Search the web for the latest information about this topic
-2. Based on the evidence, determine if the answer is YES or NO
-3. You MUST respond with ONLY one word: either "YES" or "NO"
-4. If you truly cannot determine the outcome from available information, respond with "NO" (default to NO when uncertain)
+1. Search the web for the latest FACTUAL information about this topic
+2. For price/data markets (Bitcoin, USD/TRY, gold, etc.), find the actual price/value
+3. For event markets (Oscar winners, elections, etc.), find if the event happened and the result
+4. Based on VERIFIED evidence, determine if the answer is YES or NO
+5. You MUST respond with ONLY one word: either "YES" or "NO"
+6. If you truly cannot determine the outcome from available information, respond with "SKIP"
 
-Your answer (YES or NO):`,
+Your answer (YES, NO, or SKIP):`,
         },
       ],
     });
@@ -51,19 +55,21 @@ Your answer (YES or NO):`,
       .trim()
       .toUpperCase();
 
+    if (text.includes("SKIP")) return null; // AI not confident, retry later
     if (text.includes("YES")) return "YES";
     if (text.includes("NO")) return "NO";
-    return "NO"; // default
+    return null; // couldn't determine, retry later
   } catch (err) {
     console.error(`AI resolution failed for market ${market.id}:`, err);
     return null;
   }
 }
 
-async function distributePayouts(marketId: string, outcome: "YES" | "NO") {
-  const positions = await prisma.position.findMany({
-    where: { marketId, shares: { gt: 0 } },
-  });
+async function distributePayouts(marketId: string, outcome: "YES" | "NO", slug?: string) {
+  const [positions, market] = await Promise.all([
+    prisma.position.findMany({ where: { marketId, shares: { gt: 0 } } }),
+    prisma.market.findUnique({ where: { id: marketId }, select: { title: true, slug: true } }),
+  ]);
 
   const payoutOps = [];
 
@@ -119,18 +125,25 @@ async function distributePayouts(marketId: string, outcome: "YES" | "NO") {
     ...payoutOps,
     ...predictionOps,
   ]);
+
+  // Send notifications (async, non-blocking)
+  const marketTitle = market?.title || "Piyasa";
+  const marketSlug = market?.slug || slug || "";
+  for (const pos of positions) {
+    const isWinner = pos.side === outcome;
+    if (isWinner && pos.shares > 0) {
+      const payout = Math.floor(pos.shares);
+      notifyPayout(pos.userId, marketTitle, payout, marketSlug).catch(() => {});
+    } else {
+      notifyMarketResolved(pos.userId, marketTitle, outcome, marketSlug).catch(() => {});
+    }
+  }
 }
 
 export async function GET(request: Request) {
-  // Allow both cron secret and internal calls
-  const authHeader = request.headers.get("authorization");
-  const isAuthorized =
-    authHeader === `Bearer ${process.env.CRON_SECRET}` ||
-    authHeader === `Bearer ${process.env.INTERNAL_SECRET}`;
-
-  if (process.env.CRON_SECRET && !isAuthorized) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const { verifyCronAuth } = await import("@/lib/cron-auth");
+  const authError = verifyCronAuth(request);
+  if (authError) return authError;
 
   // Find all CLOSED (not RESOLVED) markets
   const closedMarkets = await prisma.market.findMany({

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import { CATEGORIES, getLocalizedField } from "@/lib/helpers";
+import { CATEGORIES, getLocalizedField, formatDate } from "@/lib/helpers";
 import { Countdown } from "./countdown";
 
 interface MarketCardProps {
@@ -17,6 +17,8 @@ interface MarketCardProps {
     noPool: number;
     volume: number;
     resolutionDate: string;
+    createdAt?: string;
+    resolvedAt?: string | null;
     traderCount?: number;
     resolvedOutcome?: string | null;
     titleTranslations?: Record<string, string> | null;
@@ -86,8 +88,17 @@ export function MarketCard({ market }: MarketCardProps) {
           {t("volume")}: {market.volume.toLocaleString("tr-TR")} P
           {market.traderCount ? ` · ${market.traderCount} ${t("people")}` : ""}
         </span>
-        <Countdown targetDate={market.resolutionDate} locale={locale} compact />
+        {market.status === "RESOLVED" && market.resolvedAt ? (
+          <span>{t("resolved")}: {formatDate(market.resolvedAt)}</span>
+        ) : (
+          <Countdown targetDate={market.resolutionDate} locale={locale} compact />
+        )}
       </div>
+      {market.createdAt && (
+        <div className="mt-2 text-[10px] text-gray-300 dark:text-gray-600">
+          {t("createdBy")}: {formatDate(market.createdAt)}
+        </div>
+      )}
     </Link>
   );
 }

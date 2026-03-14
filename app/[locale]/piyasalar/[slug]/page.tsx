@@ -11,7 +11,7 @@ import { ShareButtons } from "@/components/share-buttons";
 import { AskAiButton } from "@/components/ask-ai-button";
 import { ResolveMarketButton } from "@/components/resolve-market-button";
 import { HaltMarketButton } from "@/components/halt-market-button";
-import { CATEGORIES, getLocalizedField } from "@/lib/helpers";
+import { CATEGORIES, getLocalizedField, formatDate } from "@/lib/helpers";
 
 async function getMarket(slug: string) {
   // Auto-close this market if expired
@@ -145,8 +145,8 @@ export default async function MarketDetailPage({
             </div>
           </div>
 
-          {/* Stats + Countdown */}
-          <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {/* Stats + Dates */}
+          <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
             <div className="rounded-lg border border-gray-200 bg-white p-4 text-center dark:border-gray-800 dark:bg-gray-900">
               <p className="text-xs text-gray-500">
                 {t("volume")}
@@ -168,6 +168,12 @@ export default async function MarketDetailPage({
               <p className="text-lg font-bold">{market.traderCount}</p>
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-4 text-center dark:border-gray-800 dark:bg-gray-900">
+              <p className="text-xs text-gray-500">
+                {t("createdAt")}
+              </p>
+              <p className="text-sm font-semibold">{formatDate(market.createdAt)}</p>
+            </div>
+            <div className="rounded-lg border border-gray-200 bg-white p-4 text-center dark:border-gray-800 dark:bg-gray-900">
               <p className="mb-1 text-xs text-gray-500">
                 {t("ends")}
               </p>
@@ -177,6 +183,14 @@ export default async function MarketDetailPage({
                 compact
               />
             </div>
+            {isResolved && market.resolvedAt && (
+              <div className="rounded-lg border border-gray-200 bg-white p-4 text-center dark:border-gray-800 dark:bg-gray-900">
+                <p className="text-xs text-gray-500">
+                  {t("resolvedAt")}
+                </p>
+                <p className="text-sm font-semibold">{formatDate(market.resolvedAt)}</p>
+              </div>
+            )}
           </div>
 
           {/* Full countdown */}

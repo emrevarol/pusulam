@@ -1,9 +1,34 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
+import { randomBytes } from "crypto";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import {
+  isValidEmail,
+  validatePassword,
+  validateLength,
+  sanitizeText,
+} from "@/lib/validation";
 
 export async function POST(request: Request) {
-  const { email, username, displayName, password } = await request.json();
+  // Rate limit: 5 registrations per IP per hour
+  const ip = getClientIp(request);
+  const rl = rateLimit(`register:${ip}`, 5, 60 * 60 * 1000);
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: "Çok fazla kayıt denemesi. Lütfen daha sonra tekrar deneyin." },
+      { status: 429 }
+    );
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Geçersiz istek" }, { status: 400 });
+  }
+
+  const { email, username, displayName, password, referralCode } = body;
 
   if (!email || !username || !displayName || !password) {
     return NextResponse.json(
@@ -12,11 +37,36 @@ export async function POST(request: Request) {
     );
   }
 
-  if (password.length < 6) {
+  // Email validation
+  if (!isValidEmail(email)) {
     return NextResponse.json(
-      { error: "Şifre en az 6 karakter olmalıdır." },
+      { error: "Geçerli bir e-posta adresi giriniz." },
       { status: 400 }
     );
+  }
+
+  // Username validation
+  const usernameErr = validateLength(username, "Kullanıcı adı", 3, 32);
+  if (usernameErr) {
+    return NextResponse.json({ error: usernameErr }, { status: 400 });
+  }
+  if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+    return NextResponse.json(
+      { error: "Kullanıcı adı sadece harf, rakam, _ ve - içerebilir." },
+      { status: 400 }
+    );
+  }
+
+  // Display name validation
+  const displayNameErr = validateLength(displayName, "Görünen ad", 2, 64);
+  if (displayNameErr) {
+    return NextResponse.json({ error: displayNameErr }, { status: 400 });
+  }
+
+  // Password validation
+  const passwordErr = validatePassword(password);
+  if (passwordErr) {
+    return NextResponse.json({ error: passwordErr }, { status: 400 });
   }
 
   const existing = await prisma.user.findFirst({
@@ -30,10 +80,30 @@ export async function POST(request: Request) {
     );
   }
 
+  // Look up referrer if referral code provided
+  let referredById: string | undefined;
+  if (referralCode && typeof referralCode === "string" && referralCode.length <= 20) {
+    const referrer = await prisma.user.findUnique({
+      where: { referralCode },
+      select: { id: true },
+    });
+    if (referrer) {
+      referredById = referrer.id;
+    }
+  }
+
   const passwordHash = await bcrypt.hash(password, 12);
+  const newReferralCode = randomBytes(4).toString("hex");
 
   const user = await prisma.user.create({
-    data: { email, username, displayName, passwordHash },
+    data: {
+      email,
+      username: sanitizeText(username),
+      displayName: sanitizeText(displayName),
+      passwordHash,
+      referralCode: newReferralCode,
+      ...(referredById ? { referredById } : {}),
+    },
   });
 
   return NextResponse.json(

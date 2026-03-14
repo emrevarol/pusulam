@@ -6,7 +6,6 @@ import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getYesPrice, getNoPrice, calculateBuyCost, calculateSellReturn } from "@/lib/amm";
-import { DAILY_FREE_OY_HAKKI } from "@/lib/credits";
 
 interface Position {
   id: string;
@@ -36,7 +35,6 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [positions, setPositions] = useState<Position[]>([]);
-  const [dailyFree, setDailyFree] = useState(DAILY_FREE_OY_HAKKI);
   const [oyHakki, setOyHakki] = useState(0);
 
   const sharesNum = parseFloat(shares) || 0;
@@ -55,7 +53,6 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
         .then((r) => r.json())
         .then((d) => {
           setOyHakki(d.oyHakki ?? 0);
-          setDailyFree(d.dailyFreeRemaining ?? 0);
         });
     }
   }, [session, pathname]);
@@ -81,7 +78,6 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
   const yesPrice = getYesPrice(yesPool, noPool);
   const noPrice = getNoPrice(yesPool, noPool);
   const currentPosition = positions.find((p) => p.side === side);
-  const isFree = dailyFree > 0;
 
   async function handleTrade() {
     if (!session) {
@@ -126,7 +122,6 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
         .then((r) => r.json())
         .then((d) => {
           setOyHakki(d.oyHakki ?? 0);
-          setDailyFree(d.dailyFreeRemaining ?? 0);
         });
       router.refresh();
     } catch {
@@ -222,9 +217,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
               <>
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-500">{t("oyHakkiCost")}</span>
-                  <span className="font-semibold">
-                    {isFree ? t("freeVote") : `1 ${tc("oyHakki")}`}
-                  </span>
+                  <span className="font-semibold">1 {tc("oyHakki")}</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-500">{t("potentialReturn")}</span>
@@ -244,11 +237,10 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
           </div>
         )}
 
-        {/* Daily free info */}
+        {/* Balance info */}
         {session && direction === "BUY" && (
           <p className="mb-3 text-[10px] text-gray-400 dark:text-gray-500">
-            {t("dailyFreeRemaining", { remaining: dailyFree, total: DAILY_FREE_OY_HAKKI })}
-            {` · ${oyHakki} ${tc("oyHakki")}`}
+            {oyHakki} {tc("oyHakki")}
           </p>
         )}
 

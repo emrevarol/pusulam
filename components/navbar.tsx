@@ -13,9 +13,10 @@ export function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const [oyHakki, setOyHakki] = useState<number | null>(null);
-  const [dailyFree, setDailyFree] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
+  const [friendRequestCount, setFriendRequestCount] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   const locale = pathname.split("/")[1] || "tr";
   const isAdmin = (session?.user as { role?: string } | undefined)?.role === "ADMIN";
@@ -25,12 +26,25 @@ export function Navbar() {
       .then((r) => r.json())
       .then((d) => {
         setOyHakki(d.oyHakki ?? 0);
-        setDailyFree(d.dailyFreeRemaining ?? 0);
       });
   }
 
   useEffect(() => {
-    if (session?.user) fetchBalance();
+    if (session?.user) {
+      fetchBalance();
+      fetch("/api/friends/requests")
+        .then((r) => r.json())
+        .then((data) => {
+          if (Array.isArray(data)) setFriendRequestCount(data.length);
+        })
+        .catch(() => {});
+      fetch("/api/notifications?unread=true&limit=1")
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.unreadCount !== undefined) setUnreadNotifications(data.unreadCount);
+        })
+        .catch(() => {});
+    }
     if (isAdmin) {
       fetch("/api/admin/market-suggestions")
         .then((r) => r.json())
@@ -75,6 +89,18 @@ export function Navbar() {
               {t("leaderboard")}
             </Link>
             <Link
+              href={`/${locale}/kullanicilar`}
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+            >
+              {t("users")}
+            </Link>
+            <Link
+              href={`/${locale}/akis`}
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+            >
+              Akis
+            </Link>
+            <Link
               href={`/${locale}/asistan`}
               className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
             >
@@ -106,17 +132,26 @@ export function Navbar() {
               >
                 {(session.user as { role?: string }).role === "ADMIN" ? t("createMarket") : t("suggestMarket")}
               </Link>
+              {/* Notification bell */}
+              <Link
+                href={`/${locale}/bildirimler`}
+                className="relative flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                {unreadNotifications > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                    {unreadNotifications > 9 ? "9+" : unreadNotifications}
+                  </span>
+                )}
+              </Link>
               <Link
                 href={`/${locale}/kredi`}
                 className="flex items-center gap-1.5 rounded-lg bg-teal-50 px-3 py-1.5 text-sm font-medium text-teal-600 hover:bg-teal-100 dark:bg-teal-900/20 dark:text-teal-400 dark:hover:bg-teal-900/40"
               >
                 <span>{oyHakki !== null ? oyHakki : "..."}</span>
                 <span className="text-xs opacity-70">{t("oyHakki")}</span>
-                {dailyFree > 0 && (
-                  <span className="rounded bg-emerald-100 px-1 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
-                    +{dailyFree}
-                  </span>
-                )}
               </Link>
 
               {/* Profile dropdown */}
@@ -148,6 +183,37 @@ export function Navbar() {
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
                       >
                         {t("profile")}
+                      </Link>
+                      <Link
+                        href={`/${locale}/bildirimler`}
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+                      >
+                        Bildirimler
+                        {unreadNotifications > 0 && (
+                          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+                            {unreadNotifications}
+                          </span>
+                        )}
+                      </Link>
+                      <Link
+                        href={`/${locale}/akis`}
+                        onClick={() => setMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+                      >
+                        Akis
+                      </Link>
+                      <Link
+                        href={`/${locale}/arkadaslar`}
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-1 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"
+                      >
+                        {t("friends")}
+                        {friendRequestCount > 0 && (
+                          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white">
+                            {friendRequestCount}
+                          </span>
+                        )}
                       </Link>
                       <Link
                         href={`/${locale}/kredi`}

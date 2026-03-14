@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { OY_HAKKI_PACKAGES, DAILY_FREE_OY_HAKKI } from "@/lib/credits";
+import { OY_HAKKI_PACKAGES } from "@/lib/credits";
 
 interface Purchase {
   id: string;
@@ -25,7 +25,6 @@ export default function OyHakkiPage() {
   const t = useTranslations("credits");
 
   const [oyHakki, setOyHakki] = useState(0);
-  const [dailyFree, setDailyFree] = useState(DAILY_FREE_OY_HAKKI);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [loading, setLoading] = useState<string | null>(null);
 
@@ -41,7 +40,6 @@ export default function OyHakkiPage() {
         .then((r) => r.json())
         .then((d) => {
           setOyHakki(d.oyHakki ?? 0);
-          setDailyFree(d.dailyFreeRemaining ?? DAILY_FREE_OY_HAKKI);
         });
       fetch("/api/credits/history")
         .then((r) => r.json())
@@ -98,21 +96,11 @@ export default function OyHakkiPage() {
 
       {/* Current Balance */}
       <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-        <div className="grid grid-cols-2 gap-6">
-          <div className="text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {tc("oyHakki")}
-            </p>
-            <p className="mt-1 text-3xl font-bold text-teal-600">{oyHakki}</p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {t("dailyFree")}
-            </p>
-            <p className="mt-1 text-3xl font-bold text-emerald-600">
-              {dailyFree}/{DAILY_FREE_OY_HAKKI}
-            </p>
-          </div>
+        <div className="text-center">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {tc("oyHakki")}
+          </p>
+          <p className="mt-1 text-3xl font-bold text-teal-600">{oyHakki}</p>
         </div>
       </div>
 
@@ -159,7 +147,7 @@ export default function OyHakkiPage() {
       <div className="mb-8 rounded-xl border border-gray-200 bg-gray-50 p-6 dark:border-gray-800 dark:bg-gray-800">
         <h3 className="mb-3 text-sm font-bold">{t("howCreditsWork")}</h3>
         <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-          <li>• {t("rule1", { count: DAILY_FREE_OY_HAKKI })}</li>
+          <li>• {t("rule1")}</li>
           <li>• {t("rule2")}</li>
           <li>• {t("rule3")}</li>
         </ul>

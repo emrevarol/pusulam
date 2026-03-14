@@ -20,10 +20,14 @@ export function formatPercent(value: number): string {
 }
 
 export function formatDate(date: Date | string): string {
-  return new Date(date).toLocaleDateString("tr-TR", {
+  return new Date(date).toLocaleString("tr-TR", {
     day: "numeric",
     month: "long",
     year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Europe/Istanbul",
+    timeZoneName: "short",
   });
 }
 

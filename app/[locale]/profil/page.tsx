@@ -58,6 +58,8 @@ export default function ProfilePage() {
   const [positions, setPositions] = useState<Position[]>([]);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [suggestions, setSuggestions] = useState<MySuggestion[]>([]);
+  const [badges, setBadges] = useState<Array<{ badge: { name: string; icon: string; tier: string; description: string }; earnedAt: string }>>([]);
+  const [streak, setStreak] = useState(0);
   const [tab, setTab] = useState<"positions" | "past" | "history" | "suggestions">("positions");
   const [loading, setLoading] = useState(true);
 
@@ -74,6 +76,8 @@ export default function ProfilePage() {
         fetch("/api/user/suggestions").then((r) => r.json()),
       ]).then(([balData, posData, tradeData, sugData]) => {
         setOyHakki(balData.oyHakki ?? 0);
+        setStreak(balData.streak ?? 0);
+        setBadges(balData.badges ?? []);
         setPositions(posData);
         setTrades(tradeData);
         setSuggestions(Array.isArray(sugData) ? sugData : []);
@@ -114,7 +118,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Stats */}
-        <div className="mt-6 grid grid-cols-3 gap-4">
+        <div className="mt-6 grid grid-cols-4 gap-4">
           <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
             <p className="text-xs text-gray-500">{t("oyHakki")}</p>
             <p className="text-xl font-bold text-emerald-600">
@@ -142,7 +146,30 @@ export default function ProfilePage() {
               {totalPnl.toLocaleString("tr-TR", { maximumFractionDigits: 0 })}
             </p>
           </div>
+          <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
+            <p className="text-xs text-gray-500">Seri</p>
+            <p className="text-xl font-bold text-orange-500">
+              {streak > 0 ? `🔥 ${streak}` : "0"}
+            </p>
+          </div>
         </div>
+
+        {/* Badges */}
+        {badges.length > 0 && (
+          <div className="mt-4">
+            <div className="flex flex-wrap gap-2">
+              {badges.map((ub, i) => (
+                <span
+                  key={i}
+                  className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1 text-sm dark:border-gray-700 dark:bg-gray-800"
+                  title={ub.badge.description}
+                >
+                  {ub.badge.icon} {ub.badge.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Tabs */}

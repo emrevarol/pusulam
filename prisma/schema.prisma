@@ -20,6 +20,10 @@ model User {
   streak       Int      @default(0)    // Gunluk tahmin serisi
   lastActiveAt DateTime @default(now())
   role         String   @default("USER") // USER, PRO, ADMIN
+  referralCode String?  @unique
+  referredById String?
+  referredBy   User?    @relation("Referrals", fields: [referredById], references: [id])
+  referrals    User[]   @relation("Referrals")
   createdAt    DateTime @default(now())
 
   markets      Market[]
@@ -33,6 +37,10 @@ model User {
   dailyPredictions DailyPrediction[]
   creditPurchases  CreditPurchase[]
   suggestions      MarketSuggestion[]
+  referralRewards  ReferralReward[]
+  notifications    Notification[]
+  friendRequestsSent     Friendship[] @relation("FriendRequester")
+  friendRequestsReceived Friendship[] @relation("FriendReceiver")
 
   @@index([reputation])
   @@index([oyHakki])
@@ -225,6 +233,49 @@ model CreditPurchase {
 
   @@index([userId])
   @@index([stripeSessionId])
+}
+
+model Friendship {
+  id        String   @id @default(cuid())
+  status    String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  requesterId String
+  requester   User @relation("FriendRequester", fields: [requesterId], references: [id])
+  receiverId  String
+  receiver    User @relation("FriendReceiver", fields: [receiverId], references: [id])
+
+  @@unique([requesterId, receiverId])
+  @@index([receiverId, status])
+}
+
+model ReferralReward {
+  id        String   @id @default(cuid())
+  amount    Int
+  createdAt DateTime @default(now())
+
+  referrerId String
+  referrer   User   @relation(fields: [referrerId], references: [id])
+  referredId String @unique // one reward per referred user
+
+  @@index([referrerId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String   // FRIEND_REQUEST, FRIEND_ACCEPTED, MARKET_RESOLVED, COMMENT_REPLY, BADGE_EARNED, PAYOUT
+  title     String
+  body      String
+  link      String?  // URL to navigate to
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id])
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
 }
 
 model MarketSuggestion {

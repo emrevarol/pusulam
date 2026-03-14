@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import Anthropic from "@anthropic-ai/sdk";
+import { rateLimit } from "@/lib/rate-limit";
 
 const anthropic = new Anthropic();
 
@@ -12,8 +13,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { message, history, locale, conversationId, marketId } =
-    await request.json();
+  // Rate limit: 20 chat messages per hour per user (AI calls are expensive)
+  const rl = rateLimit(`chat:${session.user.id}`, 20, 60 * 60 * 1000);
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: "Çok fazla mesaj. Lütfen daha sonra tekrar deneyin." },
+      { status: 429 }
+    );
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Geçersiz istek" }, { status: 400 });
+  }
+
+  const { message, history, locale, conversationId, marketId } = body;
   const isTr = locale !== "en";
 
   if (!message?.trim()) {

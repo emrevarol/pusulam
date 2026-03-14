@@ -10,21 +10,36 @@ export async function GET() {
     return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { oyHakki: true },
-  });
-
-  const today = getTodayIstanbul();
-  const daily = await prisma.dailyPrediction.findUnique({
-    where: { userId_date: { userId: session.user.id, date: today } },
-  });
+  const [user, daily] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        oyHakki: true,
+        streak: true,
+        reputation: true,
+        badges: {
+          include: {
+            badge: {
+              select: { name: true, icon: true, tier: true, description: true },
+            },
+          },
+          orderBy: { earnedAt: "desc" },
+        },
+      },
+    }),
+    prisma.dailyPrediction.findUnique({
+      where: { userId_date: { userId: session.user.id, date: getTodayIstanbul() } },
+    }),
+  ]);
 
   const usedToday = daily?.count ?? 0;
   const dailyFreeRemaining = Math.max(0, DAILY_FREE_OY_HAKKI - usedToday);
 
   return NextResponse.json({
     oyHakki: user?.oyHakki ?? 0,
+    streak: user?.streak ?? 0,
+    reputation: user?.reputation ?? 0,
+    badges: user?.badges ?? [],
     dailyFreeRemaining,
   });
 }

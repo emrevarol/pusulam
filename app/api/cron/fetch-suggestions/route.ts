@@ -4,14 +4,9 @@ import { fetchTrendingMarkets } from "@/lib/polymarket";
 import { generateTurkeyMarketSuggestions, translatePolymarketToTurkish } from "@/lib/news-analyzer";
 
 export async function GET(request: Request) {
-  const authHeader = request.headers.get("authorization");
-  const isAuthorized =
-    authHeader === `Bearer ${process.env.CRON_SECRET}` ||
-    authHeader === `Bearer ${process.env.INTERNAL_SECRET}`;
-
-  if (process.env.CRON_SECRET && !isAuthorized) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const { verifyCronAuth } = await import("@/lib/cron-auth");
+  const authError = verifyCronAuth(request);
+  if (authError) return authError;
 
   const results = { polymarket: 0, news: 0, errors: [] as string[] };
 
