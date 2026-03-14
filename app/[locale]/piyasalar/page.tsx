@@ -4,6 +4,7 @@ import { MarketCard } from "@/components/market-card";
 import { CategoryFilter } from "@/components/category-filter";
 import { SortFilter } from "@/components/sort-filter";
 import { StatusFilter } from "@/components/status-filter";
+import { MarketSearch } from "@/components/market-search";
 
 type SortOption = "closing" | "newest" | "popular" | "forecasters";
 
@@ -31,7 +32,7 @@ async function closeExpiredMarkets() {
   }
 }
 
-async function getMarkets(category?: string, sort?: string, statusFilter?: string) {
+async function getMarkets(category?: string, sort?: string, statusFilter?: string, query?: string) {
   await closeExpiredMarkets();
 
   const statusWhere =
@@ -41,9 +42,18 @@ async function getMarkets(category?: string, sort?: string, statusFilter?: strin
         ? {}
         : { status: "OPEN" };
 
-  const where = category && category !== "all"
-    ? { category, ...statusWhere }
-    : { ...statusWhere };
+  const searchWhere = query
+    ? {
+        OR: [
+          { title: { contains: query, mode: "insensitive" as const } },
+          { description: { contains: query, mode: "insensitive" as const } },
+        ],
+      }
+    : {};
+
+  const categoryWhere = category && category !== "all" ? { category } : {};
+
+  const where = { ...categoryWhere, ...statusWhere, ...searchWhere };
 
   const defaultSort = statusFilter === "resolved" ? "newest" : (sort || "newest");
   const orderBy = ORDER_BY[(defaultSort as SortOption)] || ORDER_BY.newest;
@@ -69,22 +79,33 @@ export default async function MarketsPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ kategori?: string; sirala?: string; durum?: string }>;
+  searchParams: Promise<{ kategori?: string; sirala?: string; durum?: string; q?: string }>;
 }) {
   const { locale } = await params;
-  const { kategori, sirala, durum } = await searchParams;
-  const markets = await getMarkets(kategori, sirala, durum);
+  const { kategori, sirala, durum, q } = await searchParams;
+  const markets = await getMarkets(kategori, sirala, durum, q);
   const t = await getTranslations({ locale, namespace: "market" });
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-4">
+      {/* Search + Status */}
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <MarketSearch />
         <StatusFilter activeStatus={durum} />
       </div>
+
+      {/* Category + Sort */}
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <CategoryFilter activeCategory={kategori} />
         <SortFilter />
       </div>
+
+      {/* Search result info */}
+      {q && (
+        <p className="mb-4 text-sm text-gray-500">
+          &ldquo;{q}&rdquo; icin {markets.length} sonuc
+        </p>
+      )}
 
       {markets.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -94,7 +115,9 @@ export default async function MarketsPage({
         </div>
       ) : (
         <div className="rounded-xl border-2 border-dashed border-gray-200 p-16 text-center dark:border-gray-800">
-          <p className="text-gray-400">{t("noMarkets")}</p>
+          <p className="text-gray-400">
+            {q ? `"${q}" ile eslesen piyasa bulunamadi.` : t("noMarkets")}
+          </p>
         </div>
       )}
     </div>
