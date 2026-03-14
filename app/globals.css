@@ -15,13 +15,17 @@
   --bg: #f9fafb;
   --fg: #111827;
   color-scheme: light;
+  background-color: #f9fafb;
+  color: #111827;
 }
 
 /* Dark mode overrides */
-.dark {
+:root.dark {
   --bg: #030712;
   --fg: #f3f4f6;
   color-scheme: dark;
+  background-color: #030712;
+  color: #f3f4f6;
 }
 
 /* Smooth scrolling */
