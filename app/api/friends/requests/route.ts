@@ -70,8 +70,8 @@ export async function POST(request: Request) {
     }),
   ]);
 
-  // Notify receiver (async, non-blocking)
-  notifyFriendRequest(receiverId, sender?.displayName || "Birisi").catch(() => {});
+  // Notify receiver (with email)
+  await notifyFriendRequest(receiverId, sender?.displayName || "Birisi").catch(() => {});
 
   return NextResponse.json(friendship, { status: 201 });
 }

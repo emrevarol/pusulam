@@ -126,16 +126,16 @@ async function distributePayouts(marketId: string, outcome: "YES" | "NO", slug?:
     ...predictionOps,
   ]);
 
-  // Send notifications (async, non-blocking)
+  // Send notifications (with email)
   const marketTitle = market?.title || "Piyasa";
   const marketSlug = market?.slug || slug || "";
   for (const pos of positions) {
     const isWinner = pos.side === outcome;
     if (isWinner && pos.shares > 0) {
       const payout = Math.floor(pos.shares);
-      notifyPayout(pos.userId, marketTitle, payout, marketSlug).catch(() => {});
+      await notifyPayout(pos.userId, marketTitle, payout, marketSlug).catch(() => {});
     } else {
-      notifyMarketResolved(pos.userId, marketTitle, outcome, marketSlug).catch(() => {});
+      await notifyMarketResolved(pos.userId, marketTitle, outcome, marketSlug).catch(() => {});
     }
   }
 }

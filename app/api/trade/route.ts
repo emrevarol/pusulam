@@ -206,9 +206,9 @@ export async function POST(request: Request) {
       return { cost: betAmount, shares, avgPrice };
     });
 
-    // Check referral reward + badges (async, non-blocking)
-    checkReferralReward(session.user.id).catch(() => {});
-    checkAndAwardBadges(session.user.id).catch(() => {});
+    // Check referral reward + badges
+    await checkReferralReward(session.user.id).catch(() => {});
+    await checkAndAwardBadges(session.user.id).catch(() => {});
 
     return NextResponse.json({ success: true, ...result });
   }

@@ -43,14 +43,16 @@ export async function PATCH(
       where: { id: session.user.id },
       select: { displayName: true },
     });
-    notifyFriendAccepted(
+    await notifyFriendAccepted(
       friendship.requesterId,
       accepter?.displayName || "Birisi"
     ).catch(() => {});
 
-    // Check badges for both users (social badges)
-    checkAndAwardBadges(session.user.id).catch(() => {});
-    checkAndAwardBadges(friendship.requesterId).catch(() => {});
+    // Check badges for both users
+    await Promise.all([
+      checkAndAwardBadges(session.user.id).catch(() => {}),
+      checkAndAwardBadges(friendship.requesterId).catch(() => {}),
+    ]);
   }
 
   return NextResponse.json(updated);

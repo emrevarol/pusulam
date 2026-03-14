@@ -58,8 +58,8 @@ export async function POST(request: Request) {
     },
   });
 
-  // Check badges (async, non-blocking)
-  checkAndAwardBadges(session.user.id).catch(() => {});
+  // Check badges
+  await checkAndAwardBadges(session.user.id).catch(() => {});
 
   return NextResponse.json(comment, { status: 201 });
 }
