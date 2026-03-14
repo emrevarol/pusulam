@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { calculateBuyCost, calculateSellReturn } from "@/lib/amm";
+import { calculateBuyShares, calculateSellReturn } from "@/lib/amm";
 import { getTodayIstanbul } from "@/lib/credits";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { checkAndAwardBadges } from "@/lib/badges";
 
 const REFERRAL_BONUS = 25;
-const MAX_SHARES_PER_TRADE = 100_000;
+const MAX_BET_AMOUNT = 10_000;
 
 async function checkReferralReward(userId: string) {
   const user = await prisma.user.findUnique({
@@ -17,19 +17,16 @@ async function checkReferralReward(userId: string) {
   });
   if (!user?.referredById) return;
 
-  // Already rewarded?
   const existing = await prisma.referralReward.findUnique({
     where: { referredId: userId },
   });
   if (existing) return;
 
-  // Count distinct voting days
   const distinctDays = await prisma.dailyPrediction.count({
     where: { userId },
   });
   if (distinctDays < 3) return;
 
-  // Award bonus to referrer
   await prisma.$transaction([
     prisma.referralReward.create({
       data: {
@@ -67,9 +64,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Geçersiz istek" }, { status: 400 });
   }
 
-  const { marketId, side, shares, direction } = body;
+  const { marketId, side, amount, direction, shares: legacyShares } = body;
 
-  if (!marketId || !side || !shares || !direction) {
+  // Support both new "amount" (oy hakki to spend) and legacy "shares" field
+  const betAmount = amount || legacyShares;
+
+  if (!marketId || !side || !betAmount || !direction) {
     return NextResponse.json({ error: "Eksik alan" }, { status: 400 });
   }
 
@@ -81,17 +81,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Geçersiz işlem yönü" }, { status: 400 });
   }
 
-  if (typeof shares !== "number" || shares <= 0 || shares > MAX_SHARES_PER_TRADE) {
+  if (typeof betAmount !== "number" || betAmount <= 0 || betAmount > MAX_BET_AMOUNT) {
     return NextResponse.json(
-      { error: `Miktar 1 ile ${MAX_SHARES_PER_TRADE} arasında olmalıdır.` },
+      { error: `Miktar 1 ile ${MAX_BET_AMOUNT} arasında olmalıdır.` },
       { status: 400 }
     );
   }
 
   if (direction === "BUY") {
-    // Use raw SQL with FOR UPDATE to prevent race conditions on pool state
     const result = await prisma.$transaction(async (tx) => {
-      // Lock market row and get fresh state
+      // Lock market row
       const markets = await tx.$queryRawUnsafe<
         Array<{
           id: string;
@@ -110,15 +109,7 @@ export async function POST(request: Request) {
         throw new Error("MARKET_NOT_FOUND");
       }
 
-      // Calculate with locked pool state
-      const { cost, newYesPool, newNoPool, avgPrice } = calculateBuyCost(
-        market.yesPool,
-        market.noPool,
-        side,
-        shares
-      );
-
-      // Check user balance (also lock user row)
+      // Lock user row and check balance
       const users = await tx.$queryRawUnsafe<
         Array<{ id: string; oyHakki: number }>
       >(
@@ -128,11 +119,19 @@ export async function POST(request: Request) {
 
       const user = users[0];
       if (!user) throw new Error("USER_NOT_FOUND");
-      if (user.oyHakki < 1) throw new Error("INSUFFICIENT_BALANCE");
+      if (user.oyHakki < betAmount) throw new Error("INSUFFICIENT_BALANCE");
+
+      // CPMM: spend betAmount oy hakki → receive shares
+      const { shares, newYesPool, newNoPool, avgPrice } = calculateBuyShares(
+        market.yesPool,
+        market.noPool,
+        side,
+        betAmount
+      );
 
       const today = getTodayIstanbul();
 
-      // Read existing position
+      // Update or create position
       const existingPos = await tx.position.findUnique({
         where: {
           userId_marketId_side: {
@@ -170,16 +169,17 @@ export async function POST(request: Request) {
           });
 
       await Promise.all([
+        // Deduct the actual CPMM cost (betAmount oy hakki)
         tx.user.update({
           where: { id: user.id },
-          data: { oyHakki: { decrement: 1 } },
+          data: { oyHakki: { decrement: betAmount } },
         }),
         tx.market.update({
           where: { id: market.id },
           data: {
             yesPool: newYesPool,
             noPool: newNoPool,
-            volume: market.volume + cost,
+            volume: market.volume + betAmount,
             traderCount: { increment: 1 },
           },
         }),
@@ -189,7 +189,7 @@ export async function POST(request: Request) {
             side,
             shares,
             price: avgPrice,
-            cost,
+            cost: betAmount,
             weight: 1,
             userId: user.id,
             marketId: market.id,
@@ -203,7 +203,7 @@ export async function POST(request: Request) {
         }),
       ]);
 
-      return { cost, shares, avgPrice };
+      return { cost: betAmount, shares, avgPrice };
     });
 
     // Check referral reward + badges (async, non-blocking)
@@ -244,7 +244,7 @@ export async function POST(request: Request) {
         },
       });
 
-      if (!position || position.shares < shares) {
+      if (!position || position.shares < betAmount) {
         throw new Error("INSUFFICIENT_SHARES");
       }
 
@@ -252,10 +252,14 @@ export async function POST(request: Request) {
         market.yesPool,
         market.noPool,
         side,
-        shares
+        betAmount
       );
 
       await Promise.all([
+        tx.user.update({
+          where: { id: session.user.id },
+          data: { oyHakki: { increment: returnAmount } },
+        }),
         tx.market.update({
           where: { id: market.id },
           data: {
@@ -268,8 +272,8 @@ export async function POST(request: Request) {
           data: {
             direction: "SELL",
             side,
-            shares,
-            price: returnAmount / shares,
+            shares: betAmount,
+            price: returnAmount / betAmount,
             cost: returnAmount,
             weight: 1,
             userId: session.user.id,
@@ -284,7 +288,7 @@ export async function POST(request: Request) {
               side,
             },
           },
-          data: { shares: position.shares - shares },
+          data: { shares: position.shares - betAmount },
         }),
       ]);
 

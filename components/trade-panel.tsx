@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getYesPrice, getNoPrice, calculateBuyCost, calculateSellReturn } from "@/lib/amm";
+import { getYesPrice, getNoPrice, calculateBuyShares, calculateSellReturn } from "@/lib/amm";
 
 interface Position {
   id: string;
@@ -30,14 +30,14 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
 
   const [direction, setDirection] = useState<"BUY" | "SELL">("BUY");
   const [side, setSide] = useState<"YES" | "NO">("YES");
-  const [shares, setShares] = useState("");
+  const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [positions, setPositions] = useState<Position[]>([]);
   const [oyHakki, setOyHakki] = useState(0);
 
-  const sharesNum = parseFloat(shares) || 0;
+  const amountNum = parseFloat(amount) || 0;
 
   useEffect(() => {
     if (session?.user) {
@@ -57,21 +57,19 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
     }
   }, [session, pathname]);
 
-  let cost = 0;
-  let avgPrice = 0;
+  // Calculate preview
+  let sharesReceived = 0;
   let returnAmount = 0;
   try {
-    if (direction === "BUY" && sharesNum > 0) {
-      const result = calculateBuyCost(yesPool, noPool, side, sharesNum);
-      cost = result.cost;
-      avgPrice = result.avgPrice;
-    } else if (direction === "SELL" && sharesNum > 0) {
-      const result = calculateSellReturn(yesPool, noPool, side, sharesNum);
+    if (direction === "BUY" && amountNum > 0) {
+      const result = calculateBuyShares(yesPool, noPool, side, amountNum);
+      sharesReceived = result.shares;
+    } else if (direction === "SELL" && amountNum > 0) {
+      const result = calculateSellReturn(yesPool, noPool, side, amountNum);
       returnAmount = result.returnAmount;
     }
   } catch {
-    cost = 0;
-    avgPrice = 0;
+    sharesReceived = 0;
     returnAmount = 0;
   }
 
@@ -93,12 +91,12 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
       const res = await fetch("/api/trade", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ marketId, side, shares: sharesNum, direction }),
+        body: JSON.stringify({ marketId, side, amount: amountNum, direction }),
       });
 
       if (!res.ok) {
         const data = await res.json();
-        if (data.error === "Yetersiz oy hakki") {
+        if (data.error?.includes("Yetersiz") || data.error?.includes("INSUFFICIENT")) {
           setError(t("insufficientOyHakki"));
         } else {
           setError(data.error || tc("genericError"));
@@ -106,7 +104,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
         return;
       }
 
-      setShares("");
+      setAmount("");
       setSuccess(t("tradeSuccess"));
       setTimeout(() => setSuccess(""), 2000);
       window.dispatchEvent(new Event("trade-complete"));
@@ -184,55 +182,84 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
           </button>
         </div>
 
-        {/* Shares (votes) input */}
+        {/* Amount input */}
         <div className="mb-4">
           <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
-            {t("shares")}
-            {direction === "SELL" && currentPosition && (
-              <span className="ml-1 text-gray-400">
-                (max: {currentPosition.shares.toFixed(0)})
-              </span>
-            )}
+            {direction === "BUY"
+              ? `${tc("oyHakki")} Miktari`
+              : `${t("shares")} (max: ${currentPosition?.shares.toFixed(1) || 0})`}
           </label>
           <input
             type="number"
-            value={shares}
-            onChange={(e) => setShares(e.target.value)}
-            placeholder="10"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder={direction === "BUY" ? "5" : "10"}
             min="1"
             step="1"
             max={
               direction === "SELL" && currentPosition
                 ? currentPosition.shares
-                : undefined
+                : direction === "BUY"
+                  ? oyHakki
+                  : undefined
             }
             className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
           />
+          {/* Quick amount buttons for BUY */}
+          {direction === "BUY" && oyHakki > 0 && (
+            <div className="mt-2 flex gap-1.5">
+              {[1, 3, 5, 10].filter(v => v <= oyHakki).map((v) => (
+                <button
+                  key={v}
+                  onClick={() => setAmount(String(v))}
+                  className="rounded-md border border-gray-200 px-2.5 py-1 text-xs text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
+                >
+                  {v}
+                </button>
+              ))}
+              <button
+                onClick={() => setAmount(String(oyHakki))}
+                className="rounded-md border border-gray-200 px-2.5 py-1 text-xs text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
+              >
+                Hepsi
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Cost breakdown */}
-        {sharesNum > 0 && (
+        {amountNum > 0 && (
           <div className="mb-4 space-y-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
             {direction === "BUY" ? (
               <>
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">{t("oyHakkiCost")}</span>
-                  <span className="font-semibold">1 {tc("oyHakki")}</span>
+                  <span className="text-gray-500">Harcanan</span>
+                  <span className="font-semibold">{amountNum} {tc("oyHakki")}</span>
                 </div>
                 <div className="flex justify-between text-xs">
+                  <span className="text-gray-500">Alinan Pay</span>
+                  <span className="font-semibold">{sharesReceived.toFixed(1)} pay</span>
+                </div>
+                <div className="flex justify-between text-xs border-t border-gray-200 pt-2 dark:border-gray-700">
                   <span className="text-gray-500">{t("potentialReturn")}</span>
                   <span className="font-semibold text-emerald-600">
-                    +{(sharesNum - cost).toFixed(1)} {tc("oyHakki")}
+                    +{(sharesReceived - amountNum).toFixed(1)} {tc("oyHakki")}
                   </span>
                 </div>
               </>
             ) : (
-              <div className="flex justify-between text-xs">
-                <span className="text-gray-500">{t("returnLabel")}</span>
-                <span className="font-semibold text-emerald-600">
-                  +{returnAmount.toFixed(1)} {tc("oyHakki")}
-                </span>
-              </div>
+              <>
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-500">Satilan</span>
+                  <span className="font-semibold">{amountNum} pay</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-500">{t("returnLabel")}</span>
+                  <span className="font-semibold text-emerald-600">
+                    +{returnAmount.toFixed(1)} {tc("oyHakki")}
+                  </span>
+                </div>
+              </>
             )}
           </div>
         )}
@@ -240,7 +267,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
         {/* Balance info */}
         {session && direction === "BUY" && (
           <p className="mb-3 text-[10px] text-gray-400 dark:text-gray-500">
-            {oyHakki} {tc("oyHakki")}
+            Bakiye: {oyHakki} {tc("oyHakki")}
           </p>
         )}
 
@@ -263,7 +290,7 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
 
         <button
           onClick={handleTrade}
-          disabled={loading || sharesNum <= 0}
+          disabled={loading || amountNum <= 0 || (direction === "BUY" && amountNum > oyHakki)}
           className={`w-full rounded-lg py-3 text-sm font-semibold text-white transition ${
             direction === "BUY"
               ? side === "YES"
@@ -275,7 +302,9 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
           {loading
             ? "..."
             : session
-              ? `${sharesNum || 0} ${side === "YES" ? t("yesShort") : t("noShort")} ${direction === "BUY" ? t("buy") : t("sell")}`
+              ? direction === "BUY"
+                ? `${amountNum || 0} ${tc("oyHakki")} ile ${side === "YES" ? t("yesShort") : t("noShort")} ${t("buy")}`
+                : `${amountNum || 0} pay ${t("sell")}`
               : tc("loginRequired")}
         </button>
       </div>
@@ -307,17 +336,23 @@ export function TradePanel({ marketId, yesPool, noPool }: TradePanelProps) {
                       {pos.side}
                     </span>
                     <span className="ml-2 text-sm font-medium">
-                      {pos.shares.toFixed(1)} {t("shares").toLowerCase()}
+                      {pos.shares.toFixed(1)} pay
+                    </span>
+                    <span className="ml-1 text-xs text-gray-400">
+                      (ort. %{(pos.avgPrice * 100).toFixed(0)})
                     </span>
                   </div>
                   <div className="text-right">
+                    <p className="text-xs text-gray-500">
+                      Kazanirsan: +{pos.shares.toFixed(1)}
+                    </p>
                     <p
                       className={`text-xs font-medium ${
                         pnl >= 0 ? "text-emerald-600" : "text-rose-500"
                       }`}
                     >
                       {pnl >= 0 ? "+" : ""}
-                      {pnl.toFixed(1)}
+                      {pnl.toFixed(1)} K/Z
                     </p>
                   </div>
                 </div>
