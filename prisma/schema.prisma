@@ -61,6 +61,8 @@ model Market {
   haltedAt        DateTime?
   haltReason      String?
   earlyResolution Boolean   @default(false)
+  liveData        Json?     // { price: "71,293", label: "Bitcoin", source: "CoinGecko", updatedAt: "..." }
+  recentNews      Json?     // [{ title: "...", url: "...", source: "Reuters", date: "..." }, ...]
   yesPool         Float     @default(100)
   noPool          Float     @default(100)
   volume          Float     @default(0)

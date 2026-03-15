@@ -159,6 +159,51 @@ export default async function MarketDetailPage({
             </p>
           </div>
 
+          {/* Live data */}
+          {market.liveData && (
+            <div className="mb-4 flex items-center gap-3 rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 dark:border-teal-800 dark:bg-teal-900/20">
+              <span className="text-lg font-bold text-teal-700 dark:text-teal-400">
+                {(market.liveData as { price: string }).price}
+              </span>
+              <span className="text-sm text-teal-600 dark:text-teal-500">
+                {(market.liveData as { label: string }).label}
+              </span>
+              <span className="ml-auto text-[10px] text-teal-500">
+                Kaynak: {(market.liveData as { source: string }).source}
+              </span>
+            </div>
+          )}
+
+          {/* Recent news */}
+          {market.recentNews && Array.isArray(market.recentNews) && (market.recentNews as Array<{ title: string; url: string; source: string; date: string }>).length > 0 && (
+            <div className="mb-6 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+              <h3 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Son Haberler
+              </h3>
+              <div className="space-y-2">
+                {(market.recentNews as Array<{ title: string; url: string; source: string; date: string }>).map((news, i) => (
+                  <a
+                    key={i}
+                    href={news.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-start gap-2 rounded-lg p-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+                  >
+                    <span className="mt-0.5 text-gray-400">📰</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-gray-700 dark:text-gray-300 leading-snug">
+                        {news.title}
+                      </p>
+                      <p className="mt-0.5 text-[10px] text-gray-400">
+                        {news.source} · {news.date}
+                      </p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Resolved banner */}
           {isResolved && (
             <div className={`mb-6 rounded-xl border-2 p-4 text-center ${
