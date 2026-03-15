@@ -20,6 +20,9 @@ export async function GET() {
         bio: true,
         avatar: true,
         displayName: true,
+        plan: true,
+        planExpiresAt: true,
+        streakFreezes: true,
         badges: {
           include: {
             badge: {
@@ -38,6 +41,9 @@ export async function GET() {
   const usedToday = daily?.count ?? 0;
   const dailyFreeRemaining = Math.max(0, DAILY_FREE_OY_HAKKI - usedToday);
 
+  const isExpired = user?.planExpiresAt && user.planExpiresAt < new Date();
+  const activePlan = (!isExpired && user?.plan === "PREMIUM") ? "PREMIUM" : "FREE";
+
   return NextResponse.json({
     oyHakki: user?.oyHakki ?? 0,
     streak: user?.streak ?? 0,
@@ -45,6 +51,9 @@ export async function GET() {
     bio: user?.bio ?? null,
     avatar: user?.avatar ?? null,
     displayName: user?.displayName ?? "",
+    plan: activePlan,
+    planExpiresAt: user?.planExpiresAt ?? null,
+    streakFreezes: user?.streakFreezes ?? 0,
     badges: user?.badges ?? [],
     dailyFreeRemaining,
   });

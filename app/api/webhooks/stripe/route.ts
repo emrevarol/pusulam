@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
+import { TIERS } from "@/lib/tiers";
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -97,6 +98,46 @@ export async function POST(request: Request) {
           }),
         ]);
       }
+    }
+  }
+
+  // Subscription events
+  if (event.type === "customer.subscription.created" || event.type === "customer.subscription.updated") {
+    const subscription = event.data.object;
+    const customerId = subscription.customer as string;
+
+    const user = await prisma.user.findFirst({ where: { stripeCustomerId: customerId } });
+    if (user) {
+      const isActive = subscription.status === "active" || subscription.status === "trialing";
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          plan: isActive ? "PREMIUM" : "FREE",
+          stripeSubscriptionId: subscription.id,
+          planExpiresAt: isActive
+            ? new Date(subscription.current_period_end * 1000)
+            : null,
+          streakFreezes: isActive ? TIERS.PREMIUM.streakFreezesPerMonth : 0,
+        },
+      });
+    }
+  }
+
+  if (event.type === "customer.subscription.deleted") {
+    const subscription = event.data.object;
+    const customerId = subscription.customer as string;
+
+    const user = await prisma.user.findFirst({ where: { stripeCustomerId: customerId } });
+    if (user) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          plan: "FREE",
+          planExpiresAt: null,
+          stripeSubscriptionId: null,
+          streakFreezes: 0,
+        },
+      });
     }
   }
 

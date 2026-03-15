@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import Anthropic from "@anthropic-ai/sdk";
 import { rateLimit } from "@/lib/rate-limit";
+import { getTier } from "@/lib/tiers";
 
 const anthropic = new Anthropic();
 
@@ -13,8 +14,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Rate limit: 20 chat messages per hour per user (AI calls are expensive)
-  const rl = rateLimit(`chat:${session.user.id}`, 20, 60 * 60 * 1000);
+  // Get user plan for tier-based limits
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { plan: true, planExpiresAt: true },
+  });
+  const isExpired = dbUser?.planExpiresAt && dbUser.planExpiresAt < new Date();
+  const plan = (!isExpired && dbUser?.plan === "PREMIUM") ? "PREMIUM" : "FREE";
+  const tier = getTier(plan);
+
+  // Rate limit based on plan
+  const rl = rateLimit(`chat:${session.user.id}`, tier.chatPerHour, 60 * 60 * 1000);
   if (!rl.success) {
     return NextResponse.json(
       { error: "Çok fazla mesaj. Lütfen daha sonra tekrar deneyin." },
@@ -152,7 +162,7 @@ Answer the user's question in the context of these markets. If they ask about a 
         ];
 
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
+    model: tier.chatModel,
     max_tokens: 2048,
     system: systemPrompt,
     messages,
@@ -160,7 +170,7 @@ Answer the user's question in the context of these markets. If they ask about a 
       {
         type: "web_search_20250305",
         name: "web_search",
-        max_uses: 3,
+        max_uses: tier.webSearchPerChat,
       },
     ],
   });

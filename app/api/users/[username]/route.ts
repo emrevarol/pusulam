@@ -19,6 +19,7 @@ export async function GET(
       reputation: true,
       oyHakki: true,
       streak: true,
+      plan: true,
       createdAt: true,
       _count: { select: { trades: true, comments: true } },
       badges: {

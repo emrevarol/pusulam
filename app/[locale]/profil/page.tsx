@@ -63,6 +63,7 @@ export default function ProfilePage() {
   const [bio, setBio] = useState("");
   const [avatar, setAvatar] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [plan, setPlan] = useState("FREE");
   const [editingProfile, setEditingProfile] = useState(false);
   const [editBio, setEditBio] = useState("");
   const [editAvatar, setEditAvatar] = useState("");
@@ -89,6 +90,7 @@ export default function ProfilePage() {
         setBio(balData.bio ?? "");
         setAvatar(balData.avatar ?? "");
         setDisplayName(balData.displayName ?? "");
+        setPlan(balData.plan ?? "FREE");
         setPositions(posData);
         setTrades(tradeData);
         setSuggestions(Array.isArray(sugData) ? sugData : []);
@@ -156,23 +158,44 @@ export default function ProfilePage() {
                 </div>
               )}
               <div className="flex-1">
-                <h1 className="text-xl font-bold">{displayName || session.user.name}</h1>
+                <h1 className="flex items-center gap-2 text-xl font-bold">
+                  {displayName || session.user.name}
+                  {plan === "PREMIUM" && (
+                    <span className="rounded-full bg-gradient-to-r from-amber-400 to-amber-600 px-2 py-0.5 text-[10px] font-bold text-white">
+                      PREMIUM
+                    </span>
+                  )}
+                </h1>
                 <p className="text-sm text-gray-500">@{session.user.username}</p>
                 {bio && (
                   <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{bio}</p>
                 )}
               </div>
-              <button
-                onClick={() => {
-                  setEditDisplayName(displayName || session.user.name || "");
-                  setEditBio(bio);
-                  setEditAvatar(avatar);
-                  setEditingProfile(true);
-                }}
-                className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
-              >
-                Profili Duzenle
-              </button>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => {
+                    setEditDisplayName(displayName || session.user.name || "");
+                    setEditBio(bio);
+                    setEditAvatar(avatar);
+                    setEditingProfile(true);
+                  }}
+                  className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
+                >
+                  Profili Düzenle
+                </button>
+                {plan !== "PREMIUM" && (
+                  <button
+                    onClick={async () => {
+                      const res = await fetch("/api/subscription", { method: "POST" });
+                      const data = await res.json();
+                      if (data.url) window.location.href = data.url;
+                    }}
+                    className="rounded-lg bg-gradient-to-r from-amber-400 to-amber-600 px-3 py-1.5 text-xs font-bold text-white hover:from-amber-500 hover:to-amber-700"
+                  >
+                    Premium'a Geç
+                  </button>
+                )}
+              </div>
             </div>
           </>
         ) : (

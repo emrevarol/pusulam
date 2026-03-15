@@ -20,6 +20,11 @@ model User {
   streak       Int      @default(0)    // Gunluk tahmin serisi
   lastActiveAt DateTime @default(now())
   role         String   @default("USER") // USER, PRO, ADMIN
+  plan         String   @default("FREE") // FREE, PREMIUM
+  planExpiresAt DateTime?
+  stripeCustomerId    String?  @unique
+  stripeSubscriptionId String? @unique
+  streakFreezes Int      @default(0) // remaining streak freezes this month
   referralCode String?  @unique
   referredById String?
   referredBy   User?    @relation("Referrals", fields: [referredById], references: [id])
