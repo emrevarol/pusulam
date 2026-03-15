@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { MarkdownMessage } from "@/components/markdown-message";
 
 interface Message {
   role: "user" | "assistant";
@@ -252,7 +253,7 @@ export default function AssistantPage() {
                         : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
                     }`}
                   >
-                    <div className="whitespace-pre-wrap">{msg.content}</div>
+                    <MarkdownMessage content={msg.content} role={msg.role} />
                   </div>
                 </div>
               ))}

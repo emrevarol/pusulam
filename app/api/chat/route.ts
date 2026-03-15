@@ -152,24 +152,49 @@ Answer the user's question in the context of these markets. If they ask about a 
         ];
 
   const response = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 1024,
+    model: "claude-sonnet-4-6",
+    max_tokens: 2048,
     system: systemPrompt,
     messages,
     tools: [
       {
         type: "web_search_20250305",
         name: "web_search",
-        max_uses: 2,
+        max_uses: 3,
       },
     ],
   });
 
-  // Extract text from response, skipping tool use/result blocks
-  const text = response.content
-    .filter((block): block is Anthropic.TextBlock => block.type === "text")
-    .map((block) => block.text)
-    .join("\n\n");
+  // Extract text + citations from response
+  const textParts: string[] = [];
+  const sources: Array<{ title: string; url: string }> = [];
+  const seenUrls = new Set<string>();
+
+  for (const block of response.content) {
+    if (block.type === "text") {
+      // Process inline citations
+      let blockText = block.text;
+      if (block.citations) {
+        for (const cite of block.citations) {
+          if (cite.type === "web_search_result_location" && cite.url && !seenUrls.has(cite.url)) {
+            seenUrls.add(cite.url);
+            sources.push({ title: cite.title || cite.url, url: cite.url });
+          }
+        }
+      }
+      textParts.push(blockText);
+    }
+  }
+
+  let text = textParts.join("\n\n");
+
+  // Append sources as markdown
+  if (sources.length > 0) {
+    text += "\n\n---\n**Kaynaklar:**\n";
+    sources.forEach((s, i) => {
+      text += `${i + 1}. [${s.title}](${s.url})\n`;
+    });
+  }
 
   // Save both messages to conversation
   await prisma.chatMessage.createMany({
