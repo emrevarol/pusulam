@@ -6,6 +6,7 @@ import { calculateBuyShares, calculateSellReturn } from "@/lib/amm";
 import { getTodayIstanbul } from "@/lib/credits";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { checkAndAwardBadges } from "@/lib/badges";
+import { audit } from "@/lib/audit";
 
 const REFERRAL_BONUS = 25;
 const MAX_BET_AMOUNT = 10_000;
@@ -214,7 +215,8 @@ export async function POST(request: Request) {
       return { cost: betAmount, shares, avgPrice };
     });
 
-    // Check referral reward + badges
+    audit({ action: "TRADE_BUY", userId: session.user.id, details: { marketId, side, amount: betAmount, shares: result.shares } });
+
     await checkReferralReward(session.user.id).catch(() => {});
     await checkAndAwardBadges(session.user.id).catch(() => {});
 
@@ -309,6 +311,8 @@ export async function POST(request: Request) {
 
       return { returnAmount };
     });
+
+    audit({ action: "TRADE_SELL", userId: session.user.id, details: { marketId, side, shares: betAmount } });
 
     return NextResponse.json({ success: true, ...result });
   }

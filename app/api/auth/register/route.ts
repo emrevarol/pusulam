@@ -9,6 +9,7 @@ import {
   validateLength,
   sanitizeText,
 } from "@/lib/validation";
+import { audit } from "@/lib/audit";
 
 export async function POST(request: Request) {
   // Rate limit: 5 registrations per IP per hour
@@ -105,6 +106,8 @@ export async function POST(request: Request) {
       ...(referredById ? { referredById } : {}),
     },
   });
+
+  audit({ action: "AUTH_REGISTER", userId: user.id, ip, details: { email } });
 
   return NextResponse.json(
     { id: user.id, email: user.email, username: user.username },

@@ -2,6 +2,8 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "./db";
+import { rateLimit } from "./rate-limit";
+import { audit } from "./audit";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -14,14 +16,40 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        const email = credentials.email.toLowerCase().trim();
+
+        // Account lockout: 10 failed attempts per email per 15 minutes
+        const lockoutCheck = rateLimit(`login:${email}`, 10, 15 * 60 * 1000);
+        if (!lockoutCheck.success) {
+          audit({
+            action: "AUTH_LOCKOUT",
+            details: { email, reason: "Too many failed attempts" },
+          });
+          throw new Error("Cok fazla basarisiz giris denemesi. 15 dakika bekleyin.");
+        }
+
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+          where: { email },
         });
 
-        if (!user) return null;
+        if (!user) {
+          audit({ action: "AUTH_LOGIN_FAILED", details: { email, reason: "User not found" } });
+          return null;
+        }
 
         const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
-        if (!isValid) return null;
+        if (!isValid) {
+          audit({ action: "AUTH_LOGIN_FAILED", userId: user.id, details: { email } });
+          return null;
+        }
+
+        audit({ action: "AUTH_LOGIN_SUCCESS", userId: user.id });
+
+        // Update last active
+        prisma.user.update({
+          where: { id: user.id },
+          data: { lastActiveAt: new Date() },
+        }).catch(() => {});
 
         return {
           id: user.id,
