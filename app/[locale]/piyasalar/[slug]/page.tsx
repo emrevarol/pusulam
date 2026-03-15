@@ -12,6 +12,7 @@ import { AskAiButton } from "@/components/ask-ai-button";
 import { ResolveMarketButton } from "@/components/resolve-market-button";
 import { HaltMarketButton } from "@/components/halt-market-button";
 import { CATEGORIES, getLocalizedField, formatDate } from "@/lib/helpers";
+import { PriceChart } from "@/components/price-chart";
 
 async function getMarket(slug: string) {
   // Auto-close this market if expired
@@ -205,6 +206,15 @@ export default async function MarketDetailPage({
               />
             </div>
           )}
+
+          {/* Price history chart */}
+          <div className="mb-6">
+            <PriceChart
+              marketId={market.id}
+              currentProbability={yesPrice}
+              createdAt={market.createdAt.toISOString()}
+            />
+          </div>
 
           {/* Share buttons */}
           <div className="mb-6">

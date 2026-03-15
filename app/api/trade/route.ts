@@ -201,6 +201,14 @@ export async function POST(request: Request) {
           create: { userId: user.id, date: today, count: 1 },
           update: { count: { increment: 1 } },
         }),
+        // Record price history
+        tx.priceHistory.create({
+          data: {
+            marketId: market.id,
+            probability: newNoPool / (newYesPool + newNoPool),
+            source: "TRADE",
+          },
+        }),
       ]);
 
       return { cost: betAmount, shares, avgPrice };
@@ -289,6 +297,13 @@ export async function POST(request: Request) {
             },
           },
           data: { shares: position.shares - betAmount },
+        }),
+        tx.priceHistory.create({
+          data: {
+            marketId: market.id,
+            probability: newNoPool / (newYesPool + newNoPool),
+            source: "TRADE",
+          },
         }),
       ]);
 

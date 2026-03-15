@@ -72,11 +72,12 @@ model Market {
   createdById String
   createdBy   User   @relation(fields: [createdById], references: [id])
 
-  trades      Trade[]
-  positions   Position[]
-  comments    Comment[]
-  predictions Prediction[]
+  trades       Trade[]
+  positions    Position[]
+  comments     Comment[]
+  predictions  Prediction[]
   conversations Conversation[]
+  priceHistory PriceHistory[]
 
   @@index([status, category])
   @@index([status, volume])
@@ -260,6 +261,18 @@ model ReferralReward {
   referredId String @unique // one reward per referred user
 
   @@index([referrerId])
+}
+
+model PriceHistory {
+  id        String   @id @default(cuid())
+  probability Float  // YES probability (0.0 - 1.0)
+  source    String   @default("TRADE") // TRADE, POLYMARKET, MANUAL
+  createdAt DateTime @default(now())
+
+  marketId String
+  market   Market @relation(fields: [marketId], references: [id])
+
+  @@index([marketId, createdAt])
 }
 
 model Notification {
