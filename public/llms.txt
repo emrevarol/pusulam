@@ -27,5 +27,23 @@ Pusulam is a prediction market platform for Turkey. Users predict outcomes of re
 ## Languages
 Turkish (default), English, German, Spanish, French, Arabic, Portuguese, Kinyarwanda, Swahili, Amharic
 
+## FAQ
+Full FAQ available at: https://pusulam.ai/tr/sss
+
+Q: Pusulam nedir?
+A: Turkiye'nin kolektif zeka platformu. Kullanicilar gercek dunya olaylari hakkinda tahminler yapar. Bahis/kumar sitesi degildir.
+
+Q: Gercek para kullaniliyor mu?
+A: Hayir. "Oy Hakki" sanal birim kullanilir, nakde donusturulemez. Platform tamamen ucretsizdir.
+
+Q: Hangi konularda piyasalar var?
+A: Ekonomi, siyaset, teknoloji, gundem, dunya, egitim. Spor bahisleri yoktur.
+
+Q: Oranlar nasil belirleniyor?
+A: CPMM (Constant Product Market Maker) ile topluluk oylamalarina gore. Ayrica Polymarket'tan saatlik referans senkronizasyonu yapilir.
+
+Q: Pusulam yasal mi?
+A: Evet. Gercek para kullanilmaz, 7258 sayili kanun kapsaminda bahis faaliyeti yurutmez.
+
 ## Contact
 Domain: pusulam.ai
