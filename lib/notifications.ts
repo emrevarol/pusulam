@@ -119,19 +119,21 @@ export async function notifyPayout(
 export async function notifyBadgeEarned(
   userId: string,
   badgeName: string,
-  badgeIcon: string
+  badgeIcon: string,
+  reward: number = 0
 ) {
+  const rewardText = reward > 0 ? ` +${reward} Oy Hakkı kazandın!` : "";
   await createNotification(
     userId,
     "BADGE_EARNED",
     "Yeni Rozet Kazandın!",
-    `${badgeIcon} ${badgeName} rozetini kazandın!`,
+    `${badgeIcon} ${badgeName} rozetini kazandın!${rewardText}`,
     "/profil"
   );
 
   const email = await getUserEmail(userId);
   if (email) {
-    const { subject, html } = badgeEarnedEmail(badgeName, badgeIcon);
+    const { subject, html } = badgeEarnedEmail(badgeName, badgeIcon, reward);
     sendEmail({ to: email, subject, html }).catch(() => {});
   }
 }

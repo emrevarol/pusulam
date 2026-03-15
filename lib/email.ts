@@ -106,15 +106,19 @@ export function payoutEmail(marketTitle: string, amount: number, slug: string) {
   };
 }
 
-export function badgeEarnedEmail(badgeName: string, badgeIcon: string) {
+export function badgeEarnedEmail(badgeName: string, badgeIcon: string, reward: number = 0) {
+  const rewardHtml = reward > 0
+    ? `<p style="color:#0d9488;font-size:16px;font-weight:bold;text-align:center;margin-top:12px">+${reward} Oy Hakki odulu!</p>`
+    : "";
   return {
-    subject: `${badgeIcon} Yeni rozet: ${badgeName} — Pusulam`,
+    subject: `${badgeIcon} Yeni rozet: ${badgeName}${reward > 0 ? ` (+${reward} OH)` : ""} — Pusulam`,
     html: baseTemplate(`
       <h2 style="margin:0 0 8px;font-size:18px;color:#111">Yeni Rozet Kazandin!</h2>
       <p style="color:#4b5563;font-size:14px;line-height:1.5;text-align:center">
         <span style="font-size:48px">${badgeIcon}</span><br>
         <strong>${badgeName}</strong> rozetini kazandin!
       </p>
+      ${rewardHtml}
       ${actionButton("Rozetlerini Gor", "https://pusulam.ai/tr/profil")}
     `),
   };

@@ -1,6 +1,14 @@
 import { prisma } from "@/lib/db";
 import { notifyBadgeEarned } from "@/lib/notifications";
 
+// Oy hakki reward per badge tier
+const TIER_REWARDS: Record<string, number> = {
+  BRONZE: 5,
+  SILVER: 15,
+  GOLD: 30,
+  PLATINUM: 50,
+};
+
 // Badge definitions — seeded on first check
 const BADGE_DEFS = [
   // Trade milestones
@@ -250,11 +258,19 @@ export async function checkAndAwardBadges(userId: string) {
         update: {},
         create: { userId, badgeId: badge.id },
       });
-      // Only notify if badge was just created (not already existing)
+      // Only reward + notify if badge was just created (not already existing)
       const isNew = result.earnedAt.getTime() > Date.now() - 5000;
       if (isNew) {
         newBadges.push(badge.id);
-        await notifyBadgeEarned(userId, badge.name, badge.icon).catch(() => {});
+        // Award oy hakki based on tier
+        const reward = TIER_REWARDS[badge.tier] || 0;
+        if (reward > 0) {
+          await prisma.user.update({
+            where: { id: userId },
+            data: { oyHakki: { increment: reward } },
+          });
+        }
+        await notifyBadgeEarned(userId, badge.name, badge.icon, reward).catch(() => {});
       }
     }
   }
