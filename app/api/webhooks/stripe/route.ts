@@ -103,10 +103,8 @@ export async function POST(request: Request) {
 
   // Subscription events
   if (event.type === "customer.subscription.created" || event.type === "customer.subscription.updated") {
-    const subscription = event.data.object;
-    const customerId = subscription.customer as string;
-
-    const user = await prisma.user.findFirst({ where: { stripeCustomerId: customerId } });
+    const subscription = event.data.object as { id: string; customer: string; status: string; current_period_end: number };
+    const user = await prisma.user.findFirst({ where: { stripeCustomerId: subscription.customer } });
     if (user) {
       const isActive = subscription.status === "active" || subscription.status === "trialing";
       await prisma.user.update({
@@ -124,10 +122,8 @@ export async function POST(request: Request) {
   }
 
   if (event.type === "customer.subscription.deleted") {
-    const subscription = event.data.object;
-    const customerId = subscription.customer as string;
-
-    const user = await prisma.user.findFirst({ where: { stripeCustomerId: customerId } });
+    const subscription = event.data.object as { customer: string };
+    const user = await prisma.user.findFirst({ where: { stripeCustomerId: subscription.customer } });
     if (user) {
       await prisma.user.update({
         where: { id: user.id },
