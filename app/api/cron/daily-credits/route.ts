@@ -9,7 +9,7 @@ export async function GET(request: Request) {
 
   // Free users get free tier daily amount
   const freeResult = await prisma.user.updateMany({
-    where: { OR: [{ plan: "FREE" }, { plan: null }] },
+    where: { NOT: { plan: "PREMIUM" } },
     data: { oyHakki: { increment: TIERS.FREE.dailyOyHakki } },
   });
 
