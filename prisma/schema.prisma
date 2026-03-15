@@ -25,6 +25,7 @@ model User {
   stripeCustomerId    String?  @unique
   stripeSubscriptionId String? @unique
   streakFreezes Int      @default(0) // remaining streak freezes this month
+  trialUsed     Boolean  @default(false) // has user used free trial
   referralCode String?  @unique
   referredById String?
   referredBy   User?    @relation("Referrals", fields: [referredById], references: [id])
@@ -73,6 +74,7 @@ model Market {
   volume          Float     @default(0)
   traderCount     Int       @default(0)
   featured        Boolean   @default(false)
+  premiumOnly     Boolean   @default(false)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 

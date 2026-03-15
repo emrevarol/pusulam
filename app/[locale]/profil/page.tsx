@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { CATEGORIES } from "@/lib/helpers";
+import { CalibrationChart } from "@/components/calibration-chart";
 
 interface Position {
   id: string;
@@ -69,7 +70,7 @@ export default function ProfilePage() {
   const [editAvatar, setEditAvatar] = useState("");
   const [editDisplayName, setEditDisplayName] = useState("");
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState<"positions" | "past" | "history" | "suggestions">("positions");
+  const [tab, setTab] = useState<"positions" | "past" | "history" | "stats" | "suggestions">("positions");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -352,6 +353,18 @@ export default function ProfilePage() {
         >
           {tp("voteHistory")} ({trades.length})
         </button>
+        {plan === "PREMIUM" && (
+          <button
+            onClick={() => setTab("stats")}
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+              tab === "stats"
+                ? "bg-teal-600 text-white"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400"
+            }`}
+          >
+            📊 İstatistikler
+          </button>
+        )}
         {suggestions.length > 0 && (
           <button
             onClick={() => setTab("suggestions")}
@@ -553,6 +566,31 @@ export default function ProfilePage() {
               </Link>
             ))
           )}
+        </div>
+      )}
+
+      {/* Advanced Stats tab (Premium) */}
+      {tab === "stats" && plan === "PREMIUM" && (
+        <div className="space-y-6">
+          <CalibrationChart />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div className="rounded-xl border border-gray-200 bg-white p-4 text-center dark:border-gray-800 dark:bg-gray-900">
+              <p className="text-2xl font-bold text-teal-600">{pastPositions.length}</p>
+              <p className="text-xs text-gray-500">Sonuçlanan</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4 text-center dark:border-gray-800 dark:bg-gray-900">
+              <p className="text-2xl font-bold text-emerald-600">{pastWins}</p>
+              <p className="text-xs text-gray-500">Doğru</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4 text-center dark:border-gray-800 dark:bg-gray-900">
+              <p className="text-2xl font-bold text-rose-500">{pastLosses}</p>
+              <p className="text-xs text-gray-500">Yanlış</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-4 text-center dark:border-gray-800 dark:bg-gray-900">
+              <p className="text-2xl font-bold text-amber-600">%{accuracy.toFixed(0)}</p>
+              <p className="text-xs text-gray-500">İsabet Oranı</p>
+            </div>
+          </div>
         </div>
       )}
 

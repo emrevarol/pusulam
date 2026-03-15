@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     orderBy: { updatedAt: "desc" },
   });
 
-  const staticPages = ["", "/piyasalar", "/skor", "/kullanicilar", "/asistan", "/sss", "/giris", "/kayit"];
+  const staticPages = ["", "/piyasalar", "/skor", "/kullanicilar", "/asistan", "/sss", "/premium", "/giris", "/kayit"];
 
   const staticEntries = LOCALES.flatMap((locale) =>
     staticPages.map((page) => ({

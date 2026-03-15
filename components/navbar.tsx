@@ -229,6 +229,13 @@ export function Navbar() {
                         >
                           {t("buyOyHakki")}
                         </Link>
+                        <Link
+                          href={`/${locale}/premium`}
+                          onClick={() => setMenuOpen(false)}
+                          className="block px-4 py-2 text-sm font-medium text-amber-600 hover:bg-gray-50 dark:text-amber-400 dark:hover:bg-gray-800"
+                        >
+                          👑 Premium
+                        </Link>
                         {(session.user as { role?: string }).role === "ADMIN" && (
                           <Link
                             href={`/${locale}/admin/oneriler`}

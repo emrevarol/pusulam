@@ -7,10 +7,11 @@ export const TIERS = {
     chatModel: "claude-haiku-4-5-20251001" as const,
     webSearchPerChat: 2,
     dailyOyHakki: 3,
-    maxConversations: 10,
+    maxConversations: 20,
     streakFreezesPerMonth: 0,
     advancedStats: false,
     premiumBadge: false,
+    premiumMarkets: false,
   },
   PREMIUM: {
     label: "Premium",
@@ -18,12 +19,15 @@ export const TIERS = {
     chatModel: "claude-sonnet-4-6" as const,
     webSearchPerChat: 6,
     dailyOyHakki: 60,
-    maxConversations: 200,
+    maxConversations: 400,
     streakFreezesPerMonth: 3,
     advancedStats: true,
     premiumBadge: true,
+    premiumMarkets: true,
   },
 } as const;
+
+export const TRIAL_DAYS = 7;
 
 export type PlanType = keyof typeof TIERS;
 

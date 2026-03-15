@@ -7,6 +7,7 @@ import { getTodayIstanbul } from "@/lib/credits";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { checkAndAwardBadges } from "@/lib/badges";
 import { audit } from "@/lib/audit";
+import { getTier } from "@/lib/tiers";
 
 const REFERRAL_BONUS = 25;
 const MAX_BET_AMOUNT = 10_000;
@@ -108,6 +109,23 @@ export async function POST(request: Request) {
       const market = markets[0];
       if (!market || market.status !== "OPEN") {
         throw new Error("MARKET_NOT_FOUND");
+      }
+
+      // Check premium-only market access
+      const marketFull = await tx.market.findUnique({
+        where: { id: marketId },
+        select: { premiumOnly: true },
+      });
+      if (marketFull?.premiumOnly) {
+        const trader = await tx.user.findUnique({
+          where: { id: session.user.id },
+          select: { plan: true, planExpiresAt: true },
+        });
+        const isExpired = trader?.planExpiresAt && trader.planExpiresAt < new Date();
+        const traderPlan = (!isExpired && trader?.plan === "PREMIUM") ? "PREMIUM" : "FREE";
+        if (traderPlan !== "PREMIUM") {
+          throw new Error("PREMIUM_REQUIRED");
+        }
       }
 
       // Lock user row and check balance

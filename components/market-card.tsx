@@ -22,6 +22,7 @@ interface MarketCardProps {
     traderCount?: number;
     resolvedOutcome?: string | null;
     titleTranslations?: Record<string, string> | null;
+    premiumOnly?: boolean;
   };
 }
 
@@ -66,7 +67,12 @@ export function MarketCard({ market }: MarketCardProps) {
         </span>
       </div>
 
-      <h3 className="mb-4 text-sm font-semibold leading-snug text-gray-900 group-hover:text-teal-600 dark:text-gray-100 dark:group-hover:text-teal-400">
+      <h3 className="mb-4 flex items-center gap-1.5 text-sm font-semibold leading-snug text-gray-900 group-hover:text-teal-600 dark:text-gray-100 dark:group-hover:text-teal-400">
+        {market.premiumOnly && (
+          <span className="inline-flex items-center rounded bg-amber-100 px-1 py-0.5 text-[10px] font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" title="Premium">
+            👑
+          </span>
+        )}
         {getLocalizedField(market.title, market.titleTranslations, locale)}
       </h3>
 
