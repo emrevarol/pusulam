@@ -168,8 +168,13 @@ export default async function MarketDetailPage({
               <span className="text-sm text-teal-600 dark:text-teal-500">
                 {(market.liveData as { label: string }).label}
               </span>
-              <span className="ml-auto text-[10px] text-teal-500">
-                Kaynak: {(market.liveData as { source: string }).source}
+              <span className="ml-auto text-right text-[10px] text-teal-500">
+                <span>{(market.liveData as { source: string }).source}</span>
+                {(market.liveData as { updatedAt?: string }).updatedAt && (
+                  <span className="block">
+                    {new Date((market.liveData as { updatedAt: string }).updatedAt).toLocaleString("tr-TR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                )}
               </span>
             </div>
           )}
