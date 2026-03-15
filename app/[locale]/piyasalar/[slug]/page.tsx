@@ -13,6 +13,48 @@ import { ResolveMarketButton } from "@/components/resolve-market-button";
 import { HaltMarketButton } from "@/components/halt-market-button";
 import { CATEGORIES, getLocalizedField, formatDate } from "@/lib/helpers";
 import { PriceChart } from "@/components/price-chart";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const market = await getMarket(slug);
+  if (!market) return {};
+
+  const yesPrice = getNoPrice(market.yesPool, market.noPool);
+  const yesPct = (yesPrice * 100).toFixed(0);
+  const title = `${market.title} — %${yesPct} Evet | Pusulam`;
+  const description = market.description.slice(0, 160);
+  const url = `https://pusulam.ai/${locale}/piyasalar/${slug}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: "Pusulam",
+      type: "article",
+      locale: locale === "tr" ? "tr_TR" : "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+    alternates: {
+      canonical: url,
+      languages: {
+        tr: `https://pusulam.ai/tr/piyasalar/${slug}`,
+        en: `https://pusulam.ai/en/piyasalar/${slug}`,
+      },
+    },
+  };
+}
 
 async function getMarket(slug: string) {
   // Auto-close this market if expired
@@ -73,7 +115,31 @@ export default async function MarketDetailPage({
   const yesPct = (yesPrice * 100).toFixed(1);
   const noPct = (noPrice * 100).toFixed(1);
 
+  // JSON-LD structured data
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: market.title,
+    description: market.description,
+    startDate: market.createdAt.toISOString(),
+    endDate: market.resolutionDate.toISOString(),
+    eventStatus: isResolved
+      ? "https://schema.org/EventCompleted"
+      : "https://schema.org/EventScheduled",
+    organizer: {
+      "@type": "Organization",
+      name: "Pusulam",
+      url: "https://pusulam.ai",
+    },
+    url: `https://pusulam.ai/${locale}/piyasalar/${market.slug}`,
+  };
+
   return (
+    <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Main content */}
@@ -285,5 +351,6 @@ export default async function MarketDetailPage({
         </div>
       </div>
     </div>
+    </>
   );
 }

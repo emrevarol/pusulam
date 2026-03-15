@@ -1,0 +1,16 @@
+{
+  "name": "Pusulam",
+  "short_name": "Pusulam",
+  "description": "Turkiye'nin Kolektif Zeka Platformu — Tahmin piyasalari",
+  "start_url": "/tr",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#0d9488",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "256x256",
+      "type": "image/x-icon"
+    }
+  ]
+}

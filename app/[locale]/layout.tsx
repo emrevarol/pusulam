@@ -23,9 +23,40 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pusulam — Turkiye'nin Kolektif Zeka Platformu",
+  title: {
+    default: "Pusulam — Turkiye'nin Kolektif Zeka Platformu",
+    template: "%s | Pusulam",
+  },
   description:
-    "Turkiye gundemindeki olaylara tahminlerini yap, toplulukla kiyasla, itibar kazan. pusulam.ai",
+    "Turkiye gundemindeki olaylara tahminlerini yap, toplulukla kiyasla, itibar kazan. Ekonomi, siyaset, teknoloji ve dunya olaylari icin tahmin piyasalari.",
+  metadataBase: new URL("https://pusulam.ai"),
+  openGraph: {
+    title: "Pusulam — Turkiye'nin Kolektif Zeka Platformu",
+    description:
+      "Turkiye gundemindeki olaylara tahminlerini yap, toplulukla kiyasla, itibar kazan.",
+    url: "https://pusulam.ai",
+    siteName: "Pusulam",
+    type: "website",
+    locale: "tr_TR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pusulam — Turkiye'nin Kolektif Zeka Platformu",
+    description:
+      "Turkiye gundemindeki olaylara tahminlerini yap, toplulukla kiyasla, itibar kazan.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: "https://pusulam.ai",
+    languages: {
+      tr: "https://pusulam.ai/tr",
+      en: "https://pusulam.ai/en",
+    },
+  },
+  manifest: "/manifest.json",
 };
 
 export default async function LocaleLayout({
@@ -46,6 +77,20 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className="scroll-smooth" suppressHydrationWarning>
       <head>
+        {/* Organization structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Pusulam",
+              url: "https://pusulam.ai",
+              description: "Turkiye'nin Kolektif Zeka Platformu. Tahmin piyasalari ile gelecegi ongor.",
+              sameAs: [],
+            }),
+          }}
+        />
         {/* Prevent flash of wrong theme — runs before React hydration */}
         <script
           dangerouslySetInnerHTML={{

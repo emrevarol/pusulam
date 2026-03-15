@@ -1,0 +1,31 @@
+# Pusulam — Turkey's Collective Intelligence Platform
+# https://pusulam.ai
+
+## About
+Pusulam is a prediction market platform for Turkey. Users predict outcomes of real-world events using virtual currency "Oy Hakki" (Vote Rights). It is NOT a gambling/betting site. No real money is used.
+
+## Content
+- Prediction markets on Turkish politics, economy, technology, world events, education
+- CPMM (Constant Product Market Maker) based probability pricing
+- Community predictions with calibration scoring
+- AI-powered market analysis assistant
+
+## Structure
+- /tr/piyasalar — All prediction markets (Turkish)
+- /en/piyasalar — All prediction markets (English)
+- /tr/piyasalar/[slug] — Individual market with probability, comments, trading
+- /tr/skor — Leaderboard
+- /tr/kullanicilar — User directory
+- /tr/asistan — AI analysis assistant
+
+## Key Terms
+- Oy Hakki = Vote Rights (virtual currency, not real money)
+- Piyasa = Market (prediction market)
+- Tahmin = Prediction/Forecast
+- Kolektif Zeka = Collective Intelligence
+
+## Languages
+Turkish (default), English, German, Spanish, French, Arabic, Portuguese, Kinyarwanda, Swahili, Amharic
+
+## Contact
+Domain: pusulam.ai
