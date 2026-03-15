@@ -5,6 +5,7 @@ import { CategoryFilter } from "@/components/category-filter";
 import { SortFilter } from "@/components/sort-filter";
 import { StatusFilter } from "@/components/status-filter";
 import { MarketSearch } from "@/components/market-search";
+import { CountryFilter } from "@/components/country-filter";
 
 type SortOption = "closing" | "newest" | "popular" | "forecasters";
 
@@ -32,7 +33,7 @@ async function closeExpiredMarkets() {
   }
 }
 
-async function getMarkets(category?: string, sort?: string, statusFilter?: string, query?: string) {
+async function getMarkets(category?: string, sort?: string, statusFilter?: string, query?: string, country?: string) {
   await closeExpiredMarkets();
 
   const statusWhere =
@@ -53,7 +54,12 @@ async function getMarkets(category?: string, sort?: string, statusFilter?: strin
 
   const categoryWhere = category && category !== "all" ? { category } : {};
 
-  const where = { ...categoryWhere, ...statusWhere, ...searchWhere };
+  // Country filter: show user's country markets + GLOBAL
+  const countryWhere = country && country !== "all"
+    ? { country: { in: [country, "GLOBAL"] } }
+    : {};
+
+  const where = { ...categoryWhere, ...statusWhere, ...searchWhere, ...countryWhere };
 
   const defaultSort = statusFilter === "resolved" ? "newest" : (sort || "newest");
   const orderBy = ORDER_BY[(defaultSort as SortOption)] || ORDER_BY.newest;
@@ -79,11 +85,13 @@ export default async function MarketsPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ kategori?: string; sirala?: string; durum?: string; q?: string }>;
+  searchParams: Promise<{ kategori?: string; sirala?: string; durum?: string; q?: string; ulke?: string }>;
 }) {
   const { locale } = await params;
-  const { kategori, sirala, durum, q } = await searchParams;
-  const markets = await getMarkets(kategori, sirala, durum, q);
+  const { kategori, sirala, durum, q, ulke } = await searchParams;
+  // Default country from locale
+  const defaultCountry = locale === "de" ? "DE" : locale === "fr" ? "FR" : locale === "pt" ? "BR" : locale === "es" ? "ES" : locale === "ar" ? "EG" : locale === "en" ? "GB" : "TR";
+  const markets = await getMarkets(kategori, sirala, durum, q, ulke || defaultCountry);
   const t = await getTranslations({ locale, namespace: "market" });
 
   return (
@@ -92,6 +100,11 @@ export default async function MarketsPage({
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <MarketSearch />
         <StatusFilter activeStatus={durum} />
+      </div>
+
+      {/* Country filter */}
+      <div className="mb-4">
+        <CountryFilter activeCountry={ulke || defaultCountry} />
       </div>
 
       {/* Category + Sort */}

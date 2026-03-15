@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { COUNTRY_LIST } from "@/lib/countries";
 
 export default function RegisterPage() {
   const t = useTranslations("auth");
@@ -14,12 +15,16 @@ export default function RegisterPage() {
   const locale = pathname.split("/")[1] || "tr";
   const refCode = searchParams.get("ref") || "";
 
+  // Detect country from locale
+  const defaultCountry = locale === "de" ? "DE" : locale === "fr" ? "FR" : locale === "pt" ? "BR" : locale === "es" ? "ES" : locale === "ar" ? "EG" : locale === "en" ? "GB" : "TR";
+
   const [form, setForm] = useState({
     email: "",
     username: "",
     displayName: "",
     password: "",
     confirmPassword: "",
+    country: defaultCountry,
   });
   const [referrerName, setReferrerName] = useState("");
   const [error, setError] = useState("");
@@ -57,6 +62,7 @@ export default function RegisterPage() {
           username: form.username,
           displayName: form.displayName,
           password: form.password,
+          country: form.country,
           ...(refCode ? { referralCode: refCode } : {}),
         }),
       });
@@ -91,6 +97,21 @@ export default function RegisterPage() {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="mb-1.5 block text-sm font-medium">Ülke</label>
+            <select
+              value={form.country}
+              onChange={(e) => updateField("country", e.target.value)}
+              className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+            >
+              {COUNTRY_LIST.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.flag} {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div>
             <label className="mb-1.5 block text-sm font-medium">
               {t("displayName")}

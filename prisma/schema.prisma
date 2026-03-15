@@ -26,6 +26,7 @@ model User {
   stripeSubscriptionId String? @unique
   streakFreezes Int      @default(0) // remaining streak freezes this month
   trialUsed     Boolean  @default(false) // has user used free trial
+  country      String   @default("TR") // TR, DE, FR, BR, GB, ES, EG
   referralCode String?  @unique
   referredById String?
   referredBy   User?    @relation("Referrals", fields: [referredById], references: [id])
@@ -59,6 +60,7 @@ model Market {
   titleTranslations       Json?  // { en: "...", es: "...", fr: "...", ... }
   descriptionTranslations Json?  // { en: "...", es: "...", fr: "...", ... }
   category        String
+  country         String    @default("GLOBAL") // TR, DE, FR, BR, GB, ES, EG, GLOBAL
   slug            String    @unique
   status          String    @default("OPEN") // OPEN, HALTED, CLOSED, RESOLVED
   resolutionDate  DateTime

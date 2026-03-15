@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Geçersiz istek" }, { status: 400 });
   }
 
-  const { email, username, displayName, password, referralCode } = body;
+  const { email, username, displayName, password, referralCode, country } = body;
 
   if (!email || !username || !displayName || !password) {
     return NextResponse.json(
@@ -103,6 +103,7 @@ export async function POST(request: Request) {
       displayName: sanitizeText(displayName),
       passwordHash,
       referralCode: newReferralCode,
+      country: ["TR", "DE", "FR", "BR", "GB", "ES", "EG"].includes(country) ? country : "TR",
       ...(referredById ? { referredById } : {}),
     },
   });
