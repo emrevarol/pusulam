@@ -54,12 +54,20 @@ export default function ProfilePage() {
   const router = useRouter();
   const locale = pathname.split("/")[1] || "tr";
 
-  const [oyHakki, setOyHakki] = useState<number>(0);
+  const [oyHakki, setOyHakki] = useState(0);
   const [positions, setPositions] = useState<Position[]>([]);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [suggestions, setSuggestions] = useState<MySuggestion[]>([]);
   const [badges, setBadges] = useState<Array<{ badge: { name: string; icon: string; tier: string; description: string }; earnedAt: string }>>([]);
   const [streak, setStreak] = useState(0);
+  const [bio, setBio] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [editBio, setEditBio] = useState("");
+  const [editAvatar, setEditAvatar] = useState("");
+  const [editDisplayName, setEditDisplayName] = useState("");
+  const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState<"positions" | "past" | "history" | "suggestions">("positions");
   const [loading, setLoading] = useState(true);
 
@@ -78,6 +86,9 @@ export default function ProfilePage() {
         setOyHakki(balData.oyHakki ?? 0);
         setStreak(balData.streak ?? 0);
         setBadges(balData.badges ?? []);
+        setBio(balData.bio ?? "");
+        setAvatar(balData.avatar ?? "");
+        setDisplayName(balData.displayName ?? "");
         setPositions(posData);
         setTrades(tradeData);
         setSuggestions(Array.isArray(sugData) ? sugData : []);
@@ -85,6 +96,27 @@ export default function ProfilePage() {
       });
     }
   }, [status, locale, router]);
+
+  async function saveProfile() {
+    setSaving(true);
+    const res = await fetch("/api/user/profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        displayName: editDisplayName,
+        bio: editBio || null,
+        avatar: editAvatar || null,
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setDisplayName(data.displayName);
+      setBio(data.bio ?? "");
+      setAvatar(data.avatar ?? "");
+      setEditingProfile(false);
+    }
+    setSaving(false);
+  }
 
   if (status === "loading" || loading) {
     return (
@@ -102,53 +134,146 @@ export default function ProfilePage() {
   const totalPnl = positions.reduce((sum, p) => sum + p.pnl, 0);
   const pastWins = pastPositions.filter((p) => p.side === p.market.resolvedOutcome).length;
   const pastLosses = pastPositions.length - pastWins;
+  const accuracy = pastPositions.length > 0 ? ((pastWins / pastPositions.length) * 100) : 0;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       {/* User header */}
       <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-        <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-teal-100 text-xl font-bold text-teal-600 dark:bg-teal-900/30">
-            {session.user.name?.charAt(0).toUpperCase()}
+        {!editingProfile ? (
+          <>
+            <div className="flex items-center gap-4">
+              {/* Avatar */}
+              {avatar ? (
+                <img
+                  src={avatar}
+                  alt={displayName}
+                  className="h-16 w-16 rounded-full object-cover border-2 border-teal-200 dark:border-teal-800"
+                />
+              ) : (
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-100 text-2xl font-bold text-teal-600 dark:bg-teal-900/30">
+                  {(displayName || session.user.name || "?").charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="flex-1">
+                <h1 className="text-xl font-bold">{displayName || session.user.name}</h1>
+                <p className="text-sm text-gray-500">@{session.user.username}</p>
+                {bio && (
+                  <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{bio}</p>
+                )}
+              </div>
+              <button
+                onClick={() => {
+                  setEditDisplayName(displayName || session.user.name || "");
+                  setEditBio(bio);
+                  setEditAvatar(avatar);
+                  setEditingProfile(true);
+                }}
+                className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
+              >
+                Profili Duzenle
+              </button>
+            </div>
+          </>
+        ) : (
+          /* Edit mode */
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              {editAvatar ? (
+                <img
+                  src={editAvatar}
+                  alt="Preview"
+                  className="h-16 w-16 rounded-full object-cover border-2 border-teal-200"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              ) : (
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-100 text-2xl font-bold text-teal-600 dark:bg-teal-900/30">
+                  {(editDisplayName || "?").charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="flex-1 space-y-3">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-500">Gorunen Ad</label>
+                  <input
+                    type="text"
+                    value={editDisplayName}
+                    onChange={(e) => setEditDisplayName(e.target.value)}
+                    maxLength={64}
+                    className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-500">Profil Fotografi (URL)</label>
+                  <input
+                    type="url"
+                    value={editAvatar}
+                    onChange={(e) => setEditAvatar(e.target.value)}
+                    placeholder="https://..."
+                    className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-500">Bio (max 300 karakter)</label>
+                  <textarea
+                    value={editBio}
+                    onChange={(e) => setEditBio(e.target.value)}
+                    maxLength={300}
+                    rows={2}
+                    placeholder="Kendinden bahset..."
+                    className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                  />
+                  <p className="mt-0.5 text-right text-[10px] text-gray-400">{editBio.length}/300</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setEditingProfile(false)}
+                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400"
+              >
+                {t("cancel")}
+              </button>
+              <button
+                onClick={saveProfile}
+                disabled={saving || !editDisplayName.trim()}
+                className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-50"
+              >
+                {saving ? "..." : t("save")}
+              </button>
+            </div>
           </div>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold">{session.user.name}</h1>
-            <p className="text-sm text-gray-500">@{session.user.username}</p>
-          </div>
-        </div>
+        )}
 
         {/* Stats */}
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
-            <p className="text-xs text-gray-500">{t("oyHakki")}</p>
-            <p className="text-xl font-bold text-emerald-600">
-              {oyHakki}
-            </p>
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-5 sm:gap-4">
+          <div className="rounded-lg bg-gray-50 p-3 text-center dark:bg-gray-800">
+            <p className="text-[10px] text-gray-500">{t("oyHakki")}</p>
+            <p className="text-lg font-bold text-emerald-600">{oyHakki}</p>
           </div>
-          <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
-            <p className="text-xs text-gray-500">
-              {tp("portfolioValue")}
-            </p>
-            <p className="text-xl font-bold">
+          <div className="rounded-lg bg-gray-50 p-3 text-center dark:bg-gray-800">
+            <p className="text-[10px] text-gray-500">{tp("portfolioValue")}</p>
+            <p className="text-lg font-bold">
               {totalValue.toLocaleString("tr-TR", { maximumFractionDigits: 0 })}
             </p>
           </div>
-          <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
-            <p className="text-xs text-gray-500">
-              {tp("pnl")}
-            </p>
-            <p
-              className={`text-xl font-bold ${
-                totalPnl >= 0 ? "text-emerald-600" : "text-rose-500"
-              }`}
-            >
-              {totalPnl >= 0 ? "+" : ""}
-              {totalPnl.toLocaleString("tr-TR", { maximumFractionDigits: 0 })}
+          <div className="rounded-lg bg-gray-50 p-3 text-center dark:bg-gray-800">
+            <p className="text-[10px] text-gray-500">{tp("pnl")}</p>
+            <p className={`text-lg font-bold ${totalPnl >= 0 ? "text-emerald-600" : "text-rose-500"}`}>
+              {totalPnl >= 0 ? "+" : ""}{totalPnl.toLocaleString("tr-TR", { maximumFractionDigits: 0 })}
             </p>
           </div>
-          <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-800">
-            <p className="text-xs text-gray-500">Seri</p>
-            <p className="text-xl font-bold text-orange-500">
+          <div className="rounded-lg bg-gray-50 p-3 text-center dark:bg-gray-800">
+            <p className="text-[10px] text-gray-500">Isabet</p>
+            <p className="text-lg font-bold text-teal-600">
+              {pastPositions.length > 0 ? `%${accuracy.toFixed(0)}` : "—"}
+            </p>
+            {pastPositions.length > 0 && (
+              <p className="text-[10px] text-gray-400">{pastWins}W / {pastLosses}L</p>
+            )}
+          </div>
+          <div className="rounded-lg bg-gray-50 p-3 text-center dark:bg-gray-800">
+            <p className="text-[10px] text-gray-500">Seri</p>
+            <p className="text-lg font-bold text-orange-500">
               {streak > 0 ? `🔥 ${streak}` : "0"}
             </p>
           </div>
@@ -283,17 +408,14 @@ export default function ProfilePage() {
       {/* Past Predictions tab */}
       {tab === "past" && (
         <div className="space-y-3">
-          {/* Summary bar */}
           {pastPositions.length > 0 && (
             <div className="mb-2 flex items-center gap-4 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
               <span className="text-xs text-gray-500">{tp("totalPredictions")}: {pastPositions.length}</span>
               <span className="text-xs font-medium text-emerald-600">{tp("won")}: {pastWins}</span>
               <span className="text-xs font-medium text-rose-500">{tp("lost")}: {pastLosses}</span>
-              {pastPositions.length > 0 && (
-                <span className="text-xs font-medium text-teal-600">
-                  {tp("accuracy")}: %{((pastWins / pastPositions.length) * 100).toFixed(0)}
-                </span>
-              )}
+              <span className="text-xs font-medium text-teal-600">
+                {tp("accuracy")}: %{accuracy.toFixed(0)}
+              </span>
             </div>
           )}
           {pastPositions.length === 0 ? (
@@ -340,13 +462,10 @@ export default function ProfilePage() {
                         >
                           {isWin ? tp("won") : tp("lost")}
                         </span>
-                        <span className="text-[10px] text-gray-400">
-                          {tm("result")}: {pos.market.resolvedOutcome === "YES" ? tm("resolvedYes") : tm("resolvedNo")}
-                        </span>
                       </div>
                       <h3 className="text-sm font-semibold">{pos.market.title}</h3>
                       <p className="mt-1 text-xs text-gray-500">
-                        {tp("invested")}: {costBasis.toFixed(1)} P · {pos.shares.toFixed(1)} {tm("shares").toLowerCase()} · {tm("avgPrice")}: %{(pos.avgPrice * 100).toFixed(0)}
+                        {tp("invested")}: {costBasis.toFixed(1)} · {pos.shares.toFixed(1)} {tm("shares").toLowerCase()} · {tm("avgPrice")}: %{(pos.avgPrice * 100).toFixed(0)}
                       </p>
                     </div>
                     <div className="text-right">
@@ -355,12 +474,11 @@ export default function ProfilePage() {
                           profit >= 0 ? "text-emerald-600" : "text-rose-500"
                         }`}
                       >
-                        {profit >= 0 ? "+" : ""}
-                        {profit.toFixed(1)} P
+                        {profit >= 0 ? "+" : ""}{profit.toFixed(1)}
                       </p>
                       {isWin && (
                         <p className="text-xs text-gray-500">
-                          {tp("payout")}: {payout.toFixed(1)} P
+                          {tp("payout")}: {payout.toFixed(1)}
                         </p>
                       )}
                     </div>
@@ -377,9 +495,7 @@ export default function ProfilePage() {
         <div className="space-y-2">
           {trades.length === 0 ? (
             <div className="rounded-xl border-2 border-dashed border-gray-200 p-12 text-center dark:border-gray-800">
-              <p className="text-gray-400">
-                {tp("noVotes")}
-              </p>
+              <p className="text-gray-400">{tp("noVotes")}</p>
             </div>
           ) : (
             trades.map((trade) => (
@@ -398,11 +514,9 @@ export default function ProfilePage() {
                   {trade.direction === "BUY" ? tm("buy") : tm("sell")}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="truncate text-sm font-medium">
-                    {trade.market.title}
-                  </p>
+                  <p className="truncate text-sm font-medium">{trade.market.title}</p>
                   <p className="text-xs text-gray-500">
-                    {trade.shares.toFixed(0)} {trade.side === "YES" ? tm("yesShares") : tm("noShares")}
+                    {trade.shares.toFixed(1)} pay {trade.side}
                     {" · "}
                     {new Date(trade.createdAt).toLocaleDateString(
                       locale === "tr" ? "tr-TR" : locale,
@@ -411,8 +525,7 @@ export default function ProfilePage() {
                   </p>
                 </div>
                 <span className="text-sm font-semibold">
-                  {trade.direction === "BUY" ? "-" : "+"}
-                  {trade.cost.toFixed(1)} P
+                  {trade.direction === "BUY" ? "-" : "+"}{trade.cost.toFixed(1)} OH
                 </span>
               </Link>
             ))

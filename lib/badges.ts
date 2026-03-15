@@ -99,6 +99,49 @@ const BADGE_DEFS = [
     tier: "GOLD",
     requirement: JSON.stringify({ type: "reputation", value: 200 }),
   },
+  // Accuracy & wins
+  {
+    name: "İlk Zafer",
+    description: "İlk doğru tahmininizi yaptınız",
+    icon: "✅",
+    tier: "BRONZE",
+    requirement: JSON.stringify({ type: "win_count", value: 1 }),
+  },
+  {
+    name: "Keskin Göz",
+    description: "5 doğru tahmin yaptınız",
+    icon: "🎯",
+    tier: "SILVER",
+    requirement: JSON.stringify({ type: "win_count", value: 5 }),
+  },
+  {
+    name: "Kahin",
+    description: "20 doğru tahmin yaptınız",
+    icon: "🔮",
+    tier: "GOLD",
+    requirement: JSON.stringify({ type: "win_count", value: 20 }),
+  },
+  {
+    name: "Oracle",
+    description: "50 doğru tahmin yaptınız",
+    icon: "🏛️",
+    tier: "PLATINUM",
+    requirement: JSON.stringify({ type: "win_count", value: 50 }),
+  },
+  {
+    name: "İsabetli Tahminci",
+    description: "En az 10 sonuçlanmış tahminde %70+ isabet oranı",
+    icon: "💎",
+    tier: "GOLD",
+    requirement: JSON.stringify({ type: "accuracy", value: 70, minResolved: 10 }),
+  },
+  {
+    name: "Süper İsabet",
+    description: "En az 25 sonuçlanmış tahminde %80+ isabet oranı",
+    icon: "⭐",
+    tier: "PLATINUM",
+    requirement: JSON.stringify({ type: "accuracy", value: 80, minResolved: 25 }),
+  },
   // Referral
   {
     name: "Davetçi",
@@ -128,7 +171,7 @@ async function ensureBadgesSeeded() {
 export async function checkAndAwardBadges(userId: string) {
   await ensureBadgesSeeded();
 
-  const [user, tradeCount, commentCount, friendCount, referralCount, existingBadges] =
+  const [user, tradeCount, commentCount, friendCount, referralCount, existingBadges, resolvedPositions] =
     await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
@@ -147,7 +190,16 @@ export async function checkAndAwardBadges(userId: string) {
         where: { userId },
         select: { badgeId: true },
       }),
+      prisma.position.findMany({
+        where: { userId, shares: { gt: 0 }, market: { status: "RESOLVED" } },
+        select: { side: true, market: { select: { resolvedOutcome: true } } },
+      }),
     ]);
+
+  // Calculate wins and accuracy
+  const totalResolved = resolvedPositions.length;
+  const winCount = resolvedPositions.filter((p) => p.side === p.market.resolvedOutcome).length;
+  const accuracy = totalResolved > 0 ? (winCount / totalResolved) * 100 : 0;
 
   if (!user) return;
 
@@ -180,6 +232,14 @@ export async function checkAndAwardBadges(userId: string) {
         break;
       case "referral_count":
         qualifies = referralCount >= req.value;
+        break;
+      case "win_count":
+        qualifies = winCount >= req.value;
+        break;
+      case "accuracy":
+        qualifies =
+          totalResolved >= (req as { value: number; minResolved?: number }).minResolved! &&
+          accuracy >= req.value;
         break;
     }
 

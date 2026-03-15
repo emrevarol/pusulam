@@ -17,6 +17,9 @@ export async function GET() {
         oyHakki: true,
         streak: true,
         reputation: true,
+        bio: true,
+        avatar: true,
+        displayName: true,
         badges: {
           include: {
             badge: {
@@ -39,6 +42,9 @@ export async function GET() {
     oyHakki: user?.oyHakki ?? 0,
     streak: user?.streak ?? 0,
     reputation: user?.reputation ?? 0,
+    bio: user?.bio ?? null,
+    avatar: user?.avatar ?? null,
+    displayName: user?.displayName ?? "",
     badges: user?.badges ?? [],
     dailyFreeRemaining,
   });
