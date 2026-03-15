@@ -24,16 +24,16 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Pusulam — Turkiye'nin Kolektif Zeka Platformu",
+    default: "Pusulam — Türkiye'nin Kolektif Zekâ Platformu",
     template: "%s | Pusulam",
   },
   description:
-    "Turkiye gundemindeki olaylara tahminlerini yap, toplulukla kiyasla, itibar kazan. Ekonomi, siyaset, teknoloji ve dunya olaylari icin tahmin piyasalari.",
+    "Türkiye gündemindeki olaylara tahminlerini yap, toplulukla kıyasla, itibar kazan. Ekonomi, siyaset, teknoloji ve dünya olayları için tahmin piyasaları.",
   metadataBase: new URL("https://pusulam.ai"),
   openGraph: {
-    title: "Pusulam — Turkiye'nin Kolektif Zeka Platformu",
+    title: "Pusulam — Türkiye'nin Kolektif Zekâ Platformu",
     description:
-      "Turkiye gundemindeki olaylara tahminlerini yap, toplulukla kiyasla, itibar kazan.",
+      "Türkiye gündemindeki olaylara tahminlerini yap, toplulukla kıyasla, itibar kazan.",
     url: "https://pusulam.ai",
     siteName: "Pusulam",
     type: "website",
@@ -41,9 +41,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pusulam — Turkiye'nin Kolektif Zeka Platformu",
+    title: "Pusulam — Türkiye'nin Kolektif Zekâ Platformu",
     description:
-      "Turkiye gundemindeki olaylara tahminlerini yap, toplulukla kiyasla, itibar kazan.",
+      "Türkiye gündemindeki olaylara tahminlerini yap, toplulukla kıyasla, itibar kazan.",
   },
   robots: {
     index: true,
@@ -86,7 +86,7 @@ export default async function LocaleLayout({
               "@type": "Organization",
               name: "Pusulam",
               url: "https://pusulam.ai",
-              description: "Turkiye'nin Kolektif Zeka Platformu. Tahmin piyasalari ile gelecegi ongor.",
+              description: "Türkiye'nin Kolektif Zekâ Platformu. Tahmin piyasaları ile geleceği öngör.",
               sameAs: [],
             }),
           }}

@@ -3,51 +3,51 @@ import type { Metadata } from "next";
 const FAQ_TR = [
   {
     q: "Pusulam nedir?",
-    a: "Pusulam, Turkiye'nin kolektif zeka platformudur. Kullanicilar gercek dunya olaylari hakkinda tahminler yapar, toplulukla kiyaslar ve dogru tahminlerle itibar kazanir. Bahis veya kumar sitesi degildir.",
+    a: "Pusulam, Türkiye'nin kolektif zekâ platformudur. Kullanıcılar gerçek dünya olayları hakkında tahminler yapar, toplulukla kıyaslar ve doğru tahminlerle itibar kazanır. Bahis veya kumar sitesi değildir.",
   },
   {
-    q: "Pusulam'da gercek para kullaniliyor mu?",
-    a: "Hayir. Pusulam'da 'Oy Hakki' adli sanal bir birim kullanilir. Oy Hakki gercek paraya donusturulemez. Platform tamamen ucretsizdir.",
+    q: "Pusulam'da gerçek para kullanılıyor mu?",
+    a: "Hayır. Pusulam'da 'Oy Hakkı' adlı sanal bir birim kullanılır. Oy Hakkı gerçek paraya dönüştürülemez. Platform tamamen ücretsizdir.",
   },
   {
-    q: "Nasil kayit olurum?",
-    a: "pusulam.ai adresine girin, 'Kayit Ol' butonuna tiklayin, e-posta, kullanici adi ve sifre belirleyin. Hesabiniza aninda 50 Oy Hakki yuklenir.",
+    q: "Nasıl kayıt olurum?",
+    a: "pusulam.ai adresine girin, 'Kayıt Ol' butonuna tıklayın, e-posta, kullanıcı adı ve şifre belirleyin. Hesabınıza anında 50 Oy Hakkı yüklenir.",
   },
   {
-    q: "Oy Hakki nedir ve nasil kazanilir?",
-    a: "Oy Hakki, platformdaki tahmin biriminizdir. Her gun +3 ucretsiz Oy Hakki verilir. Dogru tahminleriniz sonuclandiginda Oy Hakki geri kazanirsiniz. Ayrica rozet kazanarak bonus Oy Hakki elde edebilirsiniz.",
+    q: "Oy Hakkı nedir ve nasıl kazanılır?",
+    a: "Oy Hakkı, platformdaki tahmin biriminizdir. Her gün +3 ücretsiz Oy Hakkı verilir. Doğru tahminleriniz sonuçlandığında Oy Hakkı geri kazanırsınız. Ayrıca rozet kazanarak bonus Oy Hakkı elde edebilirsiniz.",
   },
   {
-    q: "Tahmin nasil yapilir?",
-    a: "Piyasalar sayfasindan bir konu secin. 'Evet' veya 'Hayir' oyunuzu verin ve ne kadar Oy Hakki harcamak istediginizi belirleyin. Olasilik dusukken girerseniz daha fazla pay alirsiniz — dogru cikarsa daha cok kazanirsiniz.",
+    q: "Tahmin nasıl yapılır?",
+    a: "Piyasalar sayfasından bir konu seçin. 'Evet' veya 'Hayır' oyunuzu verin ve ne kadar Oy Hakkı harcamak istediğinizi belirleyin. Olasılık düşükken girerseniz daha fazla pay alırsınız — doğru çıkarsa daha çok kazanırsınız.",
   },
   {
-    q: "Piyasa oranlari nasil belirleniyor?",
-    a: "Pusulam, CPMM (Constant Product Market Maker) kullanir. Oranlar topluluk oylamalarina gore otomatik degisir. Ayrica Polymarket gibi global platformlardan referans oranlari saatlik olarak senkronize edilir.",
+    q: "Piyasa oranları nasıl belirleniyor?",
+    a: "Pusulam, CPMM (Constant Product Market Maker) kullanır. Oranlar topluluk oylamalarına göre otomatik değişir. Ayrıca Polymarket gibi global platformlardan referans oranları saatlik olarak senkronize edilir.",
   },
   {
     q: "Hangi konularda piyasalar var?",
-    a: "Ekonomi, siyaset, teknoloji, gundem, dunya ve egitim kategorilerinde piyasalar bulunur. Spor bahisleri platformda yer almaz.",
+    a: "Ekonomi, siyaset, teknoloji, gündem, dünya ve eğitim kategorilerinde piyasalar bulunur. Spor bahisleri platformda yer almaz.",
   },
   {
-    q: "Rozet sistemi nasil calisiyor?",
-    a: "20 farkli rozet vardir. Tahmin sayisi, dogru tahmin sayisi, isabet orani, gunluk seri, arkadas sayisi ve yorum sayisina gore otomatik kazanilir. Her rozet seviyesine gore Oy Hakki odulu verilir: Bronze +5, Silver +15, Gold +30, Platinum +50.",
+    q: "Rozet sistemi nasıl çalışıyor?",
+    a: "20 farklı rozet vardır. Tahmin sayısı, doğru tahmin sayısı, isabet oranı, günlük seri, arkadaş sayısı ve yorum sayısına göre otomatik kazanılır. Her rozet seviyesine göre Oy Hakkı ödülü verilir: Bronze +5, Silver +15, Gold +30, Platinum +50.",
   },
   {
-    q: "AI Asistan ne ise yarar?",
-    a: "Pusulam AI Asistani, piyasalar hakkinda analiz yapar, farkli bakis acilari sunar ve guncel bilgileri web'den arar. Tahmin tavsiyesi vermez, sadece bilgilendirici analiz sunar.",
+    q: "AI Asistan ne işe yarar?",
+    a: "Pusulam AI Asistanı, piyasalar hakkında analiz yapar, farklı bakış açıları sunar ve güncel bilgileri web'den arar. Tahmin tavsiyesi vermez, sadece bilgilendirici analiz sunar.",
   },
   {
-    q: "Pusulam yasal mi?",
-    a: "Evet. Pusulam bir kolektif zeka platformudur, bahis veya kumar sitesi degildir. Gercek para kullanilmaz ve Oy Hakki nakde donusturulemez. Platform 7258 sayili kanun kapsaminda bahis faaliyeti yurutmez.",
+    q: "Pusulam yasal mı?",
+    a: "Evet. Pusulam bir kolektif zekâ platformudur, bahis veya kumar sitesi değildir. Gerçek para kullanılmaz ve Oy Hakkı nakde dönüştürülemez. Platform 7258 sayılı kanun kapsamında bahis faaliyeti yürütmez.",
   },
   {
-    q: "Piyasa nasil sonuclanir?",
-    a: "Piyasalar bitis tarihinde otomatik olarak kapanir. AI destekli sistem guncel haberleri ve kaynaklari tarayarak sonucu belirler. Gerektiginde admin tarafindan manuel olarak da sonuclandirilabilir.",
+    q: "Piyasa nasıl sonuçlanır?",
+    a: "Piyasalar bitiş tarihinde otomatik olarak kapanır. AI destekli sistem güncel haberleri ve kaynakları tarayarak sonucu belirler. Gerektiğinde admin tarafından manuel olarak da sonuçlandırılabilir.",
   },
   {
-    q: "Arkadaslarimi nasil eklerim?",
-    a: "Kullanicilar sayfasindan arkadas ekleyebilirsiniz. Arkadaslarinizin tahminlerini akis sayfasinda gorebilir ve arkadaslar arasi skor tablosunda karsilastirabilirsiniz.",
+    q: "Arkadaşlarımı nasıl eklerim?",
+    a: "Kullanıcılar sayfasından arkadaş ekleyebilirsiniz. Arkadaşlarınızın tahminlerini akış sayfasında görebilir ve arkadaşlar arası skor tablosunda karşılaştırabilirsiniz.",
   },
 ];
 
@@ -57,10 +57,10 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const title = locale === "tr" ? "Sikca Sorulan Sorular" : "Frequently Asked Questions";
+  const title = locale === "tr" ? "Sıkça Sorulan Sorular" : "Frequently Asked Questions";
   return {
     title,
-    description: "Pusulam hakkinda merak edilen sorular ve cevaplari. Nasil kayit olunur, Oy Hakki nedir, tahmin nasil yapilir ve daha fazlasi.",
+    description: "Pusulam hakkında merak edilen sorular ve cevapları. Nasıl kayıt olunur, Oy Hakkı nedir, tahmin nasıl yapılır ve daha fazlası.",
     alternates: {
       canonical: `https://pusulam.ai/${locale}/sss`,
     },
@@ -95,7 +95,7 @@ export default async function FaqPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="mx-auto max-w-3xl px-4 py-12">
-        <h1 className="mb-8 text-3xl font-bold">Sikca Sorulan Sorular</h1>
+        <h1 className="mb-8 text-3xl font-bold">Sıkça Sorulan Sorular</h1>
 
         <div className="space-y-4">
           {FAQ_TR.map((item, i) => (
@@ -125,7 +125,7 @@ export default async function FaqPage({
 
         <div className="mt-12 rounded-xl bg-teal-50 p-6 text-center dark:bg-teal-900/20">
           <p className="text-sm text-teal-700 dark:text-teal-400">
-            Baska sorulariniz mi var? AI Asistanimiza sorun veya{" "}
+            Başka sorularınız mı var? AI Asistanımıza sorun veya{" "}
             <a href="mailto:info@pusulam.ai" className="font-semibold underline">
               info@pusulam.ai
             </a>{" "}
